@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 
-import { useKPI, useMilestones } from '@/context/GlobalData';
+import { useKPI, useMilestones } from '../../../context/GlobalData';
 
 import './SummaryManager.css';
 

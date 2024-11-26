@@ -1,15 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { fetchInvestmentPoints, addInvestmentPoint, deleteData, updateData } from '@/app/firebase/fetch';
+import { fetchInvestmentPoints, addInvestmentPoint, deleteData, updateData } from '../../firebase/fetch';
 import { useParams } from 'next/navigation';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '@/app/firebase/firebase';
+import { storage } from '../../firebase/firebase';
 import { v4 as uuidv4 } from 'uuid';
 
 import MagicWithOpenAI from './InvestmentPointAI';
 import './investmentPointManager.css';
-import { useKPI } from '@/context/GlobalData';
+import { useKPI } from '../../../context/GlobalData';
 
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';

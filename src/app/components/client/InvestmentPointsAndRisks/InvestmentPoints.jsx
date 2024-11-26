@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import InvestmentPointItem from './InvestmentPointItem';
-import { useKPI, useInvestmentPoints } from '@/context/GlobalData';
+import { useKPI, useInvestmentPoints } from '../../../../context/GlobalData';
 
 const InvestmentPoints = ({type = "Investment Point"}) => { // async 제거
     const pointsData = useInvestmentPoints();

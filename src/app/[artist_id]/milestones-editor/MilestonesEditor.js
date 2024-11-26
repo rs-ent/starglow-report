@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { DataSet, Timeline } from "vis-timeline/standalone";
 import "vis-timeline/styles/vis-timeline-graph2d.min.css";
-import { fetchMilestones } from "@/app/firebase/fetch";
 import { useParams } from "next/navigation";
-import { useMilestones, useKPI } from "@/context/GlobalData";
+import { useMilestones, useKPI } from "../../../context/GlobalData";
 import AddMilestone from "./AddMilestone";
-import { addMilestones } from "@/app/firebase/fetch";
-import { processFutureValuation } from "@/app/processors/future-valuation";
+import { fetchMilestones, addMilestones } from "../../firebase/fetch";
+import { processFutureValuation } from "../../processors/future-valuation";
 import './MilestonesEditor.css';
 
 const MilestonesEditor = () => {

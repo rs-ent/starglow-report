@@ -3,9 +3,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { DataSet, Timeline as VisTimeline } from "vis-timeline/standalone";
 import "vis-timeline/styles/vis-timeline-graph2d.min.css";
-import { fetchMilestones } from "@/app/firebase/fetch";
+import { fetchMilestones } from "../../firebase/fetch";
 import { useParams } from "next/navigation";
-import { useTimeline, useMilestones } from "@/context/GlobalData";
+import { useTimeline, useMilestones } from "../../../context/GlobalData";
 
 const Timeline = () => {
     const { artist_id: artistId } = useParams() || 'knk_20160303';

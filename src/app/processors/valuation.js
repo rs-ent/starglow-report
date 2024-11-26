@@ -1,6 +1,6 @@
 // src/app/processors/valuation.js
 
-import { WEIGHT } from "@/app/utils/constants";
+import { WEIGHT } from "../utils/constants";
 import { 
     parse, 
     parseISO,

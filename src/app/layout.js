@@ -1,8 +1,8 @@
-import { DataProvider } from '@/context/GlobalData';
-import DefaultLayout from '@/app/components/server/DefaultLayout';
-import { fetchValuation, fetchInvestmentPoints } from '@/app/firebase/fetch';
-import { setTimeline } from '@/app/processors/valuation';
-import { computeKPIs } from '@/app/processors/computeKPI';
+import { DataProvider } from '../context/GlobalData';
+import DefaultLayout from '../app/components/server/DefaultLayout';
+import { fetchValuation, fetchInvestmentPoints } from '../app/firebase/fetch';
+import { setTimeline } from '../app/processors/valuation';
+import { computeKPIs } from '../app/processors/computeKPI';
 import { processMilestones } from './processors/milestone';
 
 import "./globals.css";
