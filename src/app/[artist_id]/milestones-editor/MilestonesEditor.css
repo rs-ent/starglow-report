@@ -1,0 +1,4 @@
+.vis-custom-time {
+    background-color: red; /* 세로선 색상을 빨간색으로 */
+    width: 2px;            /* 세로선 두께 */
+}

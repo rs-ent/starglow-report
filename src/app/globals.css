@@ -1,21 +1,74 @@
+
+/*Reference : https://funderful.kr/investdetail/project/132/project
+Mobile First + Simple is the Best + Professionalism*/
+/* src/app/globals.css */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@import "leaflet/dist/leaflet.css";
+
+/* --- Font-face 정의 --- */
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/PretendardVariable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Orbitron';
+  src: url('/fonts/Orbitron-VariableFont_wght.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* --- 글로벌 변수 설정 --- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F7FAFC; /* 따뜻한 오프화이트 */
+  --foreground: #1A202C; /* 깊은 차콜 그레이 */
+  --foreground-muted: #86919c;
+  --background-second: #DDDDDD;
+  --background-muted: #d8dbdf;
+  --foreground-unfocus: #c1c7cd;
+  
+  --primary: #2A4365; /* 신뢰를 주는 딥 블루 */
+  --secondary: #4A5568; /* 중립적이고 안정된 미드 그레이 */
+  --accent: #D4AF37; /* 고급스러운 골드 */
+  --success: #276749; /* 딥 그린 */
+  --danger: #C53030; /* 브릭 레드 */
+  --warning: #D69E2E; /* 차분한 머스타드 */
+  --info: #3182CE; /* 세련된 스카이블루 */
+
+  --glass-bg-light: rgba(255, 255, 255, 0.1); /* Glass UI 배경 */
+  --font-body: 'Pretendard', sans-serif;
+  --font-heading: 'Orbitron', sans-serif;
+  --transition-fast: 0.2s ease-in-out;
+  --transition-slow: 0.4s ease-in-out;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* --- 기본 설정 --- */
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply bg-[var(--background)] text-[var(--foreground)] font-[var(--font-body)];
+  transition: background-color var(--transition-slow), color var(--transition-slow);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+/* --- 커스텀 --- */
+.section-base {
+  @apply bg-[var(--background)] py-6 px-3 backdrop-blur-md shadow-md transition-all;
+}
+
+.section-title {
+  @apply text-[var(--primary)] text-xl font-bold mb-4 border-b border-[var(--secondary)] pb-2;
+}
+
+.expand-button {
+  @apply w-full py-1 text-[var(--background-second)] text-xs rounded-md border border-[var(--background)] hover:text-[var(--foreground)] transition-all;
 }

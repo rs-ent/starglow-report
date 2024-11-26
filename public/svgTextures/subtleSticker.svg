@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <defs>
+        <!-- 미묘한 사용감 있는 텍스처 -->
+        <pattern id="subtle-sticker" width="15" height="15" patternUnits="userSpaceOnUse">
+            <!-- 불규칙한 반투명 원 -->
+            <circle cx="5" cy="5" r="1.5" fill="rgba(255, 255, 255, 0.15)" />
+            <circle cx="10" cy="10" r="1.5" fill="rgba(255, 255, 255, 0.15)" />
+            <!-- 미세한 선 -->
+            <line x1="0" y1="7.5" x2="15" y2="7.5" stroke="rgba(255, 255, 255, 0.1)" stroke-width="0.5" />
+            <line x1="7.5" y1="0" x2="7.5" y2="15" stroke="rgba(255, 255, 255, 0.1)" stroke-width="0.5" />
+        </pattern>
+    </defs>
+</svg>
