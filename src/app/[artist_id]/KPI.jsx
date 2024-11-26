@@ -2,8 +2,8 @@
 
 import React, { useState, useRef, useMemo } from 'react';
 import 'chart.js/auto';
-import { formatNumber } from '../../utils/formatNumber';
-import { useKPI } from '../../../context/GlobalData';
+import { formatNumber } from '../utils/formatNumber';
+import { useKPI } from '../../context/GlobalData';
 
 const KPI = () => {
     const [isExpanded, setIsExpanded] = useState(false);

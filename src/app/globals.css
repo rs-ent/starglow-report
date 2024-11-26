@@ -72,3 +72,7 @@ h1, h2, h3, h4, h5, h6 {
 .expand-button {
   @apply w-full py-1 text-[var(--background-second)] text-xs rounded-md border border-[var(--background)] hover:text-[var(--foreground)] transition-all;
 }
+
+.common-content-timeline {
+  @apply text-sm text-center p-1 break-words whitespace-normal leading-tight;
+}

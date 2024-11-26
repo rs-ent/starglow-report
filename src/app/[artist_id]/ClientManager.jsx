@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState } from 'react';
 import KPI from './KPI';
 import InvestmentPoints from './InvestmentPointsAndRisks/InvestmentPoints';
 import Timeline from './Timeline';

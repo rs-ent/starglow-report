@@ -16,7 +16,7 @@ import {
   ReferenceDot,
   ReferenceLine,
 } from 'recharts';
-import { formatNumber } from '../../../utils/formatNumber';
+import { formatNumber } from '../../utils/formatNumber';
 
 const calculateYAxisDomain = (data, chartConfig) => {
   if (!data || !chartConfig) {
