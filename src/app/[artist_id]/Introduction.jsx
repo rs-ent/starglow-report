@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { useReport, useIntroduction } from '../../context/GlobalData';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -25,63 +25,17 @@ const Introduction = () => {
     const formattedIntroduction = data.introduction.split('</p>').filter(Boolean);
     const textBlocksRef = useRef([]);
 
-    const svgRef = useRef(null);
-    useEffect(() => {
-        const members = data.members || [];
-        const width = 300;
-        const height = 300;
-        const radius = Math.min(width, height) / 2;
-    
-        // Generate pie chart data
-        const pie = d3.pie().value(() => 1); // Equal slices
-        const arcData = pie(members);
-    
-        // Define arc generator
-        const arc = d3.arc()
-            .innerRadius(0) // Set to 0 for a pie chart (non-donut)
-            .outerRadius(radius);
-    
-        // Select SVG and clear previous content
-        const svg = d3.select(svgRef.current)
-            .attr('width', width)
-            .attr('height', height)
-            .append('g')
-            .attr('transform', `translate(${width / 2}, ${height / 2})`);
-    
-        // Define clipping paths for each slice
-        const defs = svg.append('defs');
-        defs.selectAll('clipPath')
-            .data(arcData)
-            .join('clipPath')
-            .attr('id', (d, i) => `clip-${i}`)
-            .append('path')
-            .attr('d', arc);
-    
-        // Draw pie chart slices
-        svg.selectAll('path')
-            .data(arcData)
-            .join('path')
-            .attr('d', arc)
-            .attr('stroke', 'rgba(255,255,255,0.3)')
-            .attr('stroke-width', 2)
-            .attr('fill', 'none'); // Keep slices invisible if only showing images
-    
-        // Add images to each slice
-        svg.selectAll('image')
-            .data(arcData)
-            .join('image')
-            .attr('xlink:href', (d, i) => members[i]?.profilePicture || '') // Use the profilePicture URL
-            .attr('width', width)
-            .attr('height', height)
-            .attr('x', -width / 2) // Center the image
-            .attr('y', -height / 2)
-            .attr('preserveAspectRatio', 'xMidYMid slice') // Ensure the image fills the slice
-            .attr('clip-path', (d, i) => `url(#clip-${i})`); // Apply clipping path
-    }, [data]);
+    const membersRef = useRef(null);
+    const members = data.members;
 
     console.log(data);
+
+    // 갤러리 이미지 클릭 핸들러
+    const handleGalleryImageClick = (index) => {
+        setActiveGalleryIndex(index);
+    };
     
-    useEffect(() => {
+    useLayoutEffect(() => {
         const catchPhraseElement = catchPhraseRef.current;
         const subCatchPhraseElement = subCatchPhraseRef.current;
 
@@ -218,10 +172,6 @@ const Introduction = () => {
         });
     }, []);
 
-    const handleGalleryImageClick = (index) => {
-        setActiveGalleryIndex(index);
-    };
-
     return (
         <div>
             <div className="text-center py-6">
@@ -322,9 +272,41 @@ const Introduction = () => {
                     />
                 ))}
             </div>
-
-            {/* 멤버 */}
-            <svg ref={svgRef} className="block mx-auto"></svg>
+            
+            <h2 className="section-title">Members</h2>
+            <div className="relative overflow-x-scroll">
+                
+                <div
+                    ref={membersRef}
+                    className="flex gap-2 items-center h-full"
+                    style={{
+                        width: `calc(${members.length} * 200px)`, // 카드 너비 280px 기반으로 계산
+                    }}
+                >
+                    {members.map((member, index) => (
+                        <div
+                            key={member.id}
+                            className="flex-shrink-0 w-[200px] h-[250px] bg-[var(--background-muted)] rounded-md shadow-md relative"
+                        >
+                            {/* 프로필 사진 */}
+                            <Image
+                                src={member.profilePicture}
+                                alt={member.name}
+                                layout="fill"
+                                objectFit="cover"
+                                className="rounded-t-md"
+                            />
+                            {/* 멤버 정보 */}
+                            <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-[var(--foreground)] to-transparent text-[var(--text-reverse)]">
+                                <h3 className="text-base font-bold">{member.name}</h3>
+                                <p className="text-xs font-light">
+                                    {member.tags.join(' · ')}
+                                </p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
     );
 };

@@ -46,6 +46,7 @@ Mobile First + Simple is the Best + Professionalism*/
   --text-primary: #4A4A4A; /* 본문용 깊은 그레이 */
   --text-secondary: #6c757d; /* 부드러운 텍스트 */
   --text-third: #adb5bd; /* 보조용 텍스트 */
+  --text-reverse: #FFFAFA;
 
   --glass-bg-light: rgba(255, 255, 255, 0.1); /* Glass UI 배경 */
   --font-body: 'Pretendard', sans-serif;
