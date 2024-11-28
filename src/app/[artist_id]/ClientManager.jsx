@@ -2,17 +2,27 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import KPI from './KPI';
 import InvestmentPoints from './InvestmentPointsAndRisks/InvestmentPoints';
 import Timeline from './Timeline';
+import Outline from './Outline';
+import Introduction from './Introduction';
 
-const ClientManager = () => {
-  const [selectedData, setSelectedData] = useState(null);
-  const [isPanelVisible, setIsPanelVisible] = useState(false);
+const ClientManager = ({artist_id}) => {
   
   return (
     <div className="flex flex-col gap-4 pb-3">
+
+      {/* 개요 */}
+      <section>
+        <Outline />
+      </section>
+
+      {/* 소개 */}
+      <section className="section-base">
+        <Introduction />
+      </section>
       
       {/* KPI 섹션 */}
       <section className="section-base">

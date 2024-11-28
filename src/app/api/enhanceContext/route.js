@@ -4,13 +4,13 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
 // 환경 변수 검증
-if (!process.env.OPENAI_API_KEY) {
-    throw new Error('OPENAI_API_KEY is not set in environment variables.');
+if (!process.env.NEXT_PUBLIC_OPENAI_API_KEY) {
+    throw new Error('NEXT_PUBLIC_OPENAI_API_KEY is not set in environment variables.');
 }
 
 // OpenAI 초기 설정
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
     // organization: 'your-org-id', // 필요 시 추가
 });
 

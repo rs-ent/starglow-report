@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { fetchInvestmentPoints, addInvestmentPoint, deleteData, updateData } from '../../firebase/fetch';
-import { useParams } from 'next/navigation';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../firebase/firebase';
 import { v4 as uuidv4 } from 'uuid';
@@ -121,8 +120,7 @@ const getChartOptions = (chartConfig) => ({
     },
 });
 
-const InvestmentPointManager = () => {
-    const { artist_id } = useParams();
+const InvestmentPointManager = ({artist_id}) => {
     const [investmentPoints, setInvestmentPoints] = useState([]);
     const [formData, setFormData] = useState({
         id: null,
@@ -365,54 +363,56 @@ const InvestmentPointManager = () => {
     };
 
     return (
-        <div style={{ padding: '20px' }}>
+        <div className="investment-point-manager">
             <h1>Manage Investment Points for Artist: {artist_id}</h1>
 
-            <div>
+            <div className="existing-investment-points">
                 <h2>Existing Investment Points</h2>
                 {loading ? (
                     <p>Loading investment points...</p>
                 ) : investmentPoints.length > 0 ? (
-                    <ul>
+                    <ul className="investment-point-list">
                         {investmentPoints.map((point) => (
-                            <li key={point.id}>
+                            <li key={point.id} className="investment-point-item">
                                 <h3>{point.title} ({point.type})</h3>
                                 <p>{point.context}</p>
-                                {point.media.length > 0 ? (
+                                {point.media.length > 0 && (
                                     <div className="point-media">
-                                    <h4>Media:</h4>
-                                    <ul>
-                                        {point.media.map((mediaItem, index) => (
-                                            <li key={`${mediaItem.url}-${index}`}>
-                                                {mediaItem.type === 'image' ? (
-                                                    <div>
-                                                        <img src={mediaItem.url} alt={mediaItem.title || `Image ${index + 1}`} style={{ maxWidth: '200px' }} />
-                                                        {mediaItem.title && <p>{mediaItem.title}</p>}
-                                                    </div>
-                                                ) : (
-                                                    <div>
-                                                        <video controls style={{ maxWidth: '400px' }}>
+                                        <h4>Media:</h4>
+                                        <ul className="media-list">
+                                            {point.media.map((mediaItem, index) => (
+                                                <li key={`${mediaItem.url}-${index}`} className="media-item">
+                                                    {mediaItem.type === 'image' ? (
+                                                        <img src={mediaItem.url} alt={mediaItem.title || `Image ${index + 1}`} className="media-image" />
+                                                    ) : (
+                                                        <video controls className="media-video">
                                                             <source src={mediaItem.url} type="video/mp4" />
                                                             Your browser does not support the video tag.
                                                         </video>
-                                                        {mediaItem.title && <p>{mediaItem.title}</p>}
+                                                    )}
+                                                    {mediaItem.title && <p className="media-title">{mediaItem.title}</p>}
+                                                    <a href={mediaItem.url} target="_blank" rel="noopener noreferrer" className="media-link">
+                                                        {mediaItem.url}
+                                                    </a>
+                                                    <div className="media-actions">
+                                                        <button onClick={() => removeMedia(index)} className="btn btn-remove">Remove</button>
+                                                        <button onClick={() => moveMedia(index, 'up')} disabled={index === 0} className="btn btn-move">⬆️</button>
+                                                        <button onClick={() => moveMedia(index, 'down')} disabled={index === formData.media.length - 1} className="btn btn-move">⬇️</button>
                                                     </div>
-                                                )}
-                                                <a href={mediaItem.url} target="_blank" rel="noopener noreferrer">
-                                                    {mediaItem.url}
-                                                </a>
-                                            </li>
-                                        ))}
-                                    </ul>
+                                                </li>
+                                            ))}
+                                        </ul>
                                     </div>
-                                ) : <p></p>}
+                                )}
                                 {point.chartConfig && (
-                                    <div style={{ marginTop: '20px' }}>
+                                    <div className="chart-preview">
                                         <Line data={getChartData(point.chartConfig, sortedData)} options={getChartOptions(point.chartConfig)} />
                                     </div>
                                 )}
-                                <button onClick={() => startEditing(point)}>Edit</button>
-                                <button onClick={() => handleDelete(point.id)}>Delete</button>
+                                <div className="point-actions">
+                                    <button onClick={() => startEditing(point)} className="btn btn-edit">Edit</button>
+                                    <button onClick={() => handleDelete(point.id)} className="btn btn-delete">Delete</button>
+                                </div>
                             </li>
                         ))}
                     </ul>
@@ -421,75 +421,82 @@ const InvestmentPointManager = () => {
                 )}
             </div>
 
-            <div style={{ marginBottom: '30px', marginTop: '100px' }}>
+            <div className="add-investment-point">
                 <h2>{isEditing ? `Edit ${formData.type}` : `Add New ${formData.type}`}</h2>
 
+                <form onSubmit={(e) => e.preventDefault()} className="investment-form">
+                    <div className="form-group">
+                        <label htmlFor="type">Select Type:</label>
+                        <select
+                            id="type"
+                            value={formData.type}
+                            onChange={(e) => setFormData((prevData) => ({ ...prevData, type: e.target.value }))}
+                            className="form-control"
+                        >
+                            <option value="Investment Point">Investment Point</option>
+                            <option value="Risk">Risk</option>
+                        </select>
+                    </div>
 
-                {/* 드롭다운으로 Investment Point와 Risk 선택 */}
-                <label htmlFor="type">Select Type:</label>
-                <select
-                    id="type"
-                    value={formData.type}
-                    onChange={(e) => setFormData((prevData) => ({ ...prevData, type: e.target.value }))}
-                >
-                    <option value="Investment Point">Investment Point</option>
-                    <option value="Risk">Risk</option>
-                </select>
+                    <div className="form-group">
+                        <label htmlFor="title">Title:</label>
+                        <input
+                            id="title"
+                            type="text"
+                            name="title"
+                            value={formData.title}
+                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                            required
+                            className="form-control"
+                        />
+                    </div>
 
-                <form onSubmit={(e) => e.preventDefault()}>
-                    <label htmlFor="title">Title:</label>
-                    <input
-                        id="title"
-                        type="text"
-                        name="title"
-                        value={formData.title}
-                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        required
-                    />
-                    <br />
-                    <label htmlFor="mediaType">Media Type:</label>
-                    <select
-                        id="mediaType"
-                        value={mediaType}
-                        onChange={(e) => setMediaType(e.target.value)}
-                    >
-                        <option value="image">Image</option>
-                        <option value="video">Video</option>
-                    </select>
-                    <br />
-                    <label>
-                        Upload Media:
+                    {/* Media Upload Section */}
+                    <div className="form-group">
+                        <label htmlFor="mediaType">Media Type:</label>
+                        <select
+                            id="mediaType"
+                            value={mediaType}
+                            onChange={(e) => setMediaType(e.target.value)}
+                            className="form-control"
+                        >
+                            <option value="image">Image</option>
+                            <option value="video">Video</option>
+                        </select>
+                    </div>
+
+                    <div className="form-group">
+                        <label>Upload Media:</label>
                         <input
                             type="file"
                             accept={mediaType === 'image' ? 'image/*' : 'video/*'}
                             onChange={(e) => setUploadFile(e.target.files[0])}
+                            className="form-control-file"
                         />
-                        <button type="button" onClick={handleFileUpload}>
-                            Upload
-                        </button>
-                    </label>
-                    <br />
-                    <label>
-                        Add Media URL:
+                        <button type="button" onClick={handleFileUpload} className="btn btn-primary">Upload</button>
+                    </div>
+
+                    <div className="form-group">
+                        <label>Add Media URL:</label>
                         <input
                             type="text"
                             value={newMediaUrl}
                             onChange={(e) => setNewMediaUrl(e.target.value)}
+                            className="form-control"
+                            placeholder="Enter media URL"
                         />
-                        <button type="button" onClick={addMediaUrl}>
-                            Add URL
-                        </button>
-                    </label>
-                    {formData.media && formData.media.length > 0 ? (
-                        <ul>
+                        <button type="button" onClick={addMediaUrl} className="btn btn-primary">Add URL</button>
+                    </div>
+
+                    {/* Media List */}
+                    {formData.media && formData.media.length > 0 && (
+                        <ul className="media-list">
                             {formData.media.map((item, index) => (
-                                <li key={item.url}>
-                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                        {/* 미디어 URL 및 링크 */}
-                                        <a href={item.url} target="_blank" rel="noopener noreferrer">
+                                <li key={item.url} className="media-item">
+                                    <div className="media-details">
+                                        <a href={item.url} target="_blank" rel="noopener noreferrer" className="media-link">
                                             {item.type === 'image' ? '🖼️' : '🎥'} {item.url}
                                         </a>
-                                        {/* 미디어 제목 입력 */}
                                         <input
                                             type="text"
                                             placeholder={`${item.type.charAt(0).toUpperCase() + item.type.slice(1)} Title`}
@@ -502,36 +509,32 @@ const InvestmentPointManager = () => {
                                                     mediaTitles: newTitles,
                                                 }));
                                             }}
+                                            className="form-control media-title-input"
                                         />
-                                        {/* 삭제 버튼 */}
-                                        <button onClick={() => removeMedia(index)}>Remove</button>
-                                        {/* 우선순위 버튼 */}
-                                        <button onClick={() => moveMedia(index, 'up')} disabled={index === 0}>
-                                            ⬆️
-                                        </button>
-                                        <button onClick={() => moveMedia(index, 'down')} disabled={index === formData.media.length - 1}>
-                                            ⬇️
-                                        </button>
+                                    </div>
+                                    <div className="media-actions">
+                                        <button onClick={() => removeMedia(index)} className="btn btn-remove">Remove</button>
+                                        <button onClick={() => moveMedia(index, 'up')} disabled={index === 0} className="btn btn-move">⬆️</button>
+                                        <button onClick={() => moveMedia(index, 'down')} disabled={index === formData.media.length - 1} className="btn btn-move">⬇️</button>
                                     </div>
                                 </li>
                             ))}
                         </ul>
-                    ) : (<></>)}
-                    
-                    <label>
-                        Source:
+                    )}
+
+                    <div className="form-group">
+                        <label>Source:</label>
                         <input
                             type="text"
                             value={formData.source}
-                            onChange={(e) =>
-                                setFormData((prevData) => ({
-                                    ...prevData,
-                                    source: e.target.value,
-                                }))
-                            }
+                            onChange={(e) => setFormData((prevData) => ({ ...prevData, source: e.target.value }))}
+                            className="form-control"
+                            placeholder="Enter source"
                         />
-                    </label>
-                    <div>
+                    </div>
+
+                    {/* KPI Selection */}
+                    <div className="kpi-section">
                         <h2>Select up to 4 KPIs</h2>
                         <div className="kpi-scroll-container">
                             {filteredKPIData.map(([key, value]) => (
@@ -550,174 +553,90 @@ const InvestmentPointManager = () => {
                                 </div>
                             ))}
                         </div>
-                        <p>
-                            Selected KPIs: {selectedKPIs.join(', ')}
-                        </p>
+                        <p className="selected-kpis">Selected KPIs: {selectedKPIs.join(', ')}</p>
                     </div>
 
+                    {/* Create Line Chart Button */}
                     <button
-                        className="primary-button"
+                        className="btn btn-primary"
                         onClick={() => setIsModalOpen(true)}
                     >
                         Create Line Chart
                     </button>
 
+                    {/* Modal for Chart Creation */}
                     {isModalOpen && (
-                        <CreateLineChart
-                            sortedData={sortedData}
-                            onClose={() => setIsModalOpen(false)}
-                            onSave={handleSaveChart}
-                        />
+                        <div className="modal">
+                            <div className="modal-content">
+                                <button onClick={() => setIsModalOpen(false)} className="close-button">×</button>
+                                <CreateLineChart
+                                    sortedData={sortedData}
+                                    onClose={() => setIsModalOpen(false)}
+                                    onSave={handleSaveChart}
+                                />
+                            </div>
+                        </div>
                     )}
 
+                    {/* Chart Preview */}
                     {chartConfig && chartConfig.selectedFields && chartConfig.selectedFields.length > 0 && (
-                        <div style={{ marginTop: '20px' }}>
+                        <div className="chart-preview">
                             <h2>Chart Preview with Markers</h2>
-                            <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+                            <div className="chart-container">
                                 <label>
                                     Chart Title:
                                     <input
                                         type="text"
                                         value={formData.chartTitle}
-                                        onChange={(e) =>
-                                            setFormData((prevData) => ({
-                                                ...prevData,
-                                                chartTitle: e.target.value,
-                                            }))
-                                        }
+                                        onChange={(e) => setFormData((prevData) => ({ ...prevData, chartTitle: e.target.value }))}
+                                        className="form-control"
+                                        placeholder="Enter chart title"
                                     />
                                 </label>
                                 <Line
-                                    data={{
-                                        labels: sortedData
-                                            .filter((data) => {
-                                                const date = new Date(data.date);
-                                                const { start, end } = chartConfig.dateRange || {};
-                                                if (!start || !end) {
-                                                    console.error('Invalid dateRange:', chartConfig.dateRange);
-                                                }
-                                                return (
-                                                    (!start || date >= new Date(start)) &&
-                                                    (!end || date <= new Date(end))
-                                                );
-                                            })
-                                            .map((data) => new Date(data.date).toLocaleDateString()),
-                                        datasets: chartConfig.selectedFields.map((configItem) => ({
-                                            label: configItem.label || configItem.field,
-                                            data: sortedData
-                                                .filter((data) => {
-                                                    const date = new Date(data.date);
-                                                    const { start, end } = chartConfig.dateRange || {};
-                                                    if (!start || !end) {
-                                                        console.error('Invalid dateRange:', chartConfig.dateRange);
-                                                    }
-                                                    return (
-                                                        (!start || date >= new Date(start)) &&
-                                                        (!end || date <= new Date(end))
-                                                    );
-                                                })
-                                                .map((data) => data[configItem.field]),
-                                            borderColor: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
-                                            backgroundColor: 'rgba(0, 0, 0, 0.1)',
-                                            tension: 0.4,
-                                        })),
-                                    }}
-                                    options={{
-                                        responsive: true,
-                                        plugins: {
-                                            legend: { display: true, position: 'top' },
-                                            title: { display: true, text: formData.chartTitle || 'Chart with Markers' },
-                                            annotation: {
-                                                annotations: chartConfig.markers.reduce((acc, marker, index) => {
-                                                    if (marker.type === 'point') {
-                                                        acc[`marker_${index}`] = {
-                                                            type: 'point',
-                                                            xValue: marker.xValue,
-                                                            yValue: marker.yValue,
-                                                            backgroundColor: marker.color || 'rgba(255, 99, 132, 0.3)',
-                                                            radius: marker.radius || 8,
-                                                            label: {
-                                                                content: marker.description || `Point ${index + 1}`,
-                                                                enabled: true,
-                                                                position: 'center',
-                                                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                                                                color: '#fff',
-                                                                font: { size: 12 },
-                                                                padding: 4,
-                                                            },
-                                                        };
-                                                    } else if (marker.type === 'box') {
-                                                        acc[`marker_${index}`] = {
-                                                            type: 'box',
-                                                            xMin: marker.xMin,
-                                                            xMax: marker.xMax,
-                                                            yMin: marker.yMin,
-                                                            yMax: marker.yMax,
-                                                            backgroundColor: `rgba(${parseInt(marker.color.slice(1, 3), 16)}, ${parseInt(marker.color.slice(3, 5), 16)}, ${parseInt(marker.color.slice(5, 7), 16)}, ${marker.alpha || 0.3})`,
-                                                            borderColor: marker.borderColor || 'rgba(75, 192, 192, 1)',
-                                                            borderWidth: 1,
-                                                            label: {
-                                                                content: marker.description || `Box ${index + 1}`,
-                                                                enabled: true,
-                                                                position: 'start',
-                                                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                                                                color: '#fff',
-                                                                font: { size: 12 },
-                                                                padding: 4,
-                                                            },
-                                                        };
-                                                    }
-                                                    return acc;
-                                                }, {}),
-                                            },
-                                        },
-                                    }}
+                                    data={getChartData(chartConfig, sortedData)}
+                                    options={getChartOptions(chartConfig)}
                                 />
                             </div>
-
                             <button
-                                className="secondary-button"
+                                className="btn btn-secondary"
                                 onClick={() => setIsModalOpen(true)}
-                                style={{ marginTop: '10px' }}
                             >
                                 Edit Chart
                             </button>
                         </div>
                     )}
 
-                    <br />
-
-                    <div>
+                    {/* Context Section */}
+                    <div className="context-section">
                         <h2>Context</h2>
                         <textarea
                             value={formData.context}
-                            onChange={(e) =>
-                                setFormData((prev) => ({ ...prev, context: e.target.value }))
-                            }
+                            onChange={(e) => setFormData((prev) => ({ ...prev, context: e.target.value }))}
                             placeholder="Enter your context here..."
                             rows={6}
-                            style={{ width: '100%' }}
+                            className="form-control"
                         />
                         <MagicWithOpenAI
                             title={formData.title}
                             context={formData.context}
-                            setContext={(enhancedContext) =>
-                                setFormData((prev) => ({ ...prev, context: enhancedContext }))
-                            }
+                            setContext={(enhancedContext) => setFormData((prev) => ({ ...prev, context: enhancedContext }))}
                             kpiData={selectedKPIs}
                             chartConfig={chartConfig}
                         />
                     </div>
-                    <br />
 
-                    <button type="button" onClick={handleSave}>
-                        {isEditing ? `Update ${formData.type}` : `Save ${formData.type}`}
-                    </button>
-                    {isEditing && (
-                        <button type="button" onClick={resetForm}>
-                            Cancel
+                    {/* Save and Cancel Buttons */}
+                    <div className="form-actions">
+                        <button type="button" onClick={handleSave} className="btn btn-primary">
+                            {isEditing ? `Update ${formData.type}` : `Save ${formData.type}`}
                         </button>
-                    )}
+                        {isEditing && (
+                            <button type="button" onClick={resetForm} className="btn btn-secondary">
+                                Cancel
+                            </button>
+                        )}
+                    </div>
                 </form>
             </div>
         </div>

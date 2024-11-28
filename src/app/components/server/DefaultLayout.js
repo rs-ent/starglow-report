@@ -6,7 +6,7 @@ export default function DefaultLayout({ children }) {
         <div className="bg-[var(--background-second)] text-[var(--foreground)] font-[var(--font-body)] transition-all">
             
             {/* 메인 콘텐츠 */}
-            <main className="flex-grow max-w-[480px] mx-auto">
+            <main className="flex-grow max-w-[480px] mx-auto min-h-dvh">
                 {children}
             </main>
 

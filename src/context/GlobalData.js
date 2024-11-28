@@ -1,17 +1,24 @@
-"use client"
-
+'use client';
+import { useReports } from './ReportsData';
 import React, { createContext, useContext } from 'react';
 
 // Context 생성
 const DataContext = createContext(null);
 
 // Provider 컴포넌트
-export const DataProvider = ({ timelineData, kpiData, investmentData, milestones, children }) => {
+export const DataProvider = ({ valuation, timelineData, kpiData, investmentData, milestones, artist_id, introduction, children }) => {
+    const reports = useReports();
+    const report = reports.find(a => a.artist_id === artist_id);
+    
     const contextValue = {
+        valuation,
         timelineData,
         kpiData,
         investmentData,
         milestones,
+        artist_id,
+        report,
+        introduction,
     };
 
     return (
@@ -19,6 +26,15 @@ export const DataProvider = ({ timelineData, kpiData, investmentData, milestones
             {children}
         </DataContext.Provider>
     );
+};
+
+// 커스텀 훅: Valuation 데이터 가져오기
+export const useValuation = () => {
+    const context = useContext(DataContext);
+    if (!context) {
+        throw new Error('useTimeline must be used within a DataProvider');
+    }
+    return context.valuation;
 };
 
 // 커스텀 훅: Timeline 데이터 가져오기
@@ -56,4 +72,20 @@ export const useInvestmentPoints = () => {
         throw new Error('useInvestmentPoints must be used within a DataProvider');
     }
     return context.investmentData;
+}
+
+export const useReport = () => {
+    const context = useContext(DataContext);
+    if (!context) {
+        throw new Error('useReport must be used within a DataProvider');
+    }
+    return context.report;
+}
+
+export const useIntroduction = () => {
+    const context = useContext(DataContext);
+    if (!context) {
+        throw new Error('useIntroduction must be used within a DataProvider');
+    }
+    return context.introduction;
 }

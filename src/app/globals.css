@@ -43,6 +43,10 @@ Mobile First + Simple is the Best + Professionalism*/
   --warning: #D69E2E; /* 차분한 머스타드 */
   --info: #3182CE; /* 세련된 스카이블루 */
 
+  --text-primary: #4A4A4A; /* 본문용 깊은 그레이 */
+  --text-secondary: #6c757d; /* 부드러운 텍스트 */
+  --text-third: #adb5bd; /* 보조용 텍스트 */
+
   --glass-bg-light: rgba(255, 255, 255, 0.1); /* Glass UI 배경 */
   --font-body: 'Pretendard', sans-serif;
   --font-heading: 'Orbitron', sans-serif;
@@ -60,9 +64,13 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
 }
 
-/* --- 커스텀 --- */
+/* --- 커스텀 --- */
 .section-base {
   @apply bg-[var(--background)] py-6 px-3 backdrop-blur-md shadow-md transition-all;
+}
+
+.section-base-without-py6-px3 {
+  @apply bg-[var(--background)] backdrop-blur-md shadow-md transition-all;
 }
 
 .section-title {
@@ -74,5 +82,21 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .common-content-timeline {
-  @apply text-sm text-center p-1 break-words whitespace-normal leading-tight;
+  @apply text-lg text-center p-1 break-words whitespace-normal leading-tight;
+}
+
+/* --- 커스텀 유틸리티 --- */
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+}
+
+@keyframes draw {
+  from {
+      background-size: 0% 40%;
+  }
+  to {
+      background-size: 100% 40%;
+  }
 }

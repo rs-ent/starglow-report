@@ -33,6 +33,9 @@ module.exports = {
         heading: ['Poppins', 'sans-serif'], // 제목 폰트
         display: ['Roboto', 'sans-serif'], // 강조 폰트
       },
+      perspective: {
+        '1000': '1000px',
+      },
     },
   },
   plugins: [
@@ -41,3 +44,4 @@ module.exports = {
     require('@tailwindcss/aspect-ratio'), // 미디어 콘텐츠 지원
   ],
 };
+

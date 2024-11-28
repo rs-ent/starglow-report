@@ -3,43 +3,38 @@
 import React, { useEffect, useRef, useState } from "react";
 import { DataSet, Timeline as VisTimeline } from "vis-timeline/standalone";
 import "vis-timeline/styles/vis-timeline-graph2d.min.css";
-import { fetchMilestones } from "../firebase/fetch";
 import { useParams } from "next/navigation";
 import { useTimeline, useMilestones } from "../../context/GlobalData";
 
 const Timeline = () => {
-    const { artist_id: artistId = 'knk_20160303' } = useParams();
-    const initialMilestones = useMilestones();
-    const [milestones, setMilestones] = useState(null);
+    const { artist_id: artistId } = useParams();
+    const milestones = useMilestones();
     const timelineRef = useRef(null);
     const youtubeData = useTimeline().flatMap(item => item.production?.media?.youtube || []);
 
-    const createContentStyle = (backgroundColor, color = "#000", fontSize = "12px") => `
+    const createContentStyle = (backgroundColor, color = "#000", fontSize = "16px") => `
       background-color: ${backgroundColor}; 
       border-color: ${backgroundColor}; 
       color: ${color}; 
       font-size: ${fontSize};
+      padding: 5px;
+      border-radius: 200px;
     `;
-
-    useEffect(() => {
-        const loadMilestones = async () => {
-            try {
-                const fetchedData = await fetchMilestones(artistId);
-                setMilestones(fetchedData || initialMilestones);
-            } catch (error) {
-                console.error("Error fetching milestones:", error);
-                setMilestones(initialMilestones);
-            }
-        };
-
-        loadMilestones();
-    }, [artistId, initialMilestones]);
 
     useEffect(() => {
         if (!milestones || !timelineRef.current) return;
 
         const container = timelineRef.current;
         const yearEntries = Object.entries(milestones).filter(([key]) => key !== "artist_id" && key !== "id");
+        
+        if (yearEntries.length === 0) return;
+
+        const firstYear = parseInt(yearEntries[0], 10);
+        const lastYear = parseInt(yearEntries[yearEntries.length - 1], 10);
+
+        const startDate = new Date(firstYear, 0, 1);
+        const endDate = new Date(lastYear, 11, 31);
+        
         let youtubeViewRank = -1;
         const items = new DataSet(
             yearEntries.flatMap(([year, data]) => [
@@ -48,35 +43,38 @@ const Timeline = () => {
                     content: `<div class="common-content-timeline">🎵 [앨범] ${album.albumName} (${album.releaseDate})</div>`,
                     start: album.releaseDate,
                     type: "box",
-                    style: createContentStyle('#a7c7e7', '#fff', '12px'),
+                    style: createContentStyle('#a7c7e7', '#fff'),
                 })),
-                ...data.production.map((prod, index) => {
+                ...data.production
+                .filter(prod => prod.type === "youtube")
+                .map((prod, index) => {
                     const start = prod.startDate || prod.date || prod.publishDate;
                     if (!start) return null;
 
                     const ydata = youtubeData.find(a => a.id === prod.title);
-                    if (prod.type === "youtube" && (!ydata || ydata.view_count <= youtubeViewRank)) return null;
-              
-                      if (prod.type === "youtube") {
+                    if (!ydata || ydata.view_count <= youtubeViewRank) return null;
+
+                    if (prod.type === "youtube") {
                         youtubeViewRank = ydata.view_count;
                         const roundedValue = Math.floor(ydata.view_count / Math.pow(10, Math.floor(Math.log10(ydata.view_count)))) * Math.pow(10, Math.floor(Math.log10(ydata.view_count)));
                         return {
-                                id: `${year}-production-${prod.title}-${prod.startDate}-${index}`,
-                                content: `<div class="common-content-timeline">📺 유튜브 조회수 ${roundedValue.toLocaleString()}회 달성</div>`,
-                                start,
-                                end: prod.endDate || undefined,
-                                type: "box",
-                                style: createContentStyle("#ffd9b3", '#000', '12px'),
+                            id: `${year}-production-${prod.title}-${prod.startDate}-${index}`,
+                            content: `<div class="common-content-timeline">📺 유튜브 조회수 ${roundedValue.toLocaleString()}회 달성</div>`,
+                            start,
+                            end: prod.endDate || undefined,
+                            type: "box",
+                            style: createContentStyle("#ffd9b3", '#000'),
                         };
                     }
 
+
                     return {
                         id: `${year}-production-${prod.title}-${prod.startDate}-${index}`,
-                        content: null,
+                        content: `<div class="common-content-timeline">📦 [Production] ${prod.title}</div>`, // 적절한 content 설정
                         start,
                         end: prod.endDate || undefined,
                         type: prod.type === "twitter" ? "box" : "range",
-                        style: createContentStyle('#fff', '#000', '12px'),
+                        style: createContentStyle('#fff', '#000'),
                     };
                 }).filter(Boolean),
                 ...data.management.map((manage, index) => ({
@@ -85,7 +83,7 @@ const Timeline = () => {
                         start: manage.startDate,
                         end: manage.endDate || undefined,
                         type: "range",
-                    style: createContentStyle("#e4d3f8", '#000', '12px'),
+                    style: createContentStyle("#e4d3f8", '#000'),
                 })).filter(item => item.startDate),
                 ...(Array.isArray(data.etc) ? data.etc.map((etcItem, index) => {
                     if (!etcItem.date) return null;
@@ -97,7 +95,7 @@ const Timeline = () => {
                             content: `<div class="common-content-timeline">📌 [기타] ${etcItem.title} (${etcItem.date})</div>`,
                             start: etcItem.date,
                             type: "box",
-                            style: createContentStyle(backgroundColor, '#000', '12px'),
+                            style: createContentStyle(backgroundColor, '#000'),
                           };
                   }).filter(Boolean) : []),
             ])
@@ -106,16 +104,20 @@ const Timeline = () => {
         const timeline = new VisTimeline(container, items, {
             selectable: true,
             editable: false,
-            margin: { item: 10 },
+            margin: { item: 5 },
             orientation: { axis: "top", item: "top" },
             height: "100%",
             width: "100%",
             zoomMin: 1000 * 60 * 60 * 24 * 30,
             zoomMax: 1000 * 60 * 60 * 24 * 365 * 5,
+            start: startDate,
+            end: endDate, 
         });
 
         const customTimeId = "clicked-time";
         timeline.addCustomTime(new Date(), customTimeId);
+
+        timeline.setWindow(startDate, endDate, { animation: false });
 
         timeline.on("click", ({ time }) => {
           if (!time) return;

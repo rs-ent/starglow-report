@@ -1,271 +1,260 @@
-/* ManageInvestmentPoints.module.css */
+/* investmentPointManager.css */
 
-/* 전체 배경 및 텍스트 설정 */
-body {
-  background-color: #2E3440; /* 어두운 배경색 */
-  color: #D8DEE9; /* 밝은 텍스트 색상 */
-  font-family: 'Pretendard', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  line-height: 1.6;
-  margin: 0;
-  padding: 0;
-}
-
-/* 컨테이너 설정 */
-.container {
-  max-width: 800px;
-  margin: 0 auto;
+/* 기본 설정 */
+.investment-point-manager {
   padding: 20px;
-}
-
-/* 제목 스타일 */
-h1, h2, h3, h4 {
-  color: #ECEFF4;
-}
-
-h1 {
-  font-size: 2em;
-  margin-bottom: 0.5em;
-}
-
-h2 {
-  font-size: 1.5em;
-  margin-top: 1em;
-  margin-bottom: 0.5em;
-}
-
-h3 {
-  font-size: 1.25em;
-  margin-top: 1em;
-  margin-bottom: 0.5em;
-}
-
-/* 폼 스타일 */
-form {
-  background-color: #3B4252;
-  padding: 20px;
-  border-radius: 8px;
-}
-
-label {
-  display: block;
-  margin-bottom: 8px;
-  color: #D8DEE9;
-}
-
-input[type="text"],
-input[type="file"],
-textarea,
-select {
   width: 100%;
-  padding: 8px;
-  margin-bottom: 12px;
-  border: 1px solid #4C566A;
-  border-radius: 4px;
-  background-color: #434C5E;
-  color: #ECEFF4;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f5f5f5;
+  border-radius: 10px;
 }
 
-input[type="text"]::placeholder,
-textarea::placeholder {
-  color: #7C818C;
+.investment-point-manager h1,
+.investment-point-manager h2,
+.investment-point-manager h3,
+.investment-point-manager h4 {
+  color: #333;
+  margin-bottom: 15px;
 }
 
-input[type="text"]:focus,
-textarea:focus,
-select:focus {
-  outline: none;
-  border-color: #81A1C1;
-  background-color: #4C566A;
+/* 기존 투자 포인트 섹션 */
+.existing-investment-points {
+  margin-bottom: 40px;
 }
 
-textarea {
-  resize: vertical;
-}
-
-/* 버튼 스타일 */
-button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-right: 8px;
-  margin-top: 8px;
-}
-
-/* 주요 버튼 */
-.primary-button {
-  background-color: #81A1C1;
-  color: #2E3440;
-}
-
-.primary-button:hover {
-  background-color: #88C0D0;
-}
-
-/* 보조 버튼 */
-.secondary-button {
-  background-color: #4C566A;
-  color: #D8DEE9;
-}
-
-.secondary-button:hover {
-  background-color: #5E81AC;
-}
-
-/* 리스트 스타일 */
-ul {
-  list-style: none;
+.investment-point-list {
+  list-style-type: none;
   padding: 0;
 }
 
-li {
-  background-color: #3B4252;
-  padding: 10px;
-  margin-bottom: 8px;
-  border-radius: 4px;
+.investment-point-item {
+  background-color: #fff;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-li div {
+.point-media {
+  margin-top: 15px;
+}
+
+.media-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.media-item {
   display: flex;
   align-items: center;
+  margin-bottom: 10px;
 }
 
-li a {
-  color: #88C0D0;
+.media-image,
+.media-video {
+  max-width: 200px;
+  border-radius: 5px;
+  margin-right: 15px;
+}
+
+.media-title {
+  margin: 0 10px 0 0;
+  font-weight: bold;
+}
+
+.media-link {
+  color: #007bff;
   text-decoration: none;
-  margin-right: 8px;
+  margin-right: 15px;
 }
 
-li a:hover {
+.media-link:hover {
   text-decoration: underline;
 }
 
-li input[type="text"] {
-  width: auto;
-  flex: 1;
-  margin: 0 8px;
+.media-actions .btn {
+  margin-right: 5px;
 }
 
-/* 리스트 아이템 내 버튼 */
-li button {
-  margin-left: 4px;
+.point-actions .btn {
+  margin-right: 10px;
+}
+
+/* 버튼 스타일 */
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+.btn-remove {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.btn-remove:hover {
+  background-color: #c82333;
+}
+
+.btn-edit {
+  background-color: #ffc107;
+  color: #fff;
+}
+
+.btn-edit:hover {
+  background-color: #e0a800;
+}
+
+.btn-move {
+  background-color: #17a2b8;
+  color: #fff;
+}
+
+.btn-move:hover {
+  background-color: #138496;
+}
+
+/* 폼 스타일 */
+.investment-form {
+  background-color: #fff;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.form-control-file {
+  margin-top: 10px;
+}
+
+.media-title-input {
+  margin-top: 5px;
+}
+
+.selected-kpis {
+  margin-top: 10px;
+  font-style: italic;
+}
+
+/* KPI 섹션 */
+.kpi-section {
+  margin-bottom: 20px;
 }
 
 .kpi-scroll-container {
   display: flex;
-  overflow-x: auto;
-  gap: 16px; /* 카드 간격 */
+  flex-wrap: wrap;
+  gap: 10px;
+  max-height: 200px;
+  overflow-y: auto;
   padding: 10px;
-  scrollbar-width: thin; /* Firefox 스크롤바 */
-  scrollbar-color: #ccc transparent; /* Firefox 스크롤 색상 */
-}
-
-.kpi-scroll-container::-webkit-scrollbar {
-  height: 8px; /* 스크롤바 높이 */
-}
-
-.kpi-scroll-container::-webkit-scrollbar-thumb {
-  background-color: #ccc; /* 스크롤바 색상 */
-  border-radius: 4px;
-}
-
-.kpi-scroll-container::-webkit-scrollbar-track {
-  background: transparent; /* 스크롤바 트랙 색상 */
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  background-color: #f8f9fa;
 }
 
 .kpi-card {
-  flex: 0 0 200px; /* 고정된 너비 */
-  height: auto;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  background-color: #e9ecef;
   padding: 10px;
-  background: rgba(0, 0, 0, 0.1);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 5px;
+  width: calc(25% - 10px);
+  box-sizing: border-box;
+  transition: background-color 0.3s ease;
 }
 
 .kpi-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+  background-color: #dee2e6;
 }
 
 .kpi-content h3 {
-  font-size: 1.1rem;
-  margin-bottom: 8px;
-  color: #eee;
-  font-size: 0.9rem;
+  margin: 0 0 5px 0;
+  font-size: 1rem;
 }
 
 .kpi-content p {
-  font-size: 1.2rem;
-  color: #eee;
+  margin: 0;
+  font-size: 0.9rem;
+  color: #6c757d;
 }
 
-/* KPI 선택 섹션 */
-.kpi-selection {
-  margin-top: 10px;
-}
-
-.kpi-selection ul {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.kpi-selection li {
-  width: 48%;
-  margin-right: 2%;
-  margin-bottom: 5px;
-}
-
-.kpi-selection label {
-  display: flex;
-  align-items: center;
-}
-
-.kpi-selection input[type="checkbox"] {
-  transform: scale(2.5); /* 크기를 1.5배로 키움 */
-  cursor: pointer; /* 클릭 가능한 커서 추가 */
-}
-
-.kpi-selection input[type="checkbox"]:checked {
-  accent-color: #007bff; /* 선택된 상태 색상 변경 */
-}
-
-/* 차트 컨테이너 */
-.chart-container {
-  margin-top: 20px;
-  background-color: #3B4252;
+/* 차트 미리보기 섹션 */
+.chart-preview {
+  margin-top: 30px;
   padding: 20px;
+  background-color: #fff;
   border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* 차트 제목 입력 */
 .chart-container label {
   display: block;
-  margin-bottom: 8px;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
-.chart-container input[type="text"] {
-  width: 100%;
+.chart-container .form-control {
+  width: 50%;
+  margin-bottom: 20px;
 }
 
-/* 토스트 알림 스타일 */
-.Toastify__toast {
-  background-color: #3B4252;
-  color: #ECEFF4;
+/* 컨텍스트 섹션 */
+.context-section {
+  margin-top: 30px;
 }
 
-.Toastify__toast--success {
-  background-color: #A3BE8C;
-}
-
-.Toastify__toast--error {
-  background-color: #BF616A;
+.context-section textarea {
+  resize: vertical;
+  padding: 10px;
+  font-size: 1rem;
 }
 
 /* 모달 스타일 */
@@ -273,34 +262,64 @@ li button {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(46, 52, 64, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  right:0;
+  bottom:0;
+  background-color: rgba(0,0,0,0.5);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:1000;
 }
 
 .modal-content {
-  background-color: #3B4252;
-  padding: 20px;
+  background-color: #fff;
+  padding: 25px;
   border-radius: 8px;
-  width: 90%;
+  width: 80%;
   max-width: 600px;
+  position: relative;
 }
 
-.modal-content h2 {
-  margin-top: 0;
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
 }
 
-.modal-content button {
-  margin-top: 20px;
+/* 반응형 디자인 */
+@media (max-width: 992px) {
+  .kpi-card {
+      width: calc(33.333% - 10px);
+  }
 }
 
-/* 반응형 스타일 */
-@media (max-width: 600px) {
-  .kpi-selection li {
+@media (max-width: 768px) {
+  .kpi-card {
+      width: calc(50% - 10px);
+  }
+
+  .media-item {
+      flex-direction: column;
+      align-items: flex-start;
+  }
+
+  .media-image,
+  .media-video {
+      max-width: 100%;
+      margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 576px) {
+  .kpi-card {
       width: 100%;
-      margin-right: 0;
+  }
+
+  .chart-container .form-control {
+      width: 100%;
   }
 }

@@ -7,6 +7,7 @@ const nextConfig = {
     },
     images: {
         domains: [
+            'firebasestorage.googleapis.com',
             'cdnimg.melon.co.kr',
             'search.pstatic.net',
         ],

@@ -1,0 +1,239 @@
+/* 전체 섹션 컨테이너 */
+.member-manager {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .member-list-section {
+    margin-top: 20px; /* 위 요소와 간격 */
+  }
+  
+  .member-list {
+    display: flex; /* 멤버들을 가로로 나란히 배치 */
+    gap: 20px; /* 멤버 카드 간 간격 */
+    overflow-x: auto; /* 가로 스크롤 활성화 */
+    padding-bottom: 10px; /* 스크롤바와 간격 유지 */
+    scroll-behavior: smooth;
+  }
+
+
+.member-list::-webkit-scrollbar {
+  height: 8px; /* 스크롤바 높이 */
+}
+
+.member-list::-webkit-scrollbar-thumb {
+  background-color: #ccc; /* 스크롤바 색상 */
+  border-radius: 4px; /* 둥근 스크롤바 */
+}
+
+.member-list::-webkit-scrollbar-thumb:hover {
+  background-color: #999; /* 호버 시 더 진한 색상 */
+}
+  
+.member-item {
+  flex-shrink: 0; /* 카드가 스크롤 영역에서 줄어들지 않도록 설정 */
+  width: 250px; /* 카드의 고정 너비 */
+  display: flex;
+  flex-direction: column; /* 카드 내부 요소를 수직으로 정렬 */
+  align-items: center; /* 중앙 정렬 */
+  background-color: #ffffff; /* 카드 배경 */
+  border: 1px solid #ddd; /* 경계선 */
+  border-radius: 10px; /* 둥근 모서리 */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+  padding: 15px; /* 내부 여백 */
+}
+  
+  .member-image {
+    width: 230px; /* 프로필 사진 크기 */
+    height: 230px; /* 프로필 사진 크기 */
+    border-radius: 50%; /* 동그란 사진 */
+    object-fit: cover; /* 이미지 비율 유지 */
+    margin-bottom: 10px; /* 아래 요소와 간격 */
+    border: 2px solid #f0f0f0; /* 사진 테두리 */
+  }
+  
+  .member-info {
+    text-align: center; /* 텍스트 중앙 정렬 */
+    margin-bottom: 10px; /* 아래 요소와 간격 */
+  }
+  
+  .member-info h3 {
+    font-size: 24px; /* 이름 크기 */
+    color: #333; /* 이름 색상 */
+    margin: 5px 0; /* 이름 위아래 간격 */
+    font-weight: bold;
+  }
+  
+  .member-info ul {
+    list-style: none; /* 기본 리스트 스타일 제거 */
+    padding: 0; /* 기본 여백 제거 */
+    margin: 0;
+    display: flex; /* 태그를 가로로 배치 */
+    flex-wrap: wrap; /* 태그가 화면을 초과하면 줄바꿈 */
+    gap: 5px; /* 태그 간 간격 */
+    justify-content: center; /* 태그를 중앙 정렬 */
+  }
+  
+  .member-info ul li {
+    background-color: #f3f4f6; /* 태그 배경색 */
+    color: #555; /* 태그 텍스트 색상 */
+    font-size: 12px; /* 태그 크기 */
+    padding: 5px 10px; /* 내부 여백 */
+    border-radius: 15px; /* 둥근 모서리 */
+    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+  }
+
+  .member-buttons {
+    display: flex; /* 버튼들을 가로로 정렬 */
+    justify-content: center; /* 버튼들을 중앙 정렬 */
+    gap: 10px; /* 버튼 간 간격 */
+    margin-top: 10px; /* 위 요소와 간격 */
+  }
+
+  .add-member-button {
+    background-color: rgba(60,177,209,1);
+    color: white; /* 버튼 텍스트 색상 */
+    border: none; /* 기본 테두리 제거 */
+    border-radius: 5px; /* 버튼 모서리 */
+    padding: 8px 15px; /* 내부 여백 */
+    font-size: 14px; /* 텍스트 크기 */
+    cursor: pointer; /* 마우스 포인터 변경 */
+    transition: background-color 0.3s ease; /* 호버 효과 */
+  }
+
+  .add-member-button:hover {
+    background-color: rgba(40,122,144,1); /* 호버 시 더 진한 빨강 */
+  }
+
+  .edit-member-button {
+    background-color: rgba(209,177,60,1);
+    color: white; /* 버튼 텍스트 색상 */
+    border: none; /* 기본 테두리 제거 */
+    border-radius: 5px; /* 버튼 모서리 */
+    padding: 8px 15px; /* 내부 여백 */
+    font-size: 14px; /* 텍스트 크기 */
+    cursor: pointer; /* 마우스 포인터 변경 */
+    transition: background-color 0.3s ease; /* 호버 효과 */
+  }
+
+  .edit-member-button:hover {
+    background-color: rgba(144,122,40,1); /* 호버 시 더 진한 빨강 */
+  }
+  
+  .remove-member-button {
+    background-color: #ff5c5c; /* 버튼 배경색 (빨강) */
+    color: white; /* 버튼 텍스트 색상 */
+    border: none; /* 기본 테두리 제거 */
+    border-radius: 5px; /* 버튼 모서리 */
+    padding: 8px 15px; /* 내부 여백 */
+    font-size: 14px; /* 텍스트 크기 */
+    cursor: pointer; /* 마우스 포인터 변경 */
+    transition: background-color 0.3s ease; /* 호버 효과 */
+  }
+  
+  .remove-member-button:hover {
+    background-color: #e60000; /* 호버 시 더 진한 빨강 */
+  }
+  
+  /* 멤버 추가 폼 섹션 */
+  .member-form-section {
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .member-form-section h2 {
+    font-size: 1.5rem;
+    color: #2a4365;
+    margin-bottom: 15px;
+  }
+  
+  /* 기타 기존 스타일 유지 */
+  .member-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+  }
+  
+  .member-form {
+    display: grid;
+    gap: 15px;
+  }
+
+  .dynamic-fields {
+    display: flex;
+    gap: 10px;
+  }
+
+  .attributes-list {
+    display: flex; /* 태그를 가로로 정렬 */
+    gap: 10px; /* 태그 간 간격 */
+    padding: 10px; /* 내부 여백 */
+    overflow-x: auto; /* 가로 스크롤 활성화 */
+    white-space: nowrap; /* 태그가 한 줄에 유지되도록 설정 */
+    border: 1px solid #ddd; /* 스크롤 영역 경계선 */
+    border-radius: 8px; /* 둥근 모서리 */
+    background-color: #f9f9f9; /* 배경색 */
+    scrollbar-width: thin; /* Firefox에서 스크롤바 크기 조정 */
+  }
+  
+  .attribute-item {
+    display: inline-flex; /* 태그를 인라인 플렉스로 설정 */
+    align-items: center; /* 태그 텍스트와 버튼을 세로로 정렬 */
+    background-color: #f3f4f6; /* 태그 배경색 */
+    border: 1px solid #ddd; /* 태그 경계선 */
+    border-radius: 12px; /* 둥근 모서리 */
+    padding: 5px 10px; /* 내부 여백 */
+    font-size: 14px; /* 텍스트 크기 */
+    color: #333; /* 텍스트 색상 */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* 살짝 들어간 느낌의 그림자 */
+    flex-shrink: 0; /* 태그가 줄어들지 않도록 설정 */
+  }
+  
+  .attribute-item span {
+    font-size: 15px;
+    color: blue;
+    margin-right: 8px; /* 태그 텍스트와 버튼 사이 간격 */
+  }
+
+  .add-attribute-button {
+    background-color: rgba(60,70,209,1);
+    color: white; /* 버튼 텍스트 색상 */
+    border: none; /* 기본 테두리 제거 */
+    border-radius: 5px; /* 버튼 모서리 */
+    padding: 8px 15px; /* 내부 여백 */
+    font-size: 16px; /* 텍스트 크기 */
+    cursor: pointer; /* 마우스 포인터 변경 */
+    transition: background-color 0.3s ease; /* 호버 효과 */
+  }
+
+  .add-attribute-button:hover {
+    background-color: rgba(3,10,144,1); /* 호버 시 더 진한 빨강 */
+  }
+  
+  .remove-attribute-button {
+    background-color: #ff5c5c; /* 버튼 배경색 (빨강) */
+    color: white; /* 버튼 텍스트 색상 */
+    border: none; /* 테두리 제거 */
+    border-radius: 50%; /* 둥근 모서리 */
+    width: 10px; /* 버튼 너비 */
+    height: 10px; /* 버튼 높이 */
+    font-size: 10px; /* 텍스트 크기 */
+    line-height: 0; /* 버튼 내부 여백 제거 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer; /* 마우스 포인터 변경 */
+    transition: background-color 0.3s ease; /* 호버 효과 */
+    font-weight: bold;
+    box-sizing: border-box; /* 패딩과 테두리를 포함하여 크기 계산 */
+    padding: 2px; /* 패딩 제거 */
+    overflow: hidden; /* 내용 넘침 방지 */
+  }
+  
+  .remove-attribute-button:hover {
+    background-color: #e60000; /* 호버 시 더 진한 빨강 */
+  }

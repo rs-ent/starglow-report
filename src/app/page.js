@@ -1,8 +1,15 @@
-import ClientManager from './[artist_id]/ClientManager'; // 새로 생성할 클라이언트 컴포넌트
+//src/app/page.js
 
-export default function Home() {
+import DefaultLayout from '../app/components/server/DefaultLayout';
+import ReportList from './ReportList';
+import { fetchReports } from './firebase/fetch';
 
+export default async function Home() {
+    const reports = await fetchReports();
+    console.log(reports);
     return (
-        <ClientManager />
+        <DefaultLayout>
+            <ReportList reports={reports}/>
+        </DefaultLayout>
     );
 }
