@@ -48,65 +48,35 @@ const Introduction = () => {
             .append('g')
             .attr('transform', `translate(${width / 2}, ${height / 2})`);
     
-        // Draw pie chart with animation
-        const paths = svg.selectAll('path')
+        // Define clipping paths for each slice
+        const defs = svg.append('defs');
+        defs.selectAll('clipPath')
+            .data(arcData)
+            .join('clipPath')
+            .attr('id', (d, i) => `clip-${i}`)
+            .append('path')
+            .attr('d', arc);
+    
+        // Draw pie chart slices
+        svg.selectAll('path')
             .data(arcData)
             .join('path')
             .attr('d', arc)
-            .attr('stroke', 'rgba(255,255,255,0)')
-            .attr('stroke-width', 2);
-
-        // Add images to cover each slice
+            .attr('stroke', 'rgba(255,255,255,0.3)')
+            .attr('stroke-width', 2)
+            .attr('fill', 'none'); // Keep slices invisible if only showing images
+    
+        // Add images to each slice
         svg.selectAll('image')
             .data(arcData)
             .join('image')
             .attr('xlink:href', (d, i) => members[i]?.profilePicture || '') // Use the profilePicture URL
-            .attr('width', radius * 2)
-            .attr('height', radius * 2)
+            .attr('width', width)
+            .attr('height', height)
+            .attr('x', -width / 2) // Center the image
+            .attr('y', -height / 2)
             .attr('preserveAspectRatio', 'xMidYMid slice') // Ensure the image fills the slice
             .attr('clip-path', (d, i) => `url(#clip-${i})`); // Apply clipping path
-
-    
-        // Add labels
-        svg.selectAll('text')
-            .data(arcData)
-            .join('text')
-            .attr('transform', d => `translate(${arc.centroid(d)})`)
-            .attr('text-anchor', 'middle')
-            .attr('font-size', '12px')
-            .text((d, i) => members[i]?.name || `Member ${i + 1}`);
-    
-        // GSAP animation
-        paths.each(function (d, i) {
-            const path = d3.select(this);
-            const centroid = arc.centroid(d); // Get the centroid for each slice
-    
-            // Start with pieces at the center
-            path.attr('transform', `translate(0, 0)`);
-    
-            // GSAP animation for each slice
-            gsap.fromTo(
-                path.node(),
-                { 
-                    opacity: 0, 
-                    transform: `translate(${centroid[0] * 1.5}px, ${centroid[1] * 1.5}px)`,
-                    filter: 'blur(15px)',
-                },
-                {
-                    opacity: 1,
-                    transform: 'translate(0, 0)',
-                    delay: Math.random() * 0.7,
-                    filter: 'blur(0px)',
-                    duration: 0.6,
-                    ease: 'power2.out',
-                    scrollTrigger: {
-                        trigger: svgRef.current, // Trigger animation when the pie chart enters viewport
-                        start: 'top 85%',
-                        toggleActions: 'play none none none',
-                    },
-                }
-            );
-        });
     }, [data]);
 
     console.log(data);
@@ -354,7 +324,7 @@ const Introduction = () => {
             </div>
 
             {/* 멤버 */}
-            <svg ref={svgRef}></svg>;
+            <svg ref={svgRef} className="block mx-auto"></svg>
         </div>
     );
 };
