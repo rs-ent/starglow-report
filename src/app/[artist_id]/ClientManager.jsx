@@ -8,6 +8,7 @@ import InvestmentPoints from './InvestmentPointsAndRisks/InvestmentPoints';
 import Timeline from './Timeline';
 import Outline from './Outline';
 import Introduction from './Introduction';
+import RiskLevel from './RiskLevel';
 
 const ClientManager = ({artist_id}) => {
   
@@ -46,6 +47,12 @@ const ClientManager = ({artist_id}) => {
       <section className="section-base">
         <h2 className="section-title">Timeline</h2>
         <Timeline />
+      </section>
+
+      {/* 위험도 */}
+      <section className="section-base">
+        <h2 className="section-title">Risk Level Analysis</h2>
+        <RiskLevel />
       </section>
 
     </div>

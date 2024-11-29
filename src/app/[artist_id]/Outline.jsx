@@ -2,7 +2,8 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import CountUp from 'react-countup';
 import { useReport, useIntroduction } from '../../context/GlobalData';
 import { formatNumber } from '../utils/formatNumber';
 import Image from 'next/image';
@@ -21,7 +22,16 @@ const Outline = () => {
     const goal_fund = reportData.goal_fund;
     const current_fund = reportData.current_fund;
     const investor_count = reportData.investor_count;
-    const progress = (current_fund / goal_fund) * 100;
+    
+    const [progress, setProgress] = useState(0);
+    useEffect(() => {
+        // 컴포넌트가 마운트되거나 current_fund가 변경될 때 애니메이션
+        const timeout = setTimeout(() => {
+            setProgress((current_fund / goal_fund) * 100);
+        }, 1000); // 애니메이션 딜레이
+
+        return () => clearTimeout(timeout); // 클린업
+    }, [current_fund, goal_fund]);
     
     const project_status = reportData.project_status;
     const statusColors = {
@@ -82,7 +92,12 @@ const Outline = () => {
                     <div>
                         <h2 className="text-base text-[var(--text-secondary)]">현재 모금액</h2>
                         <p className="text-2xl font-extrabold text-green-500 mt-0.5">
-                            ₩ {current_fund.toLocaleString()}
+                            ₩ <CountUp
+                                start={0} // 시작값
+                                end={current_fund} // 종료값 (current_fund)
+                                duration={2.5} // 카운트업 지속 시간 (초 단위)
+                                separator="," // 숫자 3자리마다 콤마 추가
+                            />
                         </p>
                     </div>
                 </div>
@@ -99,18 +114,28 @@ const Outline = () => {
                         {/* Text Information */}
                         <div className="flex items-center justify-between mb-2">
                             <p className="text-sm font-base text-[var(--text-secondary)]">
-                                {`달성률: ${(current_fund / goal_fund * 100).toFixed(1)}%`}
+                                달성률: <CountUp
+                                    start={0} // 시작값
+                                    end={progress} // 종료값 (current_fund)
+                                    duration={1.5} // 카운트업 지속 시간 (초 단위)
+                                    separator="," // 숫자 3자리마다 콤마 추가
+                                />%
                             </p>
                             <p className="text-sm font-base text-[var(--text-secondary)]">
-                                목표: ₩{formatNumber(goal_fund, '원', 1).toLocaleString()}
+                                목표: ₩<CountUp
+                                    start={0} // 시작값
+                                    end={goal_fund} // 종료값 (current_fund)
+                                    duration={2.0} // 카운트업 지속 시간 (초 단위)
+                                    separator="," // 숫자 3자리마다 콤마 추가
+                                />
                             </p>
                         </div>
 
                         {/* Progress Bar */}
                         <div className="relative w-full h-4 bg-gray-200 rounded-full overflow-hidden">
                             <div 
-                                className="absolute top-0 left-0 h-full bg-orange-400 transition-all duration-300 ease-in-out"
-                                style={{ width: `${(current_fund / goal_fund) * 100}%` }}
+                                className="absolute top-0 left-0 h-full bg-orange-400 transition-all duration-300 ease-out"
+                                style={{ width: `${progress}%` }}
                             ></div>
                         </div>
                     </div>
@@ -125,7 +150,14 @@ const Outline = () => {
                             </div>
                             <div className="ml-4">
                                 <p className="text-[var(--text-secondary)] text-sm text-center">투자자 수</p>
-                                <h4 className="text-blue-600 font-bold text-xl text-center">{investor_count}</h4>
+                                <h4 className="text-blue-600 font-bold text-xl text-center">
+                                    <CountUp
+                                        start={0} // 시작값
+                                        end={investor_count} // 종료값 (current_fund)
+                                        duration={3.0} // 카운트업 지속 시간 (초 단위)
+                                        separator="," // 숫자 3자리마다 콤마 추가
+                                    />명
+                                </h4>
                             </div>
                         </div>
                     </div>
@@ -137,7 +169,7 @@ const Outline = () => {
                         </div>
                         <div>
                             <p className="text-[var(--text-secondary)] text-sm text-center">프로젝트 상태</p>
-                            <p className={`min-w-28 px-3 py-1 rounded-full font-extrabold text-base text-center ${statusColors[project_status]}`}>
+                            <p className={`mt-1 px-3 py-0.5 rounded-full font-extrabold text-base text-center ${statusColors[project_status]}`}>
                                 {project_status}
                             </p>
                         </div>

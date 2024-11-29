@@ -28,19 +28,20 @@ Mobile First + Simple is the Best + Professionalism*/
 
 /* --- 글로벌 변수 설정 --- */
 :root {
-  --background: #F7FAFC; /* 따뜻한 오프화이트 */
+  --background: #FAF9F6; /* 따뜻한 오프화이트 */
   --foreground: #1A202C; /* 깊은 차콜 그레이 */
   --foreground-muted: #86919c;
   --background-second: #DDDDDD;
   --background-muted: #d8dbdf;
+  --background-brushed: #f7f7f7;
   --foreground-unfocus: #c1c7cd;
   
   --primary: #2A4365; /* 신뢰를 주는 딥 블루 */
   --secondary: #4A5568; /* 중립적이고 안정된 미드 그레이 */
   --accent: #D4AF37; /* 고급스러운 골드 */
-  --success: #276749; /* 딥 그린 */
+  --success: #2A4365; /* 신뢰를 주는 딥 블루 */
   --danger: #C53030; /* 브릭 레드 */
-  --warning: #D69E2E; /* 차분한 머스타드 */
+  --warning: #D4AF37; /* 고급스러운 골드 */
   --info: #3182CE; /* 세련된 스카이블루 */
 
   --text-primary: #4A4A4A; /* 본문용 깊은 그레이 */
@@ -66,6 +67,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* --- 커스텀 --- */
+
+.scrollbar-hide {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
 .section-base {
   @apply bg-[var(--background)] py-6 px-3 backdrop-blur-md shadow-md transition-all;
 }
@@ -91,6 +101,10 @@ h1, h2, h3, h4, h5, h6 {
   .perspective-1000 {
     perspective: 1000px;
   }
+
+  .animate-pulse-soft {
+    animation: pulse-soft 1.5s infinite;
+  }
 }
 
 @keyframes draw {
@@ -100,4 +114,22 @@ h1, h2, h3, h4, h5, h6 {
   to {
       background-size: 100% 40%;
   }
+}
+
+/* 강조 요소 애니메이션 */
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+/* 동적 배경 강조 */
+.dynamic-bg {
+  @apply bg-gradient-to-r from-[var(--primary)] to-[var(--accent)];
+  transition: background-color var(--transition-slow);
 }

@@ -379,59 +379,59 @@ const IntroductionManager = ({ artist_id }) => {
         </div>
       </section>
 
-      {/* Gallery Section */}
-<section className="gallery-section">
-  <h2>Gallery</h2>
-  <input
-    type="file"
-    accept="image/png, image/jpeg, image/jpg, image/webp"
-    multiple
-    onChange={handleImageUpload}
-    className="gallery-upload-input"
-  />
-  {uploadProgress > 0 && uploadProgress < 100 && (
-    <p>Uploading... {uploadProgress.toFixed(2)}%</p>
-  )}
-  <DragDropContext
-    onDragEnd={handleImageDragEnd} // 드래그 앤 드롭이 끝났을 때 호출
-  >
-    <Droppable droppableId="gallery" direction="horizontal">
-      {(provided) => (
-        <div
-          className="gallery-preview"
-          {...provided.droppableProps}
-          ref={provided.innerRef}
-        >
-          {galleryImages.map((image, index) => (
-            <Draggable key={image.url} draggableId={image.url} index={index}>
+        {/* Gallery Section */}
+        <section className="gallery-section">
+          <h2>Gallery</h2>
+          <input
+            type="file"
+            accept="image/png, image/jpeg, image/jpg, image/webp"
+            multiple
+            onChange={handleImageUpload}
+            className="gallery-upload-input"
+          />
+          {uploadProgress > 0 && uploadProgress < 100 && (
+            <p>Uploading... {uploadProgress.toFixed(2)}%</p>
+          )}
+          <DragDropContext
+            onDragEnd={handleImageDragEnd} // 드래그 앤 드롭이 끝났을 때 호출
+          >
+            <Droppable droppableId="gallery" direction="horizontal">
               {(provided) => (
                 <div
-                  className="gallery-item"
+                  className="gallery-preview"
+                  {...provided.droppableProps}
                   ref={provided.innerRef}
-                  {...provided.draggableProps}
-                  {...provided.dragHandleProps}
                 >
-                  <img
-                    src={image.url}
-                    alt={`Gallery ${index + 1}`}
-                    className="gallery-thumbnail"
-                  />
-                  <button
-                    onClick={() => handleRemoveImage(index)}
-                    className="remove-button"
-                  >
-                    Remove
-                  </button>
+                  {galleryImages.map((image, index) => (
+                    <Draggable key={image.url} draggableId={image.url} index={index}>
+                      {(provided) => (
+                        <div
+                          className="gallery-item"
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                        >
+                          <img
+                            src={image.url}
+                            alt={`Gallery ${index + 1}`}
+                            className="gallery-thumbnail"
+                          />
+                          <button
+                            onClick={() => handleRemoveImage(index)}
+                            className="remove-button"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
                 </div>
               )}
-            </Draggable>
-          ))}
-          {provided.placeholder}
-        </div>
-      )}
-    </Droppable>
-  </DragDropContext>
-</section>
+            </Droppable>
+          </DragDropContext>
+        </section>
 
         {/* 멤버 관리 섹션 */}
         <section className="member-manager-section">

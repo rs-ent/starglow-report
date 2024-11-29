@@ -40,7 +40,7 @@ export const Preprocessor = async (artist_id) => {
         ?? sortedData.length - 1;
 
     const currentData = sortedData[currentIndex];
-    const kpiData = computeKPIs(timelineData.timeline, currentIndex, currentData);
+    const kpiData = computeKPIs(valuationDataRaw, timelineData.timeline, currentIndex, currentData);
     const investmentData = await fetchInvestmentPoints(artist_id, "All");
 
     const initialMilestones = processMilestones(kpiData.sortedData);

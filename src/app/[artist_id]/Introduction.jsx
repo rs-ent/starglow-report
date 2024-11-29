@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
-import { useReport, useIntroduction } from '../../context/GlobalData';
+import { useReport, useIntroduction, useValuation } from '../../context/GlobalData';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Image from 'next/image';
-import * as d3 from 'd3';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -28,7 +27,13 @@ const Introduction = () => {
     const membersRef = useRef(null);
     const members = data.members;
 
-    console.log(data);
+    const visibleData = Object.entries(data.additionalData)
+        .filter(([key, value]) => value.visible) // visible이 true인 항목만 필터링
+        .sort(([, a], [, b]) => b.priority - a.priority) // priority 기준으로 정렬
+        .map(([key, value]) => ({
+            displayKey: value.displayKey || key,
+            value: value.value,
+        }));
 
     // 갤러리 이미지 클릭 핸들러
     const handleGalleryImageClick = (index) => {
@@ -220,7 +225,7 @@ const Introduction = () => {
 
             <div
                 ref={galleryRef}
-                className="flex gap-1 overflow-x-scroll px-4 py-6"
+                className="flex gap-1 overflow-x-scroll px-4 py-6 overflow-y-visible scrollbar-hide"
                 style={{ scrollBehavior: 'smooth' }}
             >
                 {data.galleryImages.map((image, index) => (
@@ -273,6 +278,7 @@ const Introduction = () => {
                 ))}
             </div>
             
+            {/* 멤버 소개 */}
             <h2 className="section-title">Members</h2>
             <div className="relative overflow-x-scroll">
                 
@@ -307,6 +313,25 @@ const Introduction = () => {
                     ))}
                 </div>
             </div>
+            
+            {/* 추가 내용 */}
+            {visibleData.length > 0 && (
+                <div className="compact-additional-data p-3">
+                    {visibleData.map((item, index) => (
+                        <div
+                            key={index}
+                            className={`flex justify-between items-center py-3 ${
+                                index !== visibleData.length - 1 ? 'border-b border-[var(--background-muted)]' : ''
+                            }`}
+                        >
+                            <span className="text-xs font-semibold text-[var(--text-primary)]">{item.displayKey}</span>
+                            <span className="text-xs text-[var(--text-secondary)] whitespace-pre-line text-right">
+                                {item.value}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };

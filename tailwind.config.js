@@ -14,6 +14,25 @@ module.exports = {
         'soft': '0 2px 8px rgba(0, 0, 0, 0.05)', // 심플하고 가벼운 느낌
         'strong': '0 4px 12px rgba(0, 0, 0, 0.1)', // 강조 요소에 적합
       },
+      borderRadius: {
+        'lg': '12px',  // 둥근 모서리
+        'xl': '20px',
+      },
+      spacing: {
+        '72': '18rem', // 추가 간격
+        '84': '21rem',
+        '96': '24rem',
+      },
+      animation: {
+        'spin-slow': 'spin 3s linear infinite', // 느린 회전
+        'fade-in': 'fadeIn 0.5s ease-in-out', // 페이드 인 효과
+      },
+      keyframes: {
+        fadeIn: {
+          from: { opacity: 0 },
+          to: { opacity: 1 },
+        },
+      },
       colors: {
         background: {
           light: "#ffffff", // 기본 배경색
