@@ -20,3 +20,32 @@ export const MRV_WEIGHT = {
     '음악방송':5,
     '기타':10
 }
+
+export const MockupList = [
+    {
+      id: 'photoCard',
+      name: '포토카드',
+      description: 'A beautiful photo card to cherish memories.',
+      // Add other relevant properties if needed
+    },
+    {
+      id: 'album',
+      name: '앨범',
+      description: 'A premium album to store your favorite photos.',
+    },
+    {
+      id: 'videoCall',
+      name: '영상통화',
+      description: 'Enjoy video calls with your loved ones.',
+    },
+    {
+      id: 'invitation',
+      name: '초대장',
+      description: 'Elegant invitations for your special events.',
+    },
+    {
+      id: 'goods',
+      name: '상품',
+      description: 'Exclusive merchandise just for you.',
+    },
+  ];

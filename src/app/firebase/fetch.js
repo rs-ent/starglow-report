@@ -82,7 +82,7 @@ export async function fetchData(
   
       // 결과 데이터를 매핑
       const data = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
+        docId: doc.id,
         ...doc.data(),
       }));
   

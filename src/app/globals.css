@@ -8,6 +8,8 @@ Mobile First + Simple is the Best + Professionalism*/
 @tailwind utilities;
 
 @import "leaflet/dist/leaflet.css";
+@import 'swiper/css';
+@import 'swiper/css/pagination';
 
 /* --- Font-face 정의 --- */
 @font-face {
@@ -24,6 +26,20 @@ Mobile First + Simple is the Best + Professionalism*/
   font-weight: 400 700;
   font-style: normal;
   font-display: swap;
+}
+
+@font-face {
+  font-family: 'GmarketSansBold';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansBold.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'GmarketSansMedium';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
 }
 
 /* --- 글로벌 변수 설정 --- */
@@ -51,7 +67,7 @@ Mobile First + Simple is the Best + Professionalism*/
 
   --glass-bg-light: rgba(255, 255, 255, 0.1); /* Glass UI 배경 */
   --font-body: 'Pretendard', sans-serif;
-  --font-heading: 'Orbitron', sans-serif;
+  --font-heading: 'GmarketSansMedium', sans-serif;
   --transition-fast: 0.2s ease-in-out;
   --transition-slow: 0.4s ease-in-out;
 }

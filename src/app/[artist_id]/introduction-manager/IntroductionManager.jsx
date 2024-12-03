@@ -35,6 +35,7 @@ const IntroductionManager = ({ artist_id }) => {
       setIntroduction(savedData.introduction || '');
       setGalleryImages(savedData.galleryImages || []);
       setMembers(savedData.members || []);
+      setTeamMembers(savedData.teamMembers || []);
       setArtistData(savedData.additionalData || {});
     }
   }, [savedData]);
@@ -58,6 +59,8 @@ const IntroductionManager = ({ artist_id }) => {
   const [galleryImages, setGalleryImages] = useState([]); // 업로드된 이미지 상태
 
   const [members, setMembers] = useState([]);
+
+  const [teamMembers, setTeamMembers] = useState([]);
 
   const reportData = useReport();
   const [artistData, setArtistData] = useState({});
@@ -233,6 +236,7 @@ const IntroductionManager = ({ artist_id }) => {
         introduction,
         galleryImages,
         members,
+        teamMembers,
         additionalData: artistData,
         
         // 이후 다른 섹션 데이터 추가
@@ -441,6 +445,121 @@ const IntroductionManager = ({ artist_id }) => {
             onUpdateMembers={handleUpdateMembers} // 콜백 전달
             artist_id={artist_id} // Firebase 업로드를 위한 ID 전달
             />
+      </section>
+
+      {/* New Team Members Section */}
+      <section className="team-members-section">
+        <h2>기획사 맨파워</h2>
+        {teamMembers.map((member, index) => (
+          <div key={index} className="team-member">
+            {/* Image Upload */}
+            <div className="team-member-image">
+              <input
+                type="file"
+                accept=".png,.jpg,.jpeg,.webp"
+                onChange={async (e) => {
+                  const file = e.target.files[0];
+                  if (!file) return;
+
+                  try {
+                    const [uploadedImage] = await uploadFiles([file], `team-members/${artist_id}/${index}/`, (idx, progress) => {
+                      setUploadProgress(progress);
+                    });
+                    const updatedTeamMembers = [...teamMembers];
+                    updatedTeamMembers[index].image = uploadedImage.downloadURL;
+                    setTeamMembers(updatedTeamMembers);
+                  } catch (error) {
+                    console.error('Error uploading team member image:', error);
+                    setErrorMessage('Failed to upload team member image. Please try again.');
+                  }
+                }}
+                className="team-member-upload-input"
+              />
+              {member.image && (
+                <div className="team-member-image-preview">
+                  <img src={member.image} alt={`Team Member ${index + 1}`} className="team-member-image-img" />
+                </div>
+              )}
+            </div>
+
+            {/* Text Inputs */}
+            <div className="team-member-info">
+              <div className="team-member-name-title">
+                <input
+                  type="text"
+                  placeholder="Name"
+                  value={member.name}
+                  onChange={(e) => {
+                    const updatedTeamMembers = [...teamMembers];
+                    updatedTeamMembers[index].name = e.target.value;
+                    setTeamMembers(updatedTeamMembers);
+                  }}
+                  className="team-member-name-input"
+                />
+                <input
+                  type="text"
+                  placeholder="Title"
+                  value={member.title}
+                  onChange={(e) => {
+                    const updatedTeamMembers = [...teamMembers];
+                    updatedTeamMembers[index].title = e.target.value;
+                    setTeamMembers(updatedTeamMembers);
+                  }}
+                  className="team-member-title-input"
+                />
+              </div>
+              <textarea
+                placeholder="Experience"
+                value={member.experience}
+                onChange={(e) => {
+                  const updatedTeamMembers = [...teamMembers];
+                  updatedTeamMembers[index].experience = e.target.value;
+                  setTeamMembers(updatedTeamMembers);
+                }}
+                className="team-member-experience-textarea"
+                rows={3}
+              />
+              <textarea
+                placeholder="Introduction"
+                value={member.introduction}
+                onChange={(e) => {
+                  const updatedTeamMembers = [...teamMembers];
+                  updatedTeamMembers[index].introduction = e.target.value;
+                  setTeamMembers(updatedTeamMembers);
+                }}
+                className="team-member-introduction-textarea"
+                rows={4}
+              />
+              <button
+                onClick={() => {
+                  const updatedTeamMembers = teamMembers.filter((_, i) => i !== index);
+                  setTeamMembers(updatedTeamMembers);
+                }}
+                className="remove-team-member-button"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        ))}
+
+        <button
+          onClick={() => {
+            setTeamMembers([
+              ...teamMembers,
+              {
+                image: null,
+                name: '',
+                title: '',
+                experience: '',
+                introduction: '',
+              },
+            ]);
+          }}
+          className="add-team-member-button"
+        >
+          Add Team Member
+        </button>
       </section>
 
       <section className="field-selection">

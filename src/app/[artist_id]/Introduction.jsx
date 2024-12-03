@@ -5,11 +5,13 @@ import { useReport, useIntroduction, useValuation } from '../../context/GlobalDa
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Image from 'next/image';
+import { FaCompactDisc } from 'react-icons/fa';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const Introduction = () => {
     const reportData = useReport();
+    const valuationData = useValuation();
     const data = useIntroduction();
     
     const catchPhraseRef = useRef(null);
@@ -26,6 +28,15 @@ const Introduction = () => {
 
     const membersRef = useRef(null);
     const members = data.members;
+
+    const albums = valuationData.SV?.albums || [];
+    const representativeTracks = albums
+        .flatMap((album) =>
+        album.tracks.filter((track) => track.representative === "TRUE")
+        )
+        .slice(0, 5);
+
+    const teamMembers = data.teamMembers || [];
 
     const visibleData = Object.entries(data.additionalData)
         .filter(([key, value]) => value.visible) // visible이 true인 항목만 필터링
@@ -242,8 +253,9 @@ const Introduction = () => {
                         <Image
                             src={image.url}
                             alt={image.name}
-                            width={500}
-                            height={500}
+                            fill
+                            sizes="(max-width: 768px) 70vw, (max-width: 1200px) 40vw, 23vw"
+                            loading='lazy'
                             className={`object-cover rounded-md transition-all h-full w-full ${
                                 activeGalleryIndex === index ? 'shadow-xl' : 'opacity-90'
                             }`}
@@ -298,9 +310,10 @@ const Introduction = () => {
                             <Image
                                 src={member.profilePicture}
                                 alt={member.name}
-                                layout="fill"
-                                objectFit="cover"
-                                className="rounded-t-md"
+                                fill
+                                sizes="(max-width: 768px) 70vw, (max-width: 1200px) 40vw, 23vw"
+                                className="object-cover"
+                                loading='lazy'
                             />
                             {/* 멤버 정보 */}
                             <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-[var(--foreground)] to-transparent text-[var(--text-reverse)]">
@@ -332,6 +345,84 @@ const Introduction = () => {
                     ))}
                 </div>
             )}
+
+            {/* 앨범 소개 */}
+            <div className="my-10">
+                <h2 className="section-title">Discography</h2>
+                <div className="relative overflow-x-scroll">
+                    <div
+                        ref={membersRef}
+                        className="flex gap-2 items-center h-full"
+                        style={{
+                            width: `calc(${members.length} * 200px)`, // 카드 너비 280px 기반으로 계산
+                        }}
+                    >
+                        {albums.map((album, index) => (
+                            <div
+                                key={index}
+                                className="flex-shrink-0 w-[200px] h-[200px] bg-[var(--background-muted)] rounded-md shadow-md relative"
+                            >
+                                {/* 앨범 사진 */}
+                                <Image
+                                    src={album.img_url}
+                                    alt={`${album.album_title} Cover`}
+                                    fill
+                                    sizes="(max-width: 768px) 70vw, (max-width: 1200px) 40vw, 23vw"
+                                    className="object-cover rounded-md"
+                                    loading='lazy'
+                                />
+                                {/* 앨범 정보 */}
+                                <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black to-transparent text-[var(--text-reverse)]">
+                                    <h3 className="text-xs font-bold">{album.album_title}</h3>
+                                    <p className="text-[10px] font-light">
+                                        발매일: {album.release_date} | 곡 수: {album.total_songs}
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* 기획사 맨파워 */}
+            <h2 className="section-title mt-10">Founders</h2>
+            <div>
+                {teamMembers.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-6">
+                        {teamMembers.map((member, index) => (
+                            <div key={index} className="rounded-lg border overflow-hidden grid grid-cols-[2fr_1fr] sm:flex-row h-full">
+                                {/* Team Member Details */}
+                                <div className="p-4 flex flex-col justify-center text-left">
+                                    <h3 className="text-lg font-semibold text-[var(--text-primary)">{member.name}</h3>
+                                    <p className="text-sm text-[var(--text-secondary)">{member.title}</p>
+                                    <p className="mt-2 text-[9px] font-normal text-[var(--text-secondary)] whitespace-pre-line">{member.experience}</p>
+                                    <p className="mt-2 text-xs text-[var(--text-secondary)">{member.introduction}</p>
+                                </div>
+
+                                {/* Team Member Image */}
+                                <div className="relative">
+                                    {member.image ? (
+                                        <Image
+                                            src={member.image}
+                                            alt={`${member.name} - ${member.title}`}
+                                            fill
+                                            sizes="(max-width: 768px) 70vw, (max-width: 1200px) 40vw, 23vw"
+                                            loading='lazy'
+                                        />
+                                    ) : (
+                                        <div className="flex items-center justify-center w-full h-full bg-gray-300">
+                                            <span className="text-gray-500">No Image</span>
+                                        </div>
+                                    )}
+                                </div>
+                                
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-center text-gray-500">No team members to display.</p>
+                )}
+            </div>
         </div>
     );
 };

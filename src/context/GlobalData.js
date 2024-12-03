@@ -6,7 +6,7 @@ import React, { createContext, useContext } from 'react';
 const DataContext = createContext(null);
 
 // Provider 컴포넌트
-export const DataProvider = ({ valuation, timelineData, kpiData, investmentData, milestones, artist_id, introduction, albums, songs, youtube, children }) => {
+export const DataProvider = ({ valuation, timelineData, kpiData, investmentData, milestones, artist_id, introduction, rewards, history, children }) => {
     const reports = useReports();
     const report = reports.find(a => a.artist_id === artist_id);
     
@@ -19,9 +19,8 @@ export const DataProvider = ({ valuation, timelineData, kpiData, investmentData,
         artist_id,
         report,
         introduction,
-        albums,
-        songs,
-        youtube,
+        rewards,
+        history,
     };
 
     return (
@@ -93,26 +92,19 @@ export const useIntroduction = () => {
     return context.introduction;
 }
 
-export const useAlbums = () => {
+export const useRewards = () => {
     const context = useContext(DataContext);
     if (!context) {
         throw new Error('useIntroduction must be used within a DataProvider');
     }
-    return context.albums;
+    return context.rewards;
 }
 
-export const useSongs = () => {
-    const context = useContext(DataContext);
-    if (!context) {
-        throw new Error('useSongs must be used within a DataProvider');
-    }
-    return context.songs;
-}
 
-export const useYoutube = () => {
+export const useHistory = () => {
     const context = useContext(DataContext);
     if (!context) {
-        throw new Error('useYoutube must be used within a DataProvider');
+        throw new Error('useIntroduction must be used within a DataProvider');
     }
-    return context.youtube;
+    return context.history;
 }

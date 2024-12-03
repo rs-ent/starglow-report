@@ -60,8 +60,10 @@ const Outline = () => {
                     <Image 
                         src={profilePicture} 
                         alt="프로필 사진" 
-                        layout="fill" 
-                        objectFit="cover"
+                        fill
+                        sizes="(max-width: 768px) 70vw, (max-width: 1200px) 40vw, 23vw"
+                        className="object-cover"
+                        loading='lazy'
                     />
                 </div>
 
