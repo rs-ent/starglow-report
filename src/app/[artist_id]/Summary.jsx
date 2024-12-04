@@ -61,7 +61,7 @@ const Summary = () => {
                                     { label: "모집 종료일", value: "2024.12.31" },
                                     { label: "증권 발행일", value: "2025.01.02" },
                                     { label: "증권 만기일", value: "2026.01.02" },
-                                    { label: "투자 기간*", value: "12개월", type: "bold"},
+                                    { label: "투자 기간", value: "12개월"},
                                     { label: "상환 방법", value: "만기일시상환" },
                                     { label: "손익 배당", value: "투자 기간 발생 총 매출의 35%" },
                                     { label: "만기 정산 예정일", value: "2026.04.02" },

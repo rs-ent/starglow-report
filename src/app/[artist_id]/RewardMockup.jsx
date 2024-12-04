@@ -169,16 +169,16 @@ const RewardMockup = ({ gift }) => {
     // Initialize RectAreaLightUniformsLib
     RectAreaLightUniformsLib.init();
 
-    const rectLight1 = new THREE.RectAreaLight( 0xff0000, 15, 4, 10 );
-    rectLight1.position.set( - 4, 5, 5 );
+    const rectLight1 = new THREE.RectAreaLight( 0xff0000, 30, 4, 10 );
+    rectLight1.position.set( - 8, 5, 5 );
     scene.add( rectLight1 );
 
-    const rectLight2 = new THREE.RectAreaLight( 0x00ff00, 15, 4, 10 );
+    const rectLight2 = new THREE.RectAreaLight( 0x00ff00, 30, 4, 10 );
     rectLight2.position.set( 0, 5, 5 );
     scene.add( rectLight2 );
 
-    const rectLight3 = new THREE.RectAreaLight( 0x0000ff, 15, 4, 10 );
-    rectLight3.position.set( 4, 5, 5 );
+    const rectLight3 = new THREE.RectAreaLight( 0x0000ff, 30, 4, 10 );
+    rectLight3.position.set( 8, 5, 5 );
     scene.add( rectLight3 );
 
     scene.add( new RectAreaLightHelper( rectLight1 ) );
@@ -186,7 +186,7 @@ const RewardMockup = ({ gift }) => {
     scene.add( new RectAreaLightHelper( rectLight3 ) );
 
     const syncLightsWithCamera = (camera) => {
-      const offsetDistance = 6; // 카메라 뒤 조명의 거리
+      const offsetDistance = 10; // 카메라 뒤 조명의 거리
     
       // 카메라 방향 벡터 계산
       const cameraDirection = new THREE.Vector3();
@@ -330,51 +330,70 @@ const RewardMockup = ({ gift }) => {
   };
 
   // Function to create objects based on quantity
-  const createObjectsByQuantity = (gift) => {
+  const createObjectsByQuantity = (gift, baseAngle = 0) => {
     const quantity = gift.quantity || 1;
     const objects = [];
-    const spacing = 2.5;
-    const z = 1;
-
-    for (let i = 0; i < quantity; i++) {
-      let object;
-      switch (gift.id) {
-        case 'photoCard':
-          const radius = 5; // 부채꼴 반지름 (중심으로부터의 거리)
-          const angleStep = (Math.PI / 6) / (quantity - 1); // 각 객체 간 각도 차이 (30도 부채꼴 기준)
-
-          for (let j = 0; j < quantity; j++) {
-            const angle = -Math.PI / 12 + j * angleStep; // 부채꼴 시작 각도와 각 객체의 각도
-            object = createPhotoCard();
-
-            // 위치 설정: 부채꼴 반지름을 기준으로 x, y 좌표를 계산
-            object.position.x = Math.cos(angle) * radius;
-            object.position.y = Math.sin(angle) * radius;
-            object.position.z = j/20;
-
-            // 객체를 중심 방향으로 회전
-            object.rotation.z = angle;
-
-            objects.push(object);
-          }
-          break;
-        case 'album':
-          object = createAlbum();
-          break;
-        case 'videoCall':
-          object = createVideoCall();
-          break;
-        case 'invitation':
-          object = createInvitation();
-          break;
-        case 'goods':
-          object = createGoods();
-          break;
-        default:
-          object = createDefault();
+    const radius = 5; // 부채꼴 반지름
+    const totalAngle = Math.PI / 3; // 부채꼴 전체 각도 (60도)
+    const angleStep = quantity > 1 ? totalAngle / (quantity - 1) : 0; // 각 객체 간 각도
+  
+    if (gift.id === 'photoCard') {
+      if (quantity === 1) {
+        // 객체가 하나일 때: 정중앙에 위치
+        const object = createPhotoCard();
+        object.position.set(0, 0, 0); // 정중앙 위치
+        objects.push(object);
+      } else {
+        for (let j = 0; j < quantity; j++) {
+          const angle = baseAngle - totalAngle / 2 + j * angleStep; // 부채꼴 중심을 기준으로 각도 계산
+          const object = createPhotoCard();
+  
+          // 부채꼴 위치 설정
+          object.position.x = -Math.sin(angle) * radius; // x축에 sin 사용
+          object.position.y = Math.cos(angle) * radius - 4.5; // y축에 cos 사용
+          object.position.z = 0 + j / 15; 
+  
+          // 객체가 중심 방향을 바라보도록 회전
+          object.rotation.z = angle;
+  
+          objects.push(object);
+        }
       }
-      objects.push(object);
+    } else {
+      // 다른 유형의 객체 생성
+      for (let i = 0; i < quantity; i++) {
+        let object;
+        switch (gift.id) {
+          case 'album':
+            object = createAlbum();
+            break;
+          case 'videoCall':
+            object = createVideoCall();
+            break;
+          case 'invitation':
+            object = createInvitation();
+            break;
+          case 'goods':
+            object = createGoods();
+            break;
+          default:
+            object = createDefault();
+        }
+  
+        if (quantity === 1) {
+          // 객체가 하나일 때: 정중앙에 위치
+          object.position.set(0, 0, 1); // 정중앙 위치
+        } else {
+          // 여러 객체일 때: 일정 간격으로 나열
+          object.position.x = i * 2.5; // x축 위치
+          object.position.y = 0; // y축 위치
+          object.position.z = 1; // z축은 고정
+        }
+  
+        objects.push(object);
+      }
     }
+  
     return objects;
   };
 
@@ -385,9 +404,9 @@ const RewardMockup = ({ gift }) => {
     const cardGroup = new THREE.Group();
   
     // 카드 크기 및 둥근 모서리 반경
-    const cardWidth = 5.5; // 크레딧카드 너비
-    const cardHeight = 8.5; // 크레딧카드 높이
-    const cardDepth = 0.02; // 크레딧카드 두께
+    const cardWidth = 4.4; // 크레딧카드 너비
+    const cardHeight = 6.8; // 크레딧카드 높이
+    const cardDepth = 0.1; // 크레딧카드 두께
     const cornerRadius = 0.6; // 모서리 반경
     const smoothness = 8; // 곡선의 부드러움
     

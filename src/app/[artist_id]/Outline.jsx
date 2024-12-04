@@ -171,7 +171,7 @@ const Outline = () => {
                         </div>
                         <div>
                             <p className="text-[var(--text-secondary)] text-sm text-center">프로젝트 상태</p>
-                            <p className={`mt-1 px-3 py-0.5 rounded-full font-extrabold text-base text-center ${statusColors[project_status]}`}>
+                            <p className={`mt-1 px-2 sm:px-4 md:px-6 py-0.5 rounded-full font-extrabold text-base text-center ${statusColors[project_status]}`}>
                                 {project_status}
                             </p>
                         </div>

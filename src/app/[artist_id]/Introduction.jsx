@@ -389,7 +389,7 @@ const Introduction = () => {
                 </div>
 
                 {/* 기획사 맨파워 */}
-                <h2 className="section-title mt-10">Company</h2>
+                <h2 className="section-title mt-14">Company</h2>
                 <div>
                     {teamMembers.length > 0 ? (
                         <div className="grid grid-cols-1 gap-6">
@@ -407,7 +407,7 @@ const Introduction = () => {
                                             loading='lazy'
                                         />
                                     </div>
-                                    <div className="p-3 flex flex-col justify-center text-left relative">
+                                    <div className="px-4 pt-4 pb-1 flex flex-col justify-center text-left relative">
                                         <div className="flex items-baseline space-x-2 mb-1">
                                             <h3 className="text-xl font-semibold text-[var(--primary)">{member.name}</h3>
                                             <p className="text-xs text-[var(--text-third)]">{member.title}</p>

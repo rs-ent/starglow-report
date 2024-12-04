@@ -49,7 +49,7 @@ const ClientManager = ({artist_id}) => {
 
       {/* 투자요약 섹션 */}
       <section className="section-base">
-        <h2 className="section-title">Summary</h2>
+        <h2 className="section-title">Investment Details</h2>
         <Summary />
       </section>
 
@@ -67,7 +67,7 @@ const ClientManager = ({artist_id}) => {
 
       {/* 히스토리 */}
       <section className="section-base">
-          <h2 className="section-title">History</h2>
+          <h2 className="section-title">History Analysis</h2>
           <History openModal={openHistoryModal} />
       </section>
       
