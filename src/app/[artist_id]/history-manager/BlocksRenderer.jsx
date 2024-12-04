@@ -9,6 +9,7 @@ import {
   FaExclamationCircle, FaInfoCircle, FaHistory, FaHeading, FaSubscript 
 } from 'react-icons/fa';
 import { useSwipeable } from 'react-swipeable';
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'; // 화살표 아이콘을 위해 react-icons 사용
 
 // 헬퍼 컴포넌트: Section, Title, Subtitle 등
 const Section = ({ children, className = '' }) => (
@@ -35,20 +36,26 @@ const Gallery = ({ images }) => {
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const galleryRef = React.useRef(null);
 
-  const handlers = useSwipeable({
-    onSwipedLeft: () => handleNext(),
-    onSwipedRight: () => handlePrev(),
-    preventDefaultTouchmoveEvent: true,
-    trackMouse: true
-  });
+  // Next and Previous Handlers
+  const handleNext = () => {
+      setCurrentIndex((prevIndex) =>
+          prevIndex === images.length - 1 ? 0 : prevIndex + 1
+      );
+  };
 
   const handlePrev = () => {
-    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+      setCurrentIndex((prevIndex) =>
+          prevIndex === 0 ? images.length - 1 : prevIndex - 1
+      );
   };
 
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-  };
+  // Swipe Handlers
+  const handlers = useSwipeable({
+      onSwipedLeft: handleNext,
+      onSwipedRight: handlePrev,
+      preventDefaultTouchmoveEvent: true,
+      trackMouse: true,
+  });
 
   React.useEffect(() => {
     if (galleryRef.current) {
@@ -64,45 +71,62 @@ const Gallery = ({ images }) => {
       <div
         {...handlers}
         ref={galleryRef}
-        className="flex overflow-x-auto scroll-smooth scrollbar-hide snap-x snap-mandatory"
+        className="w-full overflow-hidden"
       >
-        {images.map((image, index) => (
-          <div key={index} className="flex-shrink-0 w-full snap-start px-2">
-            <img
-              src={image.src}
-              alt={image.alt || 'Gallery image'}
-              className="w-full h-56 sm:h-48 object-cover rounded-lg shadow-soft transition-transform transform hover:scale-105"
-            />
-          </div>
-        ))}
+        <div
+            className="flex transition-transform duration-500 ease-in-out"
+            style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+        >
+            {images.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex-shrink-0 w-full px-8 cursor-pointer"
+                >
+                    {/* Background Image with Blur and Overlay */}
+                    <div className="relative w-full h-60 overflow-hidden rounded-xl border">
+                        <img
+                            src={item.src}
+                            alt={item.alt || `Slide ${index + 1}`}
+                            className="w-full h-full object-cover z-0"
+                        />
+                    </div>
+                </div>
+            ))}
+        </div>
       </div>
-      {/* 내비게이션 도트 */}
-      <div className="flex justify-center mt-2">
+
+      {/* Navigation Dots */}
+      <div className="flex justify-center mt-4">
         {images.map((_, index) => (
-          <span
-            key={index}
-            className={`h-2 w-2 mx-1 rounded-full cursor-pointer transition-colors duration-300 ${
-              currentIndex === index ? 'bg-[var(--accent)]' : 'bg-gray-300 hover:bg-[var(--accent)]'
-            }`}
-            onClick={() => setCurrentIndex(index)}
-            aria-label={`Go to slide ${index + 1}`}
-          ></span>
+            <button
+                key={index}
+                className={`h-3 w-3 mx-1 rounded-full transition-colors duration-300 ${
+                    currentIndex === index
+                        ? 'bg-blue-500'
+                        : 'bg-gray-300 hover:bg-blue-500'
+                }`}
+                onClick={() => setCurrentIndex(index)}
+                aria-label={`Go to slide ${index + 1}`}
+            ></button>
         ))}
       </div>
-      {/* 내비게이션 버튼 */}
+
+      {/* Navigation Buttons */}
+      {/* 왼쪽 화살표 */}
       <button
         onClick={handlePrev}
-        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-[var(--background)] p-2 rounded-full shadow-strong hover:bg-[var(--background-muted)] transition-all focus:outline-none"
+        className="absolute left-0 top-1/2 transform -translate-y-1/2 p-1 rounded-full hover:scale-105 transition-all"
         aria-label="Previous Slide"
       >
-        &#8592;
+        <FaArrowLeft className="text-gray-600" />
       </button>
+      {/* 오른쪽 화살표 */}
       <button
         onClick={handleNext}
-        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[var(--background)] p-2 rounded-full shadow-strong hover:bg-[var(--background-muted)] transition-all focus:outline-none"
+        className="absolute right-0 top-1/2 transform -translate-y-1/2 p-1 rounded-full hover:scale-105 transition-all"
         aria-label="Next Slide"
       >
-        &#8594;
+        <FaArrowRight className="text-gray-600" />
       </button>
     </div>
   );

@@ -334,12 +334,29 @@ const RewardMockup = ({ gift }) => {
     const quantity = gift.quantity || 1;
     const objects = [];
     const spacing = 2.5;
+    const z = 1;
 
     for (let i = 0; i < quantity; i++) {
       let object;
       switch (gift.id) {
         case 'photoCard':
-          object = createPhotoCard();
+          const radius = 5; // 부채꼴 반지름 (중심으로부터의 거리)
+          const angleStep = (Math.PI / 6) / (quantity - 1); // 각 객체 간 각도 차이 (30도 부채꼴 기준)
+
+          for (let j = 0; j < quantity; j++) {
+            const angle = -Math.PI / 12 + j * angleStep; // 부채꼴 시작 각도와 각 객체의 각도
+            object = createPhotoCard();
+
+            // 위치 설정: 부채꼴 반지름을 기준으로 x, y 좌표를 계산
+            object.position.x = Math.cos(angle) * radius;
+            object.position.y = Math.sin(angle) * radius;
+            object.position.z = j/20;
+
+            // 객체를 중심 방향으로 회전
+            object.rotation.z = angle;
+
+            objects.push(object);
+          }
           break;
         case 'album':
           object = createAlbum();
@@ -356,8 +373,6 @@ const RewardMockup = ({ gift }) => {
         default:
           object = createDefault();
       }
-      // Position the objects appropriately
-      object.position.x = (i - (quantity - 1) / 2) * spacing;
       objects.push(object);
     }
     return objects;
