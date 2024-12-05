@@ -24,16 +24,17 @@ const RoadMap = () => {
     const report = useReport();
     const kpiData = useKPI();
 
-    const bep = report.goal_fund;
+    const investorsBEPRevenue = report.goal_fund;
+    const investorsShareRatio = report.investors_share_ratio;
+    const bep = investorsBEPRevenue / investorsShareRatio;
     const avgRevenue = kpiData.expectedAnnualRevenue
     const maxRevenue = avgRevenue * (1 + kpiData.expectedRevenueSpectrum.spectrumMax);
     const minRevenue = avgRevenue * (1 - kpiData.expectedRevenueSpectrum.spectrumMin);
     const lossRevenue = bep * 0.8;
-    const investorsShareRatio = report.investors_share_ratio;
+    
     const investorsAvgRevenue = avgRevenue * investorsShareRatio;
     const investorsMaxRevenue = maxRevenue * investorsShareRatio;
     const investorsMinRevenue = minRevenue * investorsShareRatio;
-    const investorsBEPRevenue = bep * investorsShareRatio;
     const investorsLossRevenue = lossRevenue * investorsShareRatio;
 
     const data = [
@@ -200,7 +201,7 @@ const RoadMap = () => {
                         <tr className="bg-gray-200">
                             <th className="py-2 px-4 border border-gray-300 font-bold">매출 범주</th>
                             <th className="py-2 px-4 border border-gray-300 font-bold">연간 매출</th>
-                            <th className="py-2 px-4 border border-gray-300 font-bold">투자자 수익</th>
+                            <th className="py-2 px-4 border border-gray-300 font-bold">투자자 수익 (매출액의 {(investorsShareRatio * 100).toFixed(0)}%)</th>
                             <th className="py-2 px-4 border border-gray-300 font-bold">수익률</th>
                         </tr>
                     </thead>

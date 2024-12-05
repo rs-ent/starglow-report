@@ -169,7 +169,8 @@ const KPI = () => {
 
     const riskLevel = calculateRiskLevelPercentage(
         reportData.goal_fund,
-        expectedAnnualRevenue
+        expectedAnnualRevenue,
+        reportData.investors_share_ratio,
     );
 
     const revenueSpectrum = `-${Math.ceil(expectedRevenueSpectrum.spectrumMin * 100)}% ~ ${Math.ceil(expectedRevenueSpectrum.spectrumMax * 100)}%`;

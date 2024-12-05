@@ -20,11 +20,13 @@ const RiskLevel = () => {
     const kpiData = useKPI();
 
     const goal_fund = report.goal_fund || 0;
+    const shareRatio = report.investors_share_ratio || 1;
     const expectedAnnualRevenue = kpiData.expectedAnnualRevenue || 0;
 
     const riskLevelData = calculateRiskLevelPercentage(
         goal_fund,
-        expectedAnnualRevenue
+        expectedAnnualRevenue,
+        shareRatio,
     );
 
     const percentage = riskLevelData.differencePercentage;

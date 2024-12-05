@@ -1,5 +1,5 @@
 // 위험 수준 계산 함수
-export const calculateRiskLevelPercentage = (goalFund, expectedRevenue) => {
+export const calculateRiskLevelPercentage = (goalFund, expectedTotalRevenue, shareRatio) => {
 
     const riskLevels = [
         {
@@ -49,6 +49,7 @@ export const calculateRiskLevelPercentage = (goalFund, expectedRevenue) => {
         },
     ];
 
+    const expectedRevenue = expectedTotalRevenue * shareRatio;
     const difference = Math.abs(expectedRevenue - goalFund);
     const differencePercentage = (difference / goalFund) * 100;
 
