@@ -18,7 +18,6 @@ const IntroductionManager = ({ artist_id }) => {
   const loadSavedIntroductionData = async() => {
     try {
       const loadedData = await fetchData('Introduction', {comp: 'docId', sign: '==', val: artist_id}, false);
-      console.log('Introduction Data: ', loadedData);
       setSavedData(loadedData);
     } catch (e) {
       console.error('Fetch Saved Introduction Data Failed', e);
@@ -26,8 +25,14 @@ const IntroductionManager = ({ artist_id }) => {
   };
 
   useEffect(() => {
-    if (savedData) {
-      // 데이터 초기화
+    // savedData가 로딩된 후 처리
+    if (savedData === null) {
+      // savedData 없음 -> BasicData 로드 시도
+      (async() => {
+        await loadBasicData();
+      })();
+    } else {
+      // savedData 있음
       setCatchPhrase(savedData.catchPhrase || '');
       setSubCatchPhrase(savedData.subCatchPhrase || '');
       setLogo(savedData.logo || null);
@@ -36,7 +41,15 @@ const IntroductionManager = ({ artist_id }) => {
       setGalleryImages(savedData.galleryImages || []);
       setMembers(savedData.members || []);
       setTeamMembers(savedData.teamMembers || []);
-      setArtistData(savedData.additionalData || {});
+
+      if (savedData.additionalData && Object.keys(savedData.additionalData).length > 0) {
+        setArtistData(savedData.additionalData);
+      } else {
+        // 추가 데이터 없으면 basic data 로드
+        (async() => {
+          await loadBasicData();
+        })();
+      }
     }
   }, [savedData]);
 
@@ -198,7 +211,7 @@ const IntroductionManager = ({ artist_id }) => {
           };
           return acc;
         }, {});
-    
+        
         setArtistData(formattedArtistData);
 
     } catch (error) {
@@ -206,12 +219,6 @@ const IntroductionManager = ({ artist_id }) => {
         console.error('Error loading investment points.');
     }
   };
-  
-  useEffect(() => {
-    if (!savedData?.additionalData || Object.keys(artistData).length === 0) {
-      loadBasicData();
-    }
-  }, [savedData]);
 
   const [selectedFields, setSelectedFields] = useState({}); // 공개 여부 관리
 
@@ -563,6 +570,7 @@ const IntroductionManager = ({ artist_id }) => {
       </section>
 
       <section className="field-selection">
+        {console.log(artistData)}
         <h2>공개할 데이터 선택</h2>
         {Object.entries(artistData).map(([key, data]) => (
           <div key={key} className="field-option">

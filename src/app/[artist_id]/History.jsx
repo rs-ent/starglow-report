@@ -9,7 +9,7 @@ const History = ({ openModal }) => {
     const history = useHistory();
 
     // SectionTitle 타입만 필터링
-    const sectionTitles = history.history.filter(item => item.type === 'SectionTitle');
+    const sectionTitles = history?.history.filter(item => item.type === 'SectionTitle') || [];
 
     // 모달에 전달할 데이터 생성
     const handleOpenModal = (sectionTitleText) => {

@@ -1,6 +1,7 @@
 // src/app/processors/valuation.js
 
 import { WEIGHT } from "../utils/constants";
+let weights = WEIGHT;
 import { 
     parse, 
     parseISO,
@@ -26,9 +27,10 @@ const convertToISO = (dateStr) => {
     }
 
     let date;
-
-    // 이미 Date 객체인 경우
-    if (dateStr instanceof Date) {
+    if (dateStr && typeof dateStr === 'object' && 'seconds' in dateStr && 'nanoseconds' in dateStr) {
+        const millis = dateStr.seconds * 1000 + dateStr.nanoseconds / 1000000;
+        date = new Date(millis);
+    } else if (dateStr instanceof Date) {
         date = dateStr;
     } else if (typeof dateStr === "string") {
         // parseISO를 사용하여 ISO 형식 파싱
@@ -102,7 +104,7 @@ const addToTimeline = (timelineMap, date, key, value) => {
             };
         }
 
-        const weight = WEIGHT[key] || 1; // 기본값 1 설정
+        const weight = weights[key] || 1;
         timelineMap[isoMonthEnd][key] += value * weight;
     }
 };
@@ -184,7 +186,7 @@ const distributeRVOverTime = (rv, startDate, endDate) => {
     // 가치 분배 및 감쇠 적용
     const rvValues = dateRange.map((date, index) => ({
         date: date.toISOString(),
-        rv_t: rv * decayRates[index] * (WEIGHT['rv_t'] || 1)
+        rv_t: rv * decayRates[index] * (weights['rv_t'] || 1)
     }));
 
     return rvValues;
@@ -200,7 +202,7 @@ const distributeRVOverTime = (rv, startDate, endDate) => {
  * @returns {Object} - 통합된 시계열 데이터 객체
  */
 const integratePFVData = (timeline, pfvData, endDate, decayRate = null, residualRate = 0.001, sv_data, rv_data, apv_data) => {
-    const albums = pfvData?.av_a?.metrics || [];
+    const albums = pfvData?.av_a?.metrics || pfvData.sub_data || [];
     const totalPeriods = 70 * 12;
     
     if (decayRate === null) {
@@ -231,7 +233,9 @@ const integratePFVData = (timeline, pfvData, endDate, decayRate = null, residual
             rvEntries.forEach(entry => addToTimeline(timeline, entry.date, 'rv_t', entry.rv_t));
         }
 
-        const svAlbum = sv_data.albums.find(a => a.release_date === album.release_date);
+        const svAlbum = sv_data.albums.find(function (a) {
+            if (convertToISO(a.release_date).split('T')[0] === convertToISO(album.release_date).split('T')[0]) return a;
+        });
         const rvAlbum = rv_data.sales_data.find(a => a.discounted_revenue.toFixed(2) === album.rv_a.toFixed(2));
         const apvAlbum = apv_data.albums.find(a => a.album_id === album.spotify_album_id);
 
@@ -368,7 +372,7 @@ const integrateCEVEvents = (timeline, cevEvents, decayRate = 0.1, baseInfluenceM
  * @param {Object} mcvYoutube - 유튜브 MCV 데이터 객체
  * @returns {Object} - 통합된 시계열 데이터 객체
  */
-const integrateMCVEvents = (timeline, mcvTwitter, mcvYoutube) => {
+const integrateMCVEvents = (timeline, mcvTwitter, mcvYoutube, mcvInstagram) => {
     const computeFractionDecayFactor = (t, peakMonth = 6, initialDecayRate = 0.001, decayIncrement = 0.0005, maxDecayRate = 0.1, maxFactor = 0.01) => {
         if (t <= peakMonth) {
             return (t / peakMonth) * maxFactor;
@@ -381,7 +385,7 @@ const integrateMCVEvents = (timeline, mcvTwitter, mcvYoutube) => {
     };
 
     // 트위터 이벤트 통합
-    const twitterEvents = mcvTwitter.tweets || [];
+    const twitterEvents = mcvTwitter.tweets || mcvTwitter.sub_data || [];
     twitterEvents.forEach(event => {
         try {
             const createdAt = convertToISO(event.created_at);
@@ -389,7 +393,7 @@ const integrateMCVEvents = (timeline, mcvTwitter, mcvYoutube) => {
             const monthEndDate = getMonthEndDate(eventDate);
 
             const mcvValue = parseFloat(event.mcv) || 0;
-            const weightedMcv = mcvValue * (WEIGHT['mcv_twitter'] || 1);
+            const weightedMcv = mcvValue * (weights['mcv_twitter'] || 1);
 
             for (let i = 0; i < 12; i++) { // 12개월 영향
                 const date = addMonths(monthEndDate, i);
@@ -424,7 +428,7 @@ const integrateMCVEvents = (timeline, mcvTwitter, mcvYoutube) => {
     });
 
     // 유튜브 이벤트 통합
-    const youtubeEvents = mcvYoutube.details || [];
+    const youtubeEvents = mcvYoutube.details || mcvYoutube.sub_data || [];
     youtubeEvents.forEach(event => {
         try {
             const publishedAt = convertToISO(event.publishedAt);
@@ -432,7 +436,7 @@ const integrateMCVEvents = (timeline, mcvTwitter, mcvYoutube) => {
             const monthEndDate = getMonthEndDate(eventDate);
 
             const mcvValue = parseFloat(event.MCV) || 0;
-            const weightedMcv = mcvValue * (WEIGHT['mcv_youtube'] || 1);
+            const weightedMcv = mcvValue * (weights['mcv_youtube'] || 1);
 
             for (let i = 0; i < 12; i++) { // 12개월 영향
                 const date = addMonths(monthEndDate, i);
@@ -458,6 +462,43 @@ const integrateMCVEvents = (timeline, mcvTwitter, mcvYoutube) => {
             }
         } catch (error) {
             console.error('Error processing YouTube MCV event:', error, 'Event data:', event);
+        }
+    });
+
+    // 인스타그램 이벤트 통합 (추가)
+    const instagramEvents = mcvInstagram.details || mcvInstagram.sub_data || [];
+    instagramEvents.forEach(event => {
+        try {
+            const createdAt = convertToISO(event.date); // event.date가 ISO 또는 timestamp 형태라 가정
+            const eventDate = new Date(createdAt);
+            const monthEndDate = getMonthEndDate(eventDate);
+
+            const mcvValue = parseFloat(event.mcv) || 0;
+            const weightedMcv = mcvValue * (weights['mcv_instagram'] || 1);
+
+            for (let i = 0; i < 12; i++) { // 12개월 영향
+                const date = addMonths(monthEndDate, i);
+                const isoMonth = formatISO(getMonthEndDate(date));
+
+                const decayFactor = computeFractionDecayFactor(i);
+                addToTimeline(timeline, isoMonth, 'mcv_instagram', weightedMcv * decayFactor);
+
+                if (i === 0 && timeline[isoMonth]) {
+                    timeline[isoMonth].production.media.instagram = timeline[isoMonth].production.media.instagram || [];
+                    timeline[isoMonth].production.media.instagram.push({
+                        date: event.date,
+                        id: event.id,
+                        likes: event.likes || 0,
+                        comments: event.comments || 0,
+                        mcv: event.mcv || 0,
+                        ev: event.ev || 0,
+                        engagement_value: event.engagement_value || 0,
+                        url: event.url || null,
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('Error processing Instagram MCV event:', error, 'Event data:', event);
         }
     });
 
@@ -616,19 +657,26 @@ export const setTimeline = (valuationData, decayRate = null, residualRate = 0.01
             pcv_data = {},
             cev_data = {}, 
             mcv_youtube_data = {}, 
+            mcv_instagram_data = {},
             mcv_twitter_data = {}, 
             mds_data = {},
-            mrv_data = {} } = valuationData;
+            mrv_data = {},
+            importedWeights = {},
+        } = valuationData; 
+
+    console.log(importedWeights);
+    weights = Object.keys(importedWeights).length > 0 ? importedWeights : WEIGHT;
+
     const endDate = fv_t_data.length > 0 ? new Date(convertToISO(fv_t_data[fv_t_data.length - 1].date)) : new Date();
     
     // PFV 데이터 통합
     timeline = integratePFVData(timeline, pfv_data, endDate.toISOString(), decayRate, residualRate, sv_data, rv_data, apv_data);
 
     // PCV 데이터 통합
-    timeline = integrateCEVEvents(timeline, pcv_data.cev_events || [], 0.1, 2, 12, 1);
-    timeline = integrateMCVEvents(timeline, mcv_twitter_data || {}, mcv_youtube_data || {});
-    timeline = integrateMDSRecords(timeline, pcv_data.mds_record || []);
-    timeline = integrateMRVEvents(timeline, mrv_data.record || [], 0.1, 2, 12, 1);
+    timeline = integrateCEVEvents(timeline, pcv_data.cev_events || cev_data.sub_data || [], 0.1, 2, 12, 1);
+    timeline = integrateMCVEvents(timeline, mcv_twitter_data || mcv_twitter_data.sub_data || {}, mcv_youtube_data || mcv_youtube_data.sub_data || {}, mcv_instagram_data || mcv_instagram_data.sub_data || {});
+    timeline = integrateMDSRecords(timeline, pcv_data.mds_record || mds_data.sub_data || []);
+    timeline = integrateMRVEvents(timeline, mrv_data.record || mrv_data.sub_data || [], 0.1, 2, 12, 1);
 
     fv_t_data.forEach(entry => {
         try {

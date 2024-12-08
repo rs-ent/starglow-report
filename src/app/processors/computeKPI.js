@@ -35,13 +35,14 @@ const calculateExpectedAnnualRevenue = (activeRevenueAvg, activityFrequency, com
 
 const calculateExpectedRevenueSpectrum = (activeRevenueAvg, revenueVolatilityStd, albumData) => {
     const totalAV = albumData.av;
-    const avgAV = totalAV / albumData.metrics.length;
+    const metrics = albumData.metrics || albumData.sub_data;
+    const avgAV = totalAV / metrics.length;
     
     let maxAV = -1;
     let minAV = Infinity;
 
     // AV 값 수집
-    const avValues = albumData.metrics.map((album) => {
+    const avValues = metrics.map((album) => {
         if (album.av > maxAV) maxAV = album.av;
         if (album.av < minAV) minAV = album.av;
         return album.av;

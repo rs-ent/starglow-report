@@ -2,11 +2,10 @@
 
 import DefaultLayout from '../app/components/server/DefaultLayout';
 import ReportList from './ReportList';
-import { fetchReports } from './firebase/fetch';
+import { useReports } from '../context/ReportsData';
 
 export default async function Home() {
-    const reports = await fetchReports();
-    console.log(reports);
+    const reports = useReports()
     return (
         <DefaultLayout>
             <ReportList reports={reports}/>

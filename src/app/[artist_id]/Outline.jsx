@@ -42,15 +42,8 @@ const Outline = () => {
     };
 
     const {
-        catchPhrase,
-        subCatchPhrase,
-        introduction,
-        additionalData,
-        logo,
-        profilePicture,
-        members,
-        galleryImages,
-    } = data;
+        profilePicture = null,
+    } = data || {};
 
     return (
         <div>

@@ -18,18 +18,21 @@ const Introduction = () => {
     
     const catchPhraseRef = useRef(null);
     const subCatchPhraseRef = useRef(null);
-    const formattedCatchPhrase = data.catchPhrase.replace(/(.{14})/g, '$1\n');
+    const catchPhraseRaw = data?.catchPhrase || '엄청난 아티스트!';
+    const formattedCatchPhrase = catchPhraseRaw.replace(/(.{14})/g, '$1\n');
+    const subCatchPhrase = data?.subCatchPhrase || '와우~!';
 
     const logoRef = useRef(null);
     
     const [activeGalleryIndex, setActiveGalleryIndex] = useState(null);
     const galleryRef = useRef(null);
     
-    const formattedIntroduction = data.introduction.split('</p>').filter(Boolean);
+    const introductionRaw = data?.introduction || '소개이다!';
+    const formattedIntroduction = introductionRaw.split('</p>').filter(Boolean);
     const textBlocksRef = useRef([]);
 
     const membersRef = useRef(null);
-    const members = data.members;
+    const members = data?.members || [];
 
     const albums = valuationData.SV?.albums || [];
     const representativeTracks = albums
@@ -38,15 +41,15 @@ const Introduction = () => {
         )
         .slice(0, 5);
 
-    const teamMembers = data.teamMembers || [];
+    const teamMembers = data?.teamMembers || [];
 
-    const visibleData = Object.entries(data.additionalData)
-        .filter(([key, value]) => value.visible) // visible이 true인 항목만 필터링
-        .sort(([, a], [, b]) => b.priority - a.priority) // priority 기준으로 정렬
-        .map(([key, value]) => ({
-            displayKey: value.displayKey || key,
-            value: value.value,
-        }));
+    const visibleData = Object.entries(data?.additionalData || {})
+    .filter(([key, value]) => value.visible) // visible이 true인 항목만 필터링
+    .sort(([, a], [, b]) => b.priority - a.priority) // priority 기준으로 정렬
+    .map(([key, value]) => ({
+        displayKey: value.displayKey || key,
+        value: value.value,
+    })) || [];
 
     // 갤러리 이미지 클릭 핸들러
     const handleGalleryImageClick = (index) => {
@@ -219,7 +222,7 @@ const Introduction = () => {
                     ref={subCatchPhraseRef}
                     className="mt-3 text-base text-[var(--text-secondary)] italic"
                 >
-                    {data.subCatchPhrase}
+                    {subCatchPhrase}
                 </p>
             </div>
 
@@ -227,7 +230,7 @@ const Introduction = () => {
             <div className="my-10">
                 <Image
                     ref={logoRef}
-                    src={data.logo}
+                    src={data?.logo || '/noimage.jpg'}
                     alt="Artist Logo"
                     width={150}
                     height={150}
@@ -241,7 +244,7 @@ const Introduction = () => {
                 className="flex gap-1 overflow-x-scroll px-4 py-6 overflow-y-visible scrollbar-hide"
                 style={{ scrollBehavior: 'smooth' }}
             >
-                {data.galleryImages.map((image, index) => (
+                {data?.galleryImages.map((image, index) => (
                     <div
                         key={index}
                         className={`relative flex-shrink-0 transition-all duration-300 ${

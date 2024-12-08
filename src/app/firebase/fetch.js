@@ -245,8 +245,41 @@ export async function fetchValuation(docId = 'knk_20160303') {
             return null;
         }
 
-        const data = { id: docSnap.id, ...docSnap.data() };
-        return serializeFirestoreData(data);
+        let data = { id: docSnap.id, ...docSnap.data() };
+
+        for (const key of Object.keys(data)) {
+            if (key === 'id') continue; // id는 문서id용, pass
+
+            // subcollection 참조
+            const subColRef = collection(docRef, key);
+            const subSnap = await getDocs(subColRef);
+
+            if (!subSnap.empty) {
+                // subcollection 문서들 가져오기
+                const subData = subSnap.docs.map(subDoc => ({
+                    id: subDoc.id,
+                    ...subDoc.data()
+                }));
+
+                // 직렬화
+                const serializedSubData = serializeFirestoreData(subData);
+
+                // data[key]가 객체인지 확인하고, 아니라면 객체로 만들기(선택사항)
+                if (typeof data[key] !== 'object' || data[key] === null) {
+                    // data[key]가 객체가 아니라면 객체로 변환
+                    // 예를 들어 data[key]가 숫자나 문자열이라면
+                    data[key] = { value: data[key] };
+                }
+
+                // 해당 key의 값 안에 sub_data 필드를 추가
+                data[key].sub_data = serializedSubData;
+            }
+        }
+
+        // 전체 data 직렬화
+        data = serializeFirestoreData(data);
+        
+        return data;
     } catch (error) {
         console.error('Error fetching valuation data:', error);
         return null;
