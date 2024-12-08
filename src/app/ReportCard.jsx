@@ -1,6 +1,7 @@
 // src/app/components/ReportCard.jsx
+'use client';
+
 import React, { useRef, useEffect, useState } from 'react';
-import Link from 'next/link';
 
 const ReportCard = ({ artistId, image, title, artistEng, artistKor }) => {
     const cardRef = useRef(null);
@@ -10,10 +11,6 @@ const ReportCard = ({ artistId, image, title, artistEng, artistKor }) => {
             <div
                 ref={cardRef}
                 className="bg-white rounded-lg shadow-soft transition-transform duration-300 ease-out transform cursor-pointer"
-                style={{
-                    transformStyle: 'preserve-3d',
-                    transform: transformStyle,
-                }}
             >
                 <img
                     src={image}
