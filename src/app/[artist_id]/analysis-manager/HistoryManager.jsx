@@ -100,12 +100,12 @@ const HistoryManager = ({ artist_id }) => {
   };
 
   if (loading) {
-    return <div>Loading history...</div>;
+    return <div>Loading analysis...</div>;
   }
 
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-bold mb-4">History Manager</h1>
+      <h1 className="text-3xl font-bold mb-4">Analysis Manager</h1>
       {historyData.map((block, index) => (
         <div key={index} className="relative mb-1 border p-2 rounded">
           <div className="max-w-[480px] content-center">

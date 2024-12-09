@@ -124,6 +124,7 @@ const InvestmentPointManager = ({artist_id}) => {
     const [investmentPoints, setInvestmentPoints] = useState([]);
     const [formData, setFormData] = useState({
         id: null,
+        artist_id: artist_id,
         type: 'Investment Point',
         title: '',
         context: '',
@@ -262,7 +263,7 @@ const InvestmentPointManager = ({artist_id}) => {
             const newPoint = {
                 ...formData,
                 id: formData.id || `IP-${new Date().toISOString()}`,
-                artist_id,
+                artist_id: artist_id,
             };
     
             if (isEditing) {

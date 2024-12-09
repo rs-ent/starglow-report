@@ -664,7 +664,14 @@ export const setTimeline = (valuationData, decayRate = null, residualRate = 0.01
             importedWeights = {},
         } = valuationData; 
 
-    console.log(importedWeights);
+    console.log('팬덤 가치 : ', fv_t_data);
+    console.log('국내 스트리밍 : ', sv_data);
+    console.log('음반 판매 : ', rv_data);
+    console.log('해외 스트리밍 : ', apv_data);
+    console.log('공연/행사 : ', cev_data);
+    console.log('유튜브 : ', mcv_youtube_data);
+    console.log('인스타그램 : ', mcv_instagram_data);
+    console.log('트위터 : ', mcv_twitter_data);
     weights = Object.keys(importedWeights).length > 0 ? importedWeights : WEIGHT;
 
     const endDate = fv_t_data.length > 0 ? new Date(convertToISO(fv_t_data[fv_t_data.length - 1].date)) : new Date();
