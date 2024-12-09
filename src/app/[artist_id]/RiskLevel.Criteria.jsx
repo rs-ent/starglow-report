@@ -147,7 +147,7 @@ const CriteriaPage = ({ onClose }) => {
                     </p>
                     <div className="bg-gray-200 p-2 rounded-sm mb-2">
                         <p className="font-mono text-xs">
-                            위험도 = |미래 추정 수익 - 목표 금액| ÷ 목표 금액
+                            위험도 = |미래 추정 수익 - 손익분기점 매출| ÷ 손익분기점 매출
                         </p>
                     </div>
                     <p className="text-gray-700 text-xs mb-2">

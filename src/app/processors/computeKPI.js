@@ -1,6 +1,5 @@
-const calculateExpectedAnnualRevenue = (activeRevenueAvg, activityFrequency, combinedVolatility) => {
+const calculateExpectedAnnualRevenue = (activeRevenueAvg, activityFrequency, combinedVolatility, startYearMonth = null) => {
     // 월 평균 매출 & 연평균 앨범 발매 빈도 & 수익 변동성 지표
-
     const decayRate = combinedVolatility;
 
     // 감소율에 따른 활동 기간 계산
@@ -121,9 +120,10 @@ const calculateRevenueVolatility = (data) => {
     return Math.sqrt(variance);
 };
 
-const calculateActivityFrequency = (valuationData) => {
+const calculateActivityFrequency = (valuationData, startYear = null) => {
     // 데이터에서 albums 배열 추출
     const albums = valuationData.SV.albums || [];
+    console.log('calculateActivityFrequency : albums : ', albums);
 
     // 연도별 발매 횟수 집계
     const releaseData = {};
@@ -138,6 +138,8 @@ const calculateActivityFrequency = (valuationData) => {
     const currentYear = new Date().getFullYear(); // 현재 연도
     const maxYear = Math.max(currentYear, ...years);
 
+    console.log('Min Year: ', minYear, ' Max Year: ', maxYear);
+
     // 모든 연도 초기화 (발매 기록이 없는 연도는 0으로 설정)
     const releasesByYear = [];
     for (let year = minYear; year <= maxYear; year++) {
@@ -151,8 +153,10 @@ const calculateActivityFrequency = (valuationData) => {
 
     releasesByYear.forEach((releases, yearIndex) => {
         // 발매가 있는 연도 또는 직전 연도가 활동 연도일 경우
-        if (yearIndex + minYear === lastActiveYear || yearIndex + minYear === lastActiveYear + 1) {
+        console.log("YearIndex + minYear", yearIndex + minYear , ' LastActiveYear : ', lastActiveYear, ' LastActiveYear + 1 : ', lastActiveYear + 1);
+        if (releases > 0 || yearIndex + minYear === lastActiveYear || yearIndex + minYear === lastActiveYear + 1) {
             activeYearsCount++;
+            console.log('ActiveYearsCount ++ : ', activeYearsCount);
             totalReleases += releases; // 발매 횟수 누적
             if(releases > 0) lastActiveYear = yearIndex + minYear; // 마지막 활동 연도 갱신
         }
@@ -160,6 +164,10 @@ const calculateActivityFrequency = (valuationData) => {
 
     const activityFrequency = activeYearsCount > 0 ? totalReleases / activeYearsCount : 0;
 
+    console.log('calculateActivityFrequency, totalReleases: ', totalReleases);
+    console.log('releasesByYear: ', releasesByYear);
+    console.log('activateYearsCount: ', activeYearsCount);
+    console.log('activityFrequency: ', activityFrequency);
     return {
         totalReleases,
         releasesByYear,
@@ -200,6 +208,9 @@ export const computeKPIs = (valuationData, sortedData, currentIndex, currentData
     let activityEndDate;
 
     let activityRevenueSum = 0; // 활동기 매출 합계
+    let activityRevenueSumForExpectedAnnualRevenue = 0;
+    let activityRevenueDateCount = 0;
+    const expectedAnnualRevenueCalculationStartDate = new Date(valuationData.expected_revenue_calculation_start_date) || null;
     let activityGrowthRatesSum = 0; // 활동기 성장률 합계
     let activityMonthsCount = 0; // 활동기 데이터 수 (1~3개월 기준)
     let previousActivityMonthMOV = null;
@@ -256,6 +267,10 @@ export const computeKPIs = (valuationData, sortedData, currentIndex, currentData
 
         if (albumReleaseDate && activityEndDate && currentDate >= albumReleaseDate && currentDate <= activityEndDate) {
             activityRevenueSum += data.MOV ?? 0; // 활동기 매출 합산
+            if (expectedAnnualRevenueCalculationStartDate && expectedAnnualRevenueCalculationStartDate <= currentDate) {
+                activityRevenueSumForExpectedAnnualRevenue += data.MOV;
+                activityRevenueDateCount ++;
+            }
             activityMonthsCount++; // 활동기 데이터 카운트
     
             // 활동기 성장률 계산
@@ -271,10 +286,11 @@ export const computeKPIs = (valuationData, sortedData, currentIndex, currentData
 
     // 활동기 매출 평균 및 성장률 평균 계산
     const activeRevenueAvg = activityMonthsCount > 0 ? activityRevenueSum / activityMonthsCount : 0;
+    const activityRevenueAvgForExpectedAnnualRevenue = activityRevenueDateCount > 0 ? activityRevenueSumForExpectedAnnualRevenue / activityRevenueDateCount : activeRevenueAvg;
     const activeGrowthRatesAvg = activityMonthsCount > 1 ? activityGrowthRatesSum / (activityMonthsCount - 1) : 0;
 
     // 연평균 활동 빈도 (totalReleases: 총 발매횟수 / activeYearsCount: 활동 연도 수 / activityFrequency: 활동 빈도)
-    const activityFrequency = calculateActivityFrequency(valuationData);
+    const activityFrequency = calculateActivityFrequency(valuationData, expectedAnnualRevenueCalculationStartDate);
 
     const movingAverage6 = sortedData.length >= 6 
         ? calculateMovingAverage(sortedData.slice(0, currentIndex + 1), 6) 
@@ -332,9 +348,12 @@ export const computeKPIs = (valuationData, sortedData, currentIndex, currentData
     const valuePerFan = (currentData.MOV / currentData.fv_t) * 10000;
     const valuePerFanAvg = (valuePerFanSum / currentIndex) * 10000;
 
-    const expectedRevenueSpectrum = calculateExpectedRevenueSpectrum(activeRevenueAvg, revenueVolatilityStd, valuationData.AV);
+    const expectedRevenueSpectrum = calculateExpectedRevenueSpectrum(activityRevenueAvgForExpectedAnnualRevenue, revenueVolatilityStd, valuationData.AV);
+    console.log('activityFrequency', activityFrequency.activityFrequency);
+    console.log('activityRevenueAvgForExpectedAnnualRevenue', activityRevenueAvgForExpectedAnnualRevenue.toLocaleString());
+    console.log('combinedVolatility', expectedRevenueSpectrum.combinedVolatility);
     const expectedAnnualRevenue = calculateExpectedAnnualRevenue(
-                                    activeRevenueAvg, 
+                                    activityRevenueAvgForExpectedAnnualRevenue, 
                                     activityFrequency.activityFrequency, 
                                     expectedRevenueSpectrum.combinedVolatility);
 
@@ -342,7 +361,7 @@ export const computeKPIs = (valuationData, sortedData, currentIndex, currentData
         peakValue: peakData.value,
         peakDate: peakData.date ? peakData.date.slice(0, 7) : 'N/A',
         totalValue: currentData ? currentData.MOV : 0,
-        activeRevenueAvg,
+        activityRevenueAvgForExpectedAnnualRevenue,
         activeGrowthRatesAvg,
         ma6Current,
         ma3Current,
