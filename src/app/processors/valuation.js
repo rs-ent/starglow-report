@@ -233,11 +233,17 @@ const integratePFVData = (timeline, pfvData, endDate, decayRate = null, residual
             rvEntries.forEach(entry => addToTimeline(timeline, entry.date, 'rv_t', entry.rv_t));
         }
 
-        const svAlbum = sv_data.albums.find(function (a) {
+        const sv_albums = sv_data.albums ? sv_data.albums : sv_data.sub_data || [];
+        const svAlbum = sv_albums.find(function (a) {
             if (convertToISO(a.release_date).split('T')[0] === convertToISO(album.release_date).split('T')[0]) return a;
         });
-        const rvAlbum = rv_data.sales_data.find(a => a.discounted_revenue.toFixed(2) === album.rv_a.toFixed(2));
-        const apvAlbum = apv_data.albums.find(a => a.album_id === album.spotify_album_id);
+
+        const rv_sales = rv_data.sales_data ? rv_data.sales_data : rv_data.sub_data || []; 
+        const album_rv_a = album.rv_a ? album.rv_a : album.rv * album.rv_weight || 0;
+        const rvAlbum = rv_sales.find(a => a.discounted_revenue.toFixed(2) === album_rv_a.toFixed(2));
+
+        const apv_albums = apv_data.albums ? apv_data.albums : apv_data.sub_data || [];
+        const apvAlbum = apv_albums.find(a => a.album_id === album.spotify_album_id);
 
         // 최근 6개월 내의 관련 앨범을 discography에 추가
         Object.keys(timeline).forEach(date => {
@@ -667,6 +673,7 @@ export const setTimeline = (valuationData, decayRate = null, residualRate = 0.01
     const fv_t_data = Array.isArray(fv_t_data_raw) 
         ? fv_t_data_raw 
         : fv_t_data_raw?.sub_data || [];
+
     console.log('팬덤 가치 : ', fv_t_data);
     console.log('국내 스트리밍 : ', sv_data);
     console.log('음반 판매 : ', rv_data);
