@@ -648,7 +648,7 @@ const distributeValueOverTimeFV = (fvTData, endDate, decayRate, residualRate) =>
  */
 export const setTimeline = (valuationData, decayRate = null, residualRate = 0.01) => {
     let timeline = {};
-    const { fv_t_data = [], 
+    const { fv_t_data_raw = [], 
             pfv_data = {}, 
             av_data = {},
             sv_data = {},
@@ -664,6 +664,9 @@ export const setTimeline = (valuationData, decayRate = null, residualRate = 0.01
             importedWeights = {},
         } = valuationData; 
 
+    const fv_t_data = Array.isArray(fv_t_data_raw) 
+        ? fv_t_data_raw 
+        : fv_t_data_raw?.sub_data || [];
     console.log('팬덤 가치 : ', fv_t_data);
     console.log('국내 스트리밍 : ', sv_data);
     console.log('음반 판매 : ', rv_data);

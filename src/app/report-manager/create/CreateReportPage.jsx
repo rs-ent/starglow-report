@@ -26,7 +26,8 @@ export default function CreateReportPage() {
         project_status: "모집중",
         sub_title: "크나큰 IPO 리포트",
         title: "KNK IPO REPORT",
-        type: "아이돌"
+        type: "아이돌",
+        
     });
 
     const [localPreview, setLocalPreview] = useState(null);
