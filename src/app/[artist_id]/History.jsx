@@ -47,7 +47,7 @@ const History = ({ openModal }) => {
                                 <div className="absolute inset-0 bg-black bg-opacity-60 z-10"></div>
 
                                 {/* Centered Text */}
-                                <h2 className="absolute inset-0 flex items-center justify-center text-center text-white text-lg p-4 font-semibold z-20">
+                                <h2 className="absolute inset-0 flex items-center justify-center text-center text-white text-lg p-4 whitespace-break-spaces font-semibold z-20">
                                     {item.text}
                                 </h2>
                             </div>
