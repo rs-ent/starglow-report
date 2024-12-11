@@ -155,7 +155,7 @@ const BlocksRenderer = ({ block }) => {
     case 'Subtitle':
       return <Title level={3}>{props.text}</Title>;
     case 'Text':
-      return <p className="text-sm font-normal mt-1 mb-2 text-[var(--text-primary)]">{props.content}</p>;
+      return <p className="text-sm font-normal mt-1 mb-4 text-[var(--text-primary)]">{props.content}</p>;
     case 'Image':
       return (
         <img
