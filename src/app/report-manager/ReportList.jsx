@@ -37,6 +37,31 @@ export default function ReportList() {
                                     </button>
                                 </Link>
                             </div>
+                            {/* 추가 버튼들 - artist_id 경로로 이동하는 예시 */}
+                            {report.artist_id && (
+                                <>
+                                    <Link href={`/${report.artist_id}/introduction-manager`}>
+                                        <button className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
+                                            Introduction
+                                        </button>
+                                    </Link>
+                                    <Link href={`/${report.artist_id}/investment-point-manager`}>
+                                        <button className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
+                                            Investment Points
+                                        </button>
+                                    </Link>
+                                    <Link href={`/${report.artist_id}/analysis-manager`}>
+                                        <button className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
+                                            Analysis
+                                        </button>
+                                    </Link>
+                                    <Link href={`/${report.artist_id}/rewards-manager`}>
+                                        <button className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
+                                            Rewards
+                                        </button>
+                                    </Link>
+                                </>
+                            )}
                         </li>
                     ))}
                 </ul>

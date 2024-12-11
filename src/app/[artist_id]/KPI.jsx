@@ -167,6 +167,8 @@ const KPI = () => {
 
     } = calculatedKPIs;
 
+    console.log('KPI : expectedAnnualRevenue', expectedAnnualRevenue);
+
     const riskLevel = calculateRiskLevelPercentage(
         reportData.goal_fund,
         expectedAnnualRevenue,

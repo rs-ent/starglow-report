@@ -237,7 +237,7 @@ const integratePFVData = (timeline, pfvData, endDate, decayRate = null, residual
         const svAlbum = sv_albums.find(function (a) {
             if (convertToISO(a.release_date).split('T')[0] === convertToISO(album.release_date).split('T')[0]) return a;
         });
-
+        
         const rv_sales = rv_data.sales_data ? rv_data.sales_data : rv_data.sub_data || []; 
         const album_rv_a = album.rv_a ? album.rv_a : album.rv * album.rv_weight || 0;
         const rvAlbum = rv_sales.find(a => a.discounted_revenue.toFixed(2) === album_rv_a.toFixed(2));
@@ -262,22 +262,32 @@ const integratePFVData = (timeline, pfvData, endDate, decayRate = null, residual
                     rv: album.rv || 0, // 음반 판매 가치
                     apv: album.apv || 0, // 인기도 가치
                     av: album.av || 0, // 총 가치
-                    album_image: svAlbum?.img_url || album.album_image || "", // 이미지 URL
-                    melon_album_id: svAlbum?.melon_album_id || "", // 멜론 ID
-                    spotify_album_id: album.spotify_album_id || "", // Spotify ID
-                    total_tracks: svAlbum?.total_songs || album.tracks?.length || 0, // 총 트랙 수
+                    album_image: svAlbum?.img_url || apvAlbum?.album_image || album.album_image || "", // 이미지 URL
+                    melon_album_id: album.melon_album_id || svAlbum?.album_id || "", // 멜론 ID
+                    spotify_album_id: album.spotify_album_id || apvAlbum?.album_id || "", // Spotify ID
+                    total_tracks: svAlbum?.total_songs || apvAlbum?.total_tracks || album.tracks?.length || 0, // 총 트랙 수
                     udi: album.udi || 0, // UDI 지표
                     popularity: apvAlbum?.popularity || 0, // 인기도 점수
                     discounted_revenue: album.discounted_revenue || 0, // 할인된 수익
                     total_sales: rvAlbum?.total_sales || 0, // 총 판매량
-                    tracks: svAlbum.tracks?.map((track, idx) => ({
+                    tracks: svAlbum ? svAlbum.tracks?.map((track, idx) => ({
                         track_name: track.track_name || '',
-                        track_name_eng: apvAlbum?.tracks[idx].track_name || '',
-                        duration_ms: apvAlbum?.tracks[idx].duration_ms || 0,
-                        popularity: apvAlbum?.tracks[idx].popularity || 0,
+                        track_name_eng: apvAlbum?.tracks[idx]?.track_name || '',
+                        duration_ms: apvAlbum?.tracks[idx]?.duration_ms || 0,
+                        popularity: apvAlbum?.tracks[idx]?.popularity || 0,
                         melon_likes: track.melon_likes || 0,
                         melon_streams: track.melon_streams || 0,
                         melon_revenue: track.melon_revenue || 0,
+                        representative: track.representative === "TRUE" ? true : false,
+                        mv: track.mv === "TRUE" ? true : false,
+                    })) : apvAlbum.tracks?.map((track, idx) => ({
+                        track_name: track.track_name || '',
+                        track_name_eng: track.track_name || '',
+                        duration_ms: track[idx]?.duration_ms || 0,
+                        popularity: track[idx]?.popularity || 0,
+                        melon_likes: 0,
+                        melon_streams: 0,
+                        melon_revenue: 0,
                         representative: track.representative === "TRUE" ? true : false,
                         mv: track.mv === "TRUE" ? true : false,
                     })) || [] // 트랙 리스트

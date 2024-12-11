@@ -6,7 +6,6 @@ import { parseISO, isValid, format } from 'date-fns';
 
 export const Preprocessor = async (artist_id) => {
     const valuationDataRaw = await fetchValuation(artist_id);
-    console.log(valuationDataRaw);
     if (!valuationDataRaw) {
         throw new Error("데이터를 불러오는 데 실패했습니다.");
     }
@@ -17,7 +16,6 @@ export const Preprocessor = async (artist_id) => {
         );
     }
 
-    console.log('ValuationDataRaw.WEIGHT', valuationDataRaw.WEIGHT);
     const timelineData = setTimeline({
         fv_t_data: valuationDataRaw.FV_t,
         pfv_data: valuationDataRaw.PFV,
