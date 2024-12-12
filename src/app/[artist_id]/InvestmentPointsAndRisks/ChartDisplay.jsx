@@ -51,10 +51,10 @@ const ChartDisplay = ({ chartConfig, chartTitle, sortedData }) => { // sortedDat
       {chartTitle && <h2 className="pb-4 text-xs font-light text-center text-[var(--foreground-muted)]">{chartTitle}</h2>}
 
   
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" height={250}>
         <LineChart 
           data={data}
-          margin={{ top: 0, right: 0, left: -25, bottom: 0 }}
+          margin={{ top: 0, right: 20, left: -15, bottom: 0 }}
         >
           {/* 격자 배경 */}
           <CartesianGrid strokeDasharray="8 8" stroke="var(--secondary)" opacity={0.15} />
@@ -76,7 +76,7 @@ const ChartDisplay = ({ chartConfig, chartTitle, sortedData }) => { // sortedDat
             }}
           />
   
-          {/* 툴팁 */}
+          {/* 툴팁 
           <Tooltip
             formatter={(value, name) => [formatNumber(value, '', 2), name]}
             contentStyle={{
@@ -90,7 +90,7 @@ const ChartDisplay = ({ chartConfig, chartTitle, sortedData }) => { // sortedDat
             wrapperStyle={{
               padding: '2px', // 필요하면 내부 여백 조정
             }}
-          />
+          />*/}
   
           {/* 범례 */}
           <Legend wrapperStyle={{ position: 'relative', top: -30, fontSize: 12, color: 'var(--foreground-muted)' }} />
@@ -126,8 +126,28 @@ const getMarkerMaxY = (markers) => {
   return markers.map(marker => marker.yMax || 0);
 };
 
-const processChartData = (chartConfig, sortedData) => { // sortedData 추가
-  return sortedData.map((item, index) => {
+const processChartData = (chartConfig, sortedData) => {
+  if (!chartConfig || !chartConfig.dateRange) {
+    console.error('Invalid chartConfig or missing dateRange');
+    return [];
+  }
+
+  const { start, end } = chartConfig.dateRange;
+
+  // 필터링: dateRange에 해당하는 데이터만 처리
+  const filteredData = sortedData.filter((item) => {
+    const itemDate = new Date(item.date); // item.date는 ISO 8601 형식으로 가정
+    const startDate = start ? new Date(start) : null;
+    const endDate = end ? new Date(end) : null;
+
+    return (
+      (!startDate || itemDate >= startDate) && 
+      (!endDate || itemDate <= endDate)
+    );
+  });
+
+  // 데이터 매핑: 선택된 필드를 기준으로 데이터 처리
+  return filteredData.map((item) => {
     const dataPoint = { date: formatDate(item.date) };
     chartConfig.selectedFields.forEach((field) => {
       dataPoint[field.label || field.field] = item[field.field];

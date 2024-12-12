@@ -175,7 +175,6 @@ const InvestmentPointManager = ({artist_id}) => {
         setLoading(true);
         try {
             const points = await fetchInvestmentPoints(artist_id);
-            console.log(points);
             setInvestmentPoints(points);
         } catch (error) {
             console.error('Fetch error:', error);
@@ -363,6 +362,25 @@ const InvestmentPointManager = ({artist_id}) => {
         console.log('Saved Chart Config:', config); // 저장된 차트 설정 확인
     };
 
+    const extractYouTubeId = (url) => {
+        try {
+            const youtubeRegex = /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|.*&v=))([\w-]{11})(?:.*t=(\d+))?/;
+            const match = url.match(youtubeRegex);
+            
+            if (match) {
+                const videoId = match[1]; // YouTube Video ID
+                const start = match[2];  // 시작 시간 (t 파라미터)
+                return `https://www.youtube.com/embed/${videoId}${start ? `?start=${start}` : ''}`;
+            } else {
+                console.error('Not a valid YouTube URL');
+                return url; // YouTube URL이 아니면 원본 URL 반환
+            }
+        } catch (error) {
+            console.error('Error processing URL:', error);
+            return url; // 잘못된 URL이면 원본 URL 반환
+        }
+    };   
+
     return (
         <div className="investment-point-manager">
             <h1>Manage Investment Points for Artist: {artist_id}</h1>
@@ -377,34 +395,34 @@ const InvestmentPointManager = ({artist_id}) => {
                             <li key={point.id} className="investment-point-item">
                                 <h3>{point.title} ({point.type})</h3>
                                 <p>{point.context}</p>
-                                {point.media.length > 0 && (
-                                    <div className="point-media">
-                                        <h4>Media:</h4>
-                                        <ul className="media-list">
-                                            {point.media.map((mediaItem, index) => (
-                                                <li key={`${mediaItem.url}-${index}`} className="media-item">
-                                                    {mediaItem.type === 'image' ? (
-                                                        <img src={mediaItem.url} alt={mediaItem.title || `Image ${index + 1}`} className="media-image" />
-                                                    ) : (
-                                                        <video controls className="media-video">
-                                                            <source src={mediaItem.url} type="video/mp4" />
-                                                            Your browser does not support the video tag.
-                                                        </video>
-                                                    )}
-                                                    {mediaItem.title && <p className="media-title">{mediaItem.title}</p>}
-                                                    <a href={mediaItem.url} target="_blank" rel="noopener noreferrer" className="media-link">
-                                                        {mediaItem.url}
-                                                    </a>
-                                                    <div className="media-actions">
-                                                        <button onClick={() => removeMedia(index)} className="btn btn-remove">Remove</button>
-                                                        <button onClick={() => moveMedia(index, 'up')} disabled={index === 0} className="btn btn-move">⬆️</button>
-                                                        <button onClick={() => moveMedia(index, 'down')} disabled={index === formData.media.length - 1} className="btn btn-move">⬇️</button>
-                                                    </div>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                )}
+                                {point.media.map((mediaItem, index) => {
+                                    return (
+                                        <li key={`${mediaItem.url}-${index}`} className="media-item">
+                                            {mediaItem.type === 'image' ? (
+                                                <img src={mediaItem.url} alt={mediaItem.title || `Image ${index + 1}`} className="media-image" />
+                                            ) : (
+                                                <div className="video-container my-4">
+                                                    <iframe
+                                                        className="w-3/4 mx-auto rounded-lg shadow-soft transition-transform transform hover:scale-105"
+                                                        src={extractYouTubeId(mediaItem.url)}
+                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                        allowFullScreen
+                                                        title="YouTube Video"
+                                                    ></iframe>
+                                                </div>
+                                            )}
+                                            {mediaItem.title && <p className="media-title">{mediaItem.title}</p>}
+                                            <a href={mediaItem.url} target="_blank" rel="noopener noreferrer" className="media-link">
+                                                {mediaItem.url}
+                                            </a>
+                                            <div className="media-actions">
+                                                <button onClick={() => removeMedia(index)} className="btn btn-remove">Remove</button>
+                                                <button onClick={() => moveMedia(index, 'up')} disabled={index === 0} className="btn btn-move">⬆️</button>
+                                                <button onClick={() => moveMedia(index, 'down')} disabled={index === formData.media.length - 1} className="btn btn-move">⬇️</button>
+                                            </div>
+                                        </li>
+                                    );
+                                })}
                                 {point.chartConfig && (
                                     <div className="chart-preview">
                                         <Line data={getChartData(point.chartConfig, sortedData)} options={getChartOptions(point.chartConfig)} />

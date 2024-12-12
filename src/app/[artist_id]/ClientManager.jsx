@@ -4,7 +4,7 @@
 
 import React, { useState, useContext } from 'react';
 import KPI from './KPI';
-import InvestmentPoints from './InvestmentPointsAndRisks/InvestmentPoints';
+import InvestmentPoints from './InvestmentPoints';
 import History from './History';
 import HistoryModal from './HistoryModal';
 import Outline from './Outline';

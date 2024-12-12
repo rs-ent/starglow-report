@@ -93,9 +93,9 @@ const RoadMap = () => {
         { name: '평균 예상 수익', Revenue: avgRevenue, Investors: investorsAvgRevenue },
         { name: '최소 예상 수익', Revenue: minRevenue, Investors: investorsMinRevenue },
         { name: '손익분기점', Revenue: bep, Investors: investorsBEPRevenue },
-        { name: 'Loss 80%', Revenue: lossRevenue, Investors: investorsLossRevenue },
-        { name: 'Loss 50%', Revenue: bep * 0.5, Investors: bep * 0.5 * investorsShareRatio },
     ];
+
+    revenueData.sort((a, b) => b.Investors - a.Investors);
 
     const PerformanceChart = ({ revenueData }) => {
         // 손익분기점의 Revenue 값
