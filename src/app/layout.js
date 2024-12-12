@@ -1,5 +1,6 @@
 import { fetchData } from '../app/firebase/fetch';
 import { ReportsProvider } from '../context/ReportsData'; 
+import { Analytics } from "@vercel/analytics/react"
 
 import "./globals.css";
 
@@ -12,6 +13,7 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
+        <Analytics />
         <ReportsProvider reports={reports}>
           {children}
         </ReportsProvider>

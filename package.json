@@ -24,6 +24,7 @@
     "@tensorflow/tfjs": "^4.22.0",
     "@tweenjs/tween.js": "^25.0.0",
     "@use-gesture/react": "^10.3.1",
+    "@vercel/analytics": "^1.4.1",
     "arima": "^0.2.5",
     "axios": "^1.7.8",
     "chart.js": "^4.4.6",
