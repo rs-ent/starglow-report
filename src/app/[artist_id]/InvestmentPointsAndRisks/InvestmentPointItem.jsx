@@ -6,7 +6,7 @@ import MediaDisplay from './MediaDisplay';
 import ChartDisplay from './ChartDisplay';
 import KPISection from './KPISection';
 
-const InvestmentPointItem = ({ data, sortedData }) => { // sortedData 추가
+const InvestmentPointItem = ({ data, timeline }) => {
   const {
     title,
     type,
@@ -39,7 +39,7 @@ const InvestmentPointItem = ({ data, sortedData }) => { // sortedData 추가
         <ChartDisplay
           chartConfig={chartConfig}
           chartTitle={chartTitle}
-          sortedData={sortedData}
+          timeline={timeline}
         />
 
         {/* Line Breaker */}

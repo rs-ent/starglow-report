@@ -1,5 +1,5 @@
 // 위험 수준 계산 함수
-export const calculateRiskLevelPercentage = (goalFund, expectedTotalRevenue, shareRatio) => {
+export const calculateRiskLevelPercentage = (goalFund, shareRatio, minRevenue, spectrum) => {
 
     const riskLevels = [
         {
@@ -49,18 +49,21 @@ export const calculateRiskLevelPercentage = (goalFund, expectedTotalRevenue, sha
         },
     ];
 
-    const expectedRevenue = expectedTotalRevenue * shareRatio;
-    const difference = Math.abs(expectedRevenue - goalFund);
-    const differencePercentage = (difference / goalFund) * 100;
+    // 손익분기점 계산
+    const breakEven = goalFund / shareRatio;
+    
+    // minRevenue와 breakEven 비교
+    const difference = breakEven - minRevenue;
+    const percentage = difference > 0 ? ((difference / breakEven) + (spectrum * 0.2)) * 100 : spectrum * 0.3 * 100;
 
     // 현재 리스크 수준 찾기
     let currentRiskLevel =
         riskLevels.find(
-            (level) => differencePercentage >= level.min && differencePercentage < level.max
+            (level) => percentage >= level.min && percentage < level.max
         ) || riskLevels[riskLevels.length - 1];
 
     currentRiskLevel.difference = difference;
-    currentRiskLevel.differencePercentage = differencePercentage;
+    currentRiskLevel.differencePercentage = percentage;
 
     return currentRiskLevel;
 };

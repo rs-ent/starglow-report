@@ -27,15 +27,15 @@ const RoadMap = () => {
     const investorsBEPRevenue = report.goal_fund;
     const investorsShareRatio = report.investors_share_ratio;
     const bep = investorsBEPRevenue / investorsShareRatio;
-    const avgRevenue = kpiData.expectedAnnualRevenue
-    const maxRevenue = avgRevenue * (1 + kpiData.expectedRevenueSpectrum.spectrumMax);
-    const minRevenue = avgRevenue * (1 - kpiData.expectedRevenueSpectrum.spectrumMin);
+    const spectrum = kpiData.expectedRevenueSpectrum.spectrum;
+    const avgRevenue = kpiData.expectedAnnualRevenue;
+    const minRevenue = avgRevenue * (1 - spectrum);
+    const maxRevenue = avgRevenue * (1 + spectrum);
     const lossRevenue = bep * 0.8;
     
     const investorsAvgRevenue = avgRevenue * investorsShareRatio;
     const investorsMaxRevenue = maxRevenue * investorsShareRatio;
     const investorsMinRevenue = minRevenue * investorsShareRatio;
-    const investorsLossRevenue = lossRevenue * investorsShareRatio;
 
     const data = [
         { label: "음원/음반 발매", value: "정규 및 리메이크 앨범 등", spend: "600,000,000" },

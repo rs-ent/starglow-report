@@ -42,8 +42,8 @@ const calculateYAxisDomain = (data, chartConfig) => {
   return [0, paddedMaxY]; // Y축 도메인 반환
 };
 
-const ChartDisplay = ({ chartConfig, chartTitle, sortedData }) => { // sortedData 추가
-  const data = processChartData(chartConfig, sortedData); // sortedData 전달
+const ChartDisplay = ({ chartConfig, chartTitle, timeline }) => { // sortedData 추가
+  const data = processChartData(chartConfig, timeline); // sortedData 전달
 
   return (
     <div className="chart-display">
@@ -112,7 +112,7 @@ const ChartDisplay = ({ chartConfig, chartTitle, sortedData }) => { // sortedDat
           {/* 마커 렌더링 */}
           {chartConfig.markers &&
             chartConfig.markers.map((marker, index) =>
-              renderMarker(marker, index, sortedData)
+              renderMarker(marker, index, timeline)
             )}
         </LineChart>
       </ResponsiveContainer>

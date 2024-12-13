@@ -17,17 +17,17 @@ import {
     ResponsiveContainer,
 } from 'recharts';
 
-export const revenueSpectrumChart = (totalValueMultiple, currentRevenue, minPercentage, maxPercentage) => {
-    console.log(totalValueMultiple, currentRevenue, minPercentage, maxPercentage);
+export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenue, minRevenue, maxRevenue) => {
     // 데이터 계산
     const avgPoint1 = totalValueMultiple;
     const avgPoint3 = currentRevenue;
 
-    const lowerBoundPoint1 = totalValueMultiple * (1 - (minPercentage / 3));
-    const lowerBoundPoint2 = currentRevenue * (1 - minPercentage); // 최저 기대 수익 x:2
 
-    const upperBoundPoint1 = totalValueMultiple * (1 + (maxPercentage / 2));
-    const upperBoundPoint2 = currentRevenue * (1 + maxPercentage); // 최고 기대 수익 x:2
+    const lowerBoundPoint1 = totalValueMultiple * (1 - (spectrum / 3));
+    const lowerBoundPoint2 = minRevenue; // 최저 기대 수익 x:2
+
+    const upperBoundPoint1 = totalValueMultiple * (1 + (spectrum / 2));
+    const upperBoundPoint2 = maxRevenue; // 최고 기대 수익 x:2
 
     const data = [
         { label: '평균 기대 수익', x: 0, value: avgPoint1 },
@@ -132,7 +132,6 @@ export const revenueSpectrumChart = (totalValueMultiple, currentRevenue, minPerc
 
 const KPI = () => {
     const [isExpanded, setIsExpanded] = useState(false);
-    const [selectedKPI, setSelectedKPI] = useState(null);
     const containerRef = useRef(null);
     const reportData = useReport();
     const calculatedKPIs = useKPI();
@@ -141,42 +140,19 @@ const KPI = () => {
         return <p>No KPI data available</p>;
     }
 
-    const {
-        peakValue,
-        peakDate,
-        totalValue,
-        activeRevenueAvg,
-        activeGrowthRatesAvg,
-        ma6Current,
-        ma3Current,
-        revenueVolatilityStd,
-        maxCoreRevenueLabel,
-        maxCoreRevenueValue,
-        CAGR,
-        cumulativeMOV,
-        valuePerFan,
-        valuePerFanAvg,
-        revenueDiversityIndex,
-        normalizedDiversityIndex,
-        sortedData,
-        currentDate,
-        currentData,
-        activityFrequency,
-        expectedAnnualRevenue,
-        expectedRevenueSpectrum,
-
-    } = calculatedKPIs;
-
-    console.log('KPI : expectedAnnualRevenue', expectedAnnualRevenue);
+    const avgRevenue = calculatedKPIs.expectedAnnualRevenue;
+    const spectrum = calculatedKPIs.expectedRevenueSpectrum.spectrum;
+    const minRevenue = avgRevenue * (1 - spectrum);
+    const maxRevenue = avgRevenue * (1 + spectrum);
+    const revenueSpectrum = `-${Math.ceil((1 - minRevenue / avgRevenue) * 100)}% ~ ${Math.ceil((1 - avgRevenue / maxRevenue) * 100)}%`;
+    const totalValueMultiple = calculatedKPIs.currentData.MOV ? (calculatedKPIs.currentData.MOV + reportData.goal_fund) * (1 + calculatedKPIs.expectedRevenueSpectrum.spectrum) : 0;
 
     const riskLevel = calculateRiskLevelPercentage(
-        reportData.goal_fund,
-        expectedAnnualRevenue,
-        reportData.investors_share_ratio,
+        reportData.goal_fund || 1,
+        reportData.investors_share_ratio || 1,
+        minRevenue,
+        spectrum,
     );
-
-    const revenueSpectrum = `-${Math.ceil(expectedRevenueSpectrum.spectrumMin * 100)}% ~ ${Math.ceil(expectedRevenueSpectrum.spectrumMax * 100)}%`;
-    const totalValueMultiple = (totalValue + reportData.goal_fund) * (1 + activeGrowthRatesAvg);
 
     // 표시할 KPI 목록을 준비합니다.
     const allKPIs = useMemo(() => [
@@ -184,44 +160,17 @@ const KPI = () => {
         { label: `현재 가치`, value: totalValueMultiple, suffix: '₩', importance: 9, higherIsBetter: true },
         { label: '위험도', value: riskLevel.differencePercentage, suffix: '%', importance: 10, higherIsBetter: false},
         { label: '위험성평가', value: riskLevel.riskText, suffix: '상품', importance: 10, higherIsBetter: true},
-        { label: '예상기대수익', value: expectedAnnualRevenue, suffix: '₩', importance: 10, higherIsBetter: true},
+        { label: '예상기대수익', value: calculatedKPIs.expectedAnnualRevenue, suffix: '₩', importance: 10, higherIsBetter: true},
         { label: '예상기대수익 스펙트럼', value: revenueSpectrum, suffix: '', importance: 10, higherIsBetter: true},
-        //{ label: '최고점 가치', value: peakValue, suffix: '₩', importance: 10, higherIsBetter: true },
-        //{ label: '최고점 날짜', value: peakDate, suffix: '', importance: 8, higherIsBetter: false },
-        { label: '활동기 평균 매출 성장률', value: parseFloat((activeGrowthRatesAvg * 100).toFixed(2)), suffix: '%', importance: 6, higherIsBetter: true },
-        //{ label: '6개월 이동평균', value: ma6Current ? parseFloat(ma6Current.toFixed(2)) : null, suffix: '₩', importance: 6, higherIsBetter: true },
-        { label: '수익 다양성 지표', value: parseFloat(((1 - normalizedDiversityIndex) * 100).toFixed(2)), suffix: '%', importance: 5, higherIsBetter: false },
-        { label: '핵심 수익원', value: maxCoreRevenueLabel, suffix: ' 수익', importance: 4, higherIsBetter: false },
-        //{ label: `${maxCoreRevenueLabel} 누적 가치`, value: maxCoreRevenueValue, suffix: '₩', importance: 3, higherIsBetter: true },
-        //{ label: '누적 가치', value: cumulativeMOV, suffix: '₩', importance: 9, higherIsBetter: true },
-        //{ label: '활동기 가치 평균', value: parseFloat(activeRevenueAvg.toFixed(2)), suffix: '₩', importance: 7, higherIsBetter: true },
-        //{ label: '3개월 이동평균', value: ma3Current ? parseFloat(ma3Current.toFixed(2)) : null, suffix: '₩', importance: 6, higherIsBetter: true },
-        //{ label: '수익 다양성 지수', value: parseFloat(revenueDiversityIndex.toFixed(2)), suffix: '', importance: 5, higherIsBetter: true },
-        //{ label: '복합 연평균 성장률 (CAGR)', value: parseFloat((CAGR * 100).toFixed(2)), suffix: '%', importance: 7, higherIsBetter: true },
-        //{ label: '팬당 가치 평균', value: parseFloat(valuePerFanAvg.toFixed(2)), suffix: '₩', importance: 5, higherIsBetter: true },
-        //{ label: '팬당 가치 (현재)', value: parseFloat(valuePerFan.toFixed(2)), suffix: '₩', importance: 6, higherIsBetter: true },
+        { label: '전성기 날짜', value: calculatedKPIs.peakDate, suffix: '', importance: 8, higherIsBetter: false },
+        //{ label: '활동기 평균 매출 성장률', value: parseFloat((activeGrowthRatesAvg * 100).toFixed(2)), suffix: '%', importance: 6, higherIsBetter: true },
+        { label: '수익 다양성 지표', value: (calculatedKPIs.normalizedDiversityIndex * 100).toFixed(2), suffix: '%', importance: 5, higherIsBetter: false },
+        { label: '핵심 수익원', value: calculatedKPIs.maxCoreRevenueLabel, suffix: ' 수익', importance: 4, higherIsBetter: false },
         
-    ], [
-        peakValue,
-        peakDate,
-        totalValue,
-        activeRevenueAvg,
-        activeGrowthRatesAvg,
-        ma6Current,
-        ma3Current,
-        revenueVolatilityStd,
-        maxCoreRevenueLabel,
-        maxCoreRevenueValue,
-        CAGR,
-        cumulativeMOV,
-        valuePerFan,
-        valuePerFanAvg,
-        revenueDiversityIndex,
-    ]);
+    ], [calculatedKPIs]);
 
     // 초기 표시할 8개의 KPI
     const fixedKPIs = useMemo(() => allKPIs.slice(0, 6), [allKPIs]);
-    const additionalKPIs = useMemo(() => allKPIs.filter(kpi => !fixedKPIs.some(fixedKPI => fixedKPI.label === kpi.label)));
 
     // 표시할 KPI 결정
     const displayedKPIs = useMemo(() => {
@@ -260,7 +209,7 @@ const KPI = () => {
                             </p>
                         </div>
                         {isExpanded && kpi.label === '예상기대수익 스펙트럼' && (
-                            revenueSpectrumChart(totalValueMultiple, expectedAnnualRevenue, expectedRevenueSpectrum.spectrumMin, expectedRevenueSpectrum.spectrumMax)
+                            revenueSpectrumChart(totalValueMultiple, spectrum, avgRevenue, minRevenue, maxRevenue)
                         )}
                     </div>
                 ))}

@@ -147,7 +147,7 @@ const CriteriaPage = ({ onClose }) => {
                     </p>
                     <div className="bg-gray-200 p-2 rounded-sm mb-2">
                         <p className="font-mono text-xs">
-                            위험도 = |미래 추정 수익 - 손익분기점 매출| ÷ 손익분기점 매출
+                            위험도 = |목표 금액 - 최소 예상 매출| ÷ 목표 금액 + 가중치
                         </p>
                     </div>
                     <p className="text-gray-700 text-xs mb-2">
@@ -155,14 +155,14 @@ const CriteriaPage = ({ onClose }) => {
                     </p>
                     <ul className="list-disc list-inside mb-2 text-xs">
                         <li>
-                            <strong>펀딩 후 추정 수익</strong>: 펀딩을 통해 조달된 자금을 기반으로 예상되는 수익입니다.
+                            <strong>최소 예상 매출</strong>: 소속사가 제공한 데이터를 통해 추정한 최소 수익입니다.
                         </li>
                         <li>
-                            <strong>목표 금액</strong>: 펀딩을 통해 조달할 자금이자 투자 수익의 최소 목표치입니다.
+                            <strong>목표 금액(손익분기점)</strong>: 펀딩을 통해 조달할 자금이자 투자 수익의 최소 목표치입니다.
                         </li>
                     </ul>
                     <p className="text-gray-700 text-xs">
-                        이 공식은 예상 수익이 목표 금액과 얼마나 차이가 있는지를 백분율로 나타냅니다.
+                        이 공식은 최소 예상 수익이 목표 금액과 얼마나 차이가 있는지를 백분율로 나타냅니다.
                         위험도 값이 높을수록 목표 수익 달성에 어려움이 있을 수 있음을 의미합니다.
                     </p>
                     <p className="text-gray-700 text-xs">
@@ -262,10 +262,12 @@ const CriteriaPage = ({ onClose }) => {
                     <table className="min-w-full bg-white text-xs">
                         <thead>
                             <tr>
-                                <th className="py-1 px-2 bg-gray-100 text-left text-gray-600 font-bold">
+                                <th className="py-1 px-2 bg-gray-100 text-left text-gray-600 font-bold"
+                                    style={{ width: '25%' }}>
                                     등급
                                 </th>
-                                <th className="py-1 px-2 bg-gray-100 text-left text-gray-600 font-bold">
+                                <th className="py-1 px-2 bg-gray-100 text-left text-gray-600 font-bold"
+                                    style={{ width: '20%' }}>
                                     위험도 (%)
                                 </th>
                                 <th className="py-1 px-2 bg-gray-100 text-left text-gray-600 font-bold">
@@ -275,8 +277,8 @@ const CriteriaPage = ({ onClose }) => {
                         </thead>
                         <tbody>
                             {riskLevels.map((level, index) => (
-                                <tr key={index} className="border-b">
-                                    <td className="py-2 px-2 flex items-center">
+                                <tr key={index} className="border-b justify-center items-center">
+                                    <td className="py-2 px-2 flex align-middle">
                                         <div
                                             className={`w-4 h-4 mr-2 rounded-full ${level.color}`}
                                         ></div>
@@ -285,7 +287,7 @@ const CriteriaPage = ({ onClose }) => {
                                         </span>
                                     </td>
                                     <td className="py-2 px-2">
-                                        {level.min}% - {level.max}%
+                                        {level.min}-{level.max}%
                                     </td>
                                     <td className="py-2 px-2">{level.qualitative}</td>
                                 </tr>

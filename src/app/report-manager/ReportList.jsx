@@ -1,13 +1,27 @@
 'use client';
 
 import { useReports } from "../../context/ReportsData"
+import { TimelineData } from "../processors/preprocessor";
+import ChartModal from './ChartModal';
 import Link from 'next/link';
-import React from 'react';
+import React, { useState } from 'react';
 
 export default function ReportList() {
     const reports = useReports();
+    const [chartLoading, setChartLoading] = useState(false);
+    const [timelineData, setTimelineData] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    console.log(reports);
+    const setValuationChart = async ({artist_id}) => {
+        setChartLoading(true);
+        setIsModalOpen(false);
+        const data = await TimelineData(artist_id);
+        console.log('Timeline : ', data.timelineData);
+        setTimelineData(data.timelineData.timeline || []);
+        setChartLoading(false);
+        setIsModalOpen(true); // 차트 데이터 로드 후 모달 열림
+    };
+
     return (
         <>
             <h2 className="text-2xl font-bold mb-4">Report List</h2>
@@ -18,7 +32,6 @@ export default function ReportList() {
                 <ul className="space-y-4">
                     {reports.map((report) => (
                         <li key={report.docId} className="border p-4 rounded flex gap-4 items-center">
-                            {/* 이미지가 있을 경우 표시, 없으면 대체 텍스트 */}
                             <div className="w-24 h-24 bg-gray-100 flex justify-center items-center rounded overflow-hidden">
                                 {report.image_alpha ? (
                                     <img src={report.image_alpha} alt={report.title} className="object-cover w-full h-full" />
@@ -31,13 +44,19 @@ export default function ReportList() {
                                 <p className="text-sm text-gray-600">{report.artist_kor || report.artist_eng || report.artist_id}</p>
                             </div>
                             <div>
+                                <Link href={`/${report.artist_id}`}>
+                                    <button className="px-3 py-1 bg-yellow-700 text-white rounded hover:bg-yellow-900">
+                                        Page
+                                    </button>
+                                </Link>
+                            </div>
+                            <div>
                                 <Link href={`/report-manager/create?docId=${report.docId}`}>
                                     <button className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600">
                                         Edit
                                     </button>
                                 </Link>
                             </div>
-                            {/* 추가 버튼들 - artist_id 경로로 이동하는 예시 */}
                             {report.artist_id && (
                                 <>
                                     <Link href={`/${report.artist_id}/introduction-manager`}>
@@ -60,11 +79,22 @@ export default function ReportList() {
                                             Rewards
                                         </button>
                                     </Link>
+                                    <button className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                            onClick={() => setValuationChart({ artist_id: report.artist_id })}
+                                            disabled={chartLoading}
+                                    >
+                                        {chartLoading ? "Calculating..." : "Valuation"}
+                                    </button>
                                 </>
                             )}
                         </li>
                     ))}
                 </ul>
+            )}
+
+            {/* 차트 */}
+            {isModalOpen && timelineData.length > 0 && (
+                <ChartModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} timelineData={timelineData}/>
             )}
         </>
     )

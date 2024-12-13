@@ -22,6 +22,8 @@ const CreateLineChart = ({ sortedData, onClose, onSave }) => {
         apv_t: '해외 스트리밍',
         rv_t: '음반판매',
         cev_t: '공연/행사',
+        mcv_twitter: '트위터',
+        mcv_instagram: '인스타그램',
         mcv_youtube: '영상콘텐츠',
         mds_t: '굿즈/상품',
         mrv_t: '매니지먼트',
@@ -39,6 +41,8 @@ const CreateLineChart = ({ sortedData, onClose, onSave }) => {
             return (!start || date >= new Date(start)) && (!end || date <= new Date(end));
         });
     }, [sortedData, dateRange]);
+
+    console.log('filteredData: ', filteredData);
 
     const chartData = useMemo(() => {
         const labels = filteredData.map((data) => new Date(data.date).toLocaleDateString());
@@ -307,7 +311,7 @@ const CreateLineChart = ({ sortedData, onClose, onSave }) => {
                                         )
                                     }
                                 />
-                                {defaultLabels[field]} ({field})
+                                {defaultLabels[field]}
                             </label>
                             {selectedFields.includes(field) && (
                                 <input

@@ -48,7 +48,7 @@ const InvestmentPoints = ({type = "Investment Point"}) => { // async 제거
                         <div className="bg-[var(--surface)] shadow-inner">
                             <InvestmentPointItem
                                 data={item}
-                                sortedData={kpiData.sortedData}
+                                timeline={kpiData.timeline}
                             />
                         </div>
                     </div>

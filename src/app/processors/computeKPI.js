@@ -1,7 +1,4 @@
-const calculateExpectedAnnualRevenue = (activeRevenueAvg, activityFrequency, combinedVolatility, startYearMonth = null) => {
-    // 월 평균 매출 & 연평균 앨범 발매 빈도 & 수익 변동성 지표
-    const decayRate = combinedVolatility;
-
+const calculateExpectedAnnualRevenue = (activeRevenueAvg, activityFrequency, decayRate) => {
     // 감소율에 따른 활동 기간 계산
     const calculateDynamicMonths = (decayRate, minMonths = 1, maxMonths = 3) => {
         if (decayRate <= 0) return maxMonths; // 감소율이 없는 경우 최대 기간 반환
@@ -32,156 +29,110 @@ const calculateExpectedAnnualRevenue = (activeRevenueAvg, activityFrequency, com
     return expectedAnnualRevenue;
 }
 
-const calculateExpectedRevenueSpectrum = (activeRevenueAvg, revenueVolatilityStd, albumData) => {
-    const totalAV = albumData.av;
-    const metrics = albumData.metrics || albumData.sub_data;
-    const avgAV = totalAV / metrics.length;
-    
-    let maxAV = -1;
-    let minAV = Infinity;
+function calculateHistoricalSpectrum(activityRevenueMap, revenueAvg, albums = []) {
 
-    // AV 값 수집
-    const avValues = metrics.map((album) => {
-        if (album.av > maxAV) maxAV = album.av;
-        if (album.av < minAV) minAV = album.av;
-        return album.av;
-    });
+    // 값 추출
+    const values = Object.values(activityRevenueMap); // 연간 수익 배열
+    values.sort((a, b) => a - b);
 
-    // 표준 편차 계산 (원래 데이터 기준)
-    const avVariance = avValues.reduce((acc, value) => acc + Math.pow(value - avgAV, 2), 0) / avValues.length;
-    const avStdDev = Math.sqrt(avVariance);
+    // 기본 통계
+    const n = values.length;
+    const mean = values.reduce((sum,v) => sum+v, 0) / n;
+    const variance = values.reduce((sum,v) => sum + Math.pow(v-mean,2),0) / n;
+    const std = Math.sqrt(variance);
+    const min = values[0];
+    const max = values[n-1];
 
-    // 정규화된 AV 값 계산
-    const normalizedAVs = avValues.map((value) => {
-        if (maxAV === minAV) return 0.5; // 최대값과 최소값이 같다면 0.5로 처리
-        return (value - minAV) / (maxAV - minAV);
-    });
+    // 분위수 계산 함수
+    function quantile(arr, q) {
+        const pos = (arr.length - 1)*q;
+        const base = Math.floor(pos);
+        const rest = pos - base;
+        if ((arr[base+1]!==undefined)) {
+            return arr[base] + rest*(arr[base+1]-arr[base]);
+        } else {
+            return arr[base];
+        }
+    }
 
-    // 정규화된 데이터의 평균
-    const normalizedAvgAV = normalizedAVs.reduce((acc, value) => acc + value, 0) / normalizedAVs.length;
+    // 분위수 예: Q1(25%), Q2(50%, median), Q3(75%)
+    const q1 = quantile(values, 0.25);
+    const median = quantile(values, 0.5);
+    const q3 = quantile(values, 0.75);
 
-    // 정규화된 데이터의 표준 편차
-    const normalizedVariance = normalizedAVs.reduce((acc, value) => acc + Math.pow(value - normalizedAvgAV, 2), 0) / normalizedAVs.length;
-    const normalizedStdDev = Math.sqrt(normalizedVariance);
+    // 스펙트럼 정의 (예시):
+    // 여기서는 단순히 '과거 데이터 범위'와 '분위수 기반 범위'를 스펙트럼으로 제시.
+    // min ~ max: 과거 관측치 전체 범위
+    // q1 ~ q3: 중간 50% 범위
+    // mean ± std: 평균 ± 표준편차 범위
 
-    const revenueSpectrum = revenueVolatilityStd / activeRevenueAvg;
+    const mov_spectrum = std / mean;
 
-    const combinedVolatility = 0.8 * revenueSpectrum + 0.2 * normalizedStdDev;
+    // 앨범 가치(AV) 변동성 계산
+    let album_av_values = [];
+    if (albums && albums.length > 0) {
+        album_av_values = albums.map(a => a.av);
+    }
 
-    // 최소값과 최대값 계산
-    const minRevenue = activeRevenueAvg * (1 - combinedVolatility);
-    const maxRevenue = activeRevenueAvg * (1 + combinedVolatility);
+    let album_spectrum = 0;
+    if (album_av_values.length > 0) {
+        const albumCount = album_av_values.length;
+        const albumMean = album_av_values.reduce((s,v)=>s+v,0) / albumCount;
+        const albumVar = album_av_values.reduce((s,v)=> s + Math.pow(v - albumMean, 2), 0) / albumCount;
+        const albumStd = Math.sqrt(albumVar);
+        album_spectrum = albumStd / albumMean; 
+    }
 
-    // 수익률 스펙트럼 계산
-    const spectrumMax = activeRevenueAvg / maxRevenue;
-    const spectrumMin = minRevenue / activeRevenueAvg;
+    // album_spectrum을 20% 정도만 반영
+    let combined_spectrum = mov_spectrum + (0.2 * album_spectrum);
+
+    const spectrum = combined_spectrum;
+    const spectrumMin = mean * (1 - spectrum);
+    const spectrumMax = mean * (1 + spectrum);
 
     return {
-        spectrumMax: 1 - spectrumMax,
-        spectrumMin: 1 - spectrumMin,
-        maxRevenue: maxRevenue,
-        minRevenue: minRevenue,
-        combinedVolatility: combinedVolatility,
+        min,
+        max,
+        mean,
+        std,
+        q1,
+        median,
+        q3,
+        interquartileRange: q3 - q1,
+        oneStdRange: [mean - std, mean + std],
+        twoStdRange: [mean - 2*std, mean + 2*std],
+        spectrum,
+        spectrumMin,
+        spectrumMax,
+        mov_spectrum,
+        album_spectrum,
     };
 }
 
-// 이동 평균값 계산 함수
-const calculateMovingAverage = (data, windowSize) => {
-    const ma = [];
-    let sum = 0;
-
-    for (let i = 0; i < data.length; i++) {
-        sum += data[i].MOV ?? 0; // 현재 값을 합산
-        if (i >= windowSize) {
-            sum -= data[i - windowSize].MOV ?? 0; // 윈도우 밖의 값을 제거
-        }
-        ma.push(i >= windowSize - 1 ? sum / windowSize : null);
-    }
-
-    return ma;
-};
-
-// 수익 변동성 계산 함수
-const calculateRevenueVolatility = (data, startYear = '') => {
-    if (!data || data.length === 0) return 0;
+const calculateActivityFrequency = (releaseDates) => {
     
-    if (startYear) {
-        const startYearInt = startYear instanceof Date ? startYear.getFullYear() : parseInt(startYear, 10);
-        data = data.filter(item => {
-            const itemYear = new Date(item.date).getFullYear();
-            return itemYear >= startYearInt; // startYear 이후 데이터만 남김
-        });
-    }
-
-    if (data.length === 0) return 0;
-
-    let sum = 0, sumOfSquares = 0;
-    const movValues = data.map(item => item.MOV ?? 0);
-
-    for (const value of movValues) {
-        sum += value;
-    }
-    const meanMOV = sum / movValues.length;
-
-    for (const value of movValues) {
-        sumOfSquares += Math.pow(value - meanMOV, 2);
-    }
-    const variance = sumOfSquares / movValues.length;
-    return Math.sqrt(variance);
-};
-
-const calculateActivityFrequency = (valuationData, startYear = null) => {
-    // 데이터에서 albums 배열 추출
-    const albums = valuationData.AV.albums || valuationData.AV.sub_data || valuationData.SV.albums || [];
-
-    // 연도별 발매 횟수 집계
-    const releaseData = {};
-    albums.forEach(album => {
-        const releaseYear = parseInt(album.release_date.split(".")[0], 10); // '2019.01.07' -> 2019
-        releaseData[releaseYear] = (releaseData[releaseYear] || 0) + 1; // 연도별 발매 횟수 누적
-    });
-
-    // 최소 연도와 최대 연도 계산
-    const years = albums.map(album => parseInt(album.release_date.split(".")[0], 10));
-    let minYear = Math.min(...years);
-    if (startYear && startYear instanceof Date) {
-        minYear = startYear.getFullYear().toString();
-    }
-    const currentYear = new Date().getFullYear(); // 현재 연도
-    const maxYear = Math.max(currentYear, ...years);
-
-    // 모든 연도 초기화 (발매 기록이 없는 연도는 0으로 설정)
-    const releasesByYear = [];
-    for (let year = minYear; year <= maxYear; year++) {
-        releasesByYear.push(releaseData[year] || 0); // 발매 기록이 없는 연도는 0
-    }
-
-    // 발매 빈도 계산
-    let totalReleases = 0; // 총 발매 횟수
-    let activeYearsCount = 0; // 활동 연도 수
-    let lastActiveYear = minYear; // 마지막 활동 연도
-
-    releasesByYear.forEach((releases, yearIndex) => {
-        // 발매가 있는 연도 또는 직전 연도가 활동 연도일 경우
-        if (releases > 0 || yearIndex + minYear === lastActiveYear || yearIndex + minYear === lastActiveYear + 1) {
-            activeYearsCount++;
-            totalReleases += releases; // 발매 횟수 누적
-            if(releases > 0) lastActiveYear = yearIndex + minYear; // 마지막 활동 연도 갱신
+    const releasesByYear = {};
+    let activeYearsCount = 0;
+    releaseDates.forEach(function (releaseDate) {
+        const year = releaseDate.getFullYear() + '';
+        if (releasesByYear[year]) {
+            releasesByYear[year] += 1;
+        } else {
+            releasesByYear[year] = 1;
+            activeYearsCount += 1;
         }
     });
-
-    const activityFrequency = activeYearsCount > 0 ? totalReleases / activeYearsCount : 0;
+    const activityFrequency = releaseDates.length > 0 ? releaseDates.length / activeYearsCount : 1;
     return {
-        totalReleases,
-        releasesByYear,
-        activeYearsCount,
-        activityFrequency,
+        'totalReleases': releaseDates.length,
+        'releasesByYear': releasesByYear,
+        'activeYearsCount': activeYearsCount,
+        'activityFrequency': activityFrequency,
     };
 };
 
 // KPI 계산 함수
-export const computeKPIs = (valuationData, sortedData, currentIndex, currentData) => {
-    const currentDate = sortedData[currentIndex].date;
+export const computeKPIs = (valuationData, timeline, currentIndex, currentData) => {   
     
     let peakData = { value: -Infinity, date: '' };
 
@@ -204,31 +155,33 @@ export const computeKPIs = (valuationData, sortedData, currentIndex, currentData
         mrv_t: '방송 출연'
     };
 
-    let cumulativeMOV = 0;
-    let valuePerFanSum = 0;
-
-    let albumReleaseDate;
-    let activityEndDate;
-
-    let activityRevenueSum = 0; // 활동기 매출 합계
-    let activityRevenueSumForExpectedAnnualRevenue = 0;
-    let activityRevenueDateCount = 0;
     let expectedAnnualRevenueCalculationStartDate = '';
     if (valuationData.expected_revenue_calculation_start_date){
         expectedAnnualRevenueCalculationStartDate = new Date(valuationData.expected_revenue_calculation_start_date);
     }
-    let activityGrowthRatesSum = 0; // 활동기 성장률 합계
-    let activityMonthsCount = 0; // 활동기 데이터 수 (1~3개월 기준)
-    let previousActivityMonthMOV = null;
+    
 
     let maxCoreRevenueValue = -Infinity;
     let maxCoreRevenueLabel = '';
 
+    let totalMOV = 0;
+    let activityRevenueSum = 0; // 활동기 매출 합계
+    let activityCount = 0;
+    let activityRevenueMap = {};
+    const albums = valuationData.PFV?.av_a?.metrics || valuationData.PFV?.sub_data || [];
+    const albumReleaseDates = albums
+                .map(album => new Date(album.release_date))
+                .filter(albumDate => 
+                    !expectedAnnualRevenueCalculationStartDate || 
+                    albumDate >= expectedAnnualRevenueCalculationStartDate
+                )
+                .sort((a, b) => a - b);
+
+    let previousMOV = 0;
     for (let i = 0; i <= currentIndex; i++) {
-        const data = sortedData[i];
+        const data = timeline[i];
         const currentDate = new Date(data.date);
-        const currentYear = currentDate.getFullYear();
-        const currentMonth = currentDate.getMonth();
+        const currentYear = currentDate.getFullYear() + '';
 
         // 최고점 가치 및 날짜 업데이트
         if (data.MOV > peakData.value) {
@@ -253,135 +206,76 @@ export const computeKPIs = (valuationData, sortedData, currentIndex, currentData
         });
 
         // 누적 MOV 계산
-        cumulativeMOV += data.MOV ?? 0;
-        
-        if(data.MOV && data.MOV > 0 && data.fv_t && data.fv_t > 0) {
-            valuePerFanSum += (data.MOV / data.fv_t);
+        totalMOV += data.MOV ?? 0;
+
+        // 앨범 발매에 따른 활동기 확인
+        const isActivity = albumReleaseDates.some(albumDate => {
+            const threeMonthsLater = new Date(albumDate);
+            threeMonthsLater.setMonth(threeMonthsLater.getMonth() + 3);
+
+            return currentDate >= albumDate && currentDate <= threeMonthsLater;
+        });
+
+        // 활동기 매출 합산
+        if (isActivity) {
+            activityRevenueSum += data.MOV;
+            activityCount ++;
+
+            if (activityRevenueMap[currentYear] && activityRevenueMap[currentYear] > 0) {
+                activityRevenueMap[currentYear] += data.MOV;
+            } else {
+                activityRevenueMap[currentYear] = data.MOV;
+            }
         }
 
-        // 앨범 발매일 및 활동기 설정
-        if (data.discography && data.discography.length > 0) {
-            data.discography.forEach(album => {
-                const releaseDate = new Date(album.release_date);
-                if (!albumReleaseDate || releaseDate > albumReleaseDate) {
-                    albumReleaseDate = releaseDate;
-                    activityEndDate = new Date(albumReleaseDate);
-                    activityEndDate.setMonth(albumReleaseDate.getMonth() + 3); // 발매 후 3개월
-                }
-            });
-        }
-
-        if (albumReleaseDate && activityEndDate && currentDate >= albumReleaseDate && currentDate <= activityEndDate) {
-            activityRevenueSum += data.MOV ?? 0; // 활동기 매출 합산
-            if (expectedAnnualRevenueCalculationStartDate && expectedAnnualRevenueCalculationStartDate <= currentDate) {
-                activityRevenueSumForExpectedAnnualRevenue += data.MOV;
-                activityRevenueDateCount ++;
-            }
-            activityMonthsCount++; // 활동기 데이터 카운트
-    
-            // 활동기 성장률 계산
-            if (previousActivityMonthMOV !== null) {
-                const growthRate = previousActivityMonthMOV !== 0
-                    ? (data.MOV - previousActivityMonthMOV) / previousActivityMonthMOV
-                    : 0;
-                activityGrowthRatesSum += growthRate;
-            }
-            previousActivityMonthMOV = data.MOV; // 현재 MOV를 저장
-        }
+        previousMOV = data.MOV;
     }
 
     // 활동기 매출 평균 및 성장률 평균 계산
-    const activeRevenueAvg = activityMonthsCount > 0 ? activityRevenueSum / activityMonthsCount : 0;
-    const activityRevenueAvgForExpectedAnnualRevenue = activityRevenueDateCount > 0 ? activityRevenueSumForExpectedAnnualRevenue / activityRevenueDateCount : activeRevenueAvg;
-    const activeGrowthRatesAvg = activityMonthsCount > 1 ? activityGrowthRatesSum / (activityMonthsCount - 1) : 0;
+    const activityRevenueAvg = activityCount > 0 ? activityRevenueSum / activityCount : 0;
 
     // 연평균 활동 빈도 (totalReleases: 총 발매횟수 / activeYearsCount: 활동 연도 수 / activityFrequency: 활동 빈도)
-    const activityFrequency = calculateActivityFrequency(valuationData, expectedAnnualRevenueCalculationStartDate);
+    const activityFrequency = calculateActivityFrequency(albumReleaseDates);  
 
-    const movingAverage6 = sortedData.length >= 6 
-        ? calculateMovingAverage(sortedData.slice(0, currentIndex + 1), 6) 
-        : Array(currentIndex + 1).fill(null);
-    const ma6Current = movingAverage6[movingAverage6.length - 1];
-
-    const movingAverage3 = sortedData.length >= 3 
-        ? calculateMovingAverage(sortedData.slice(0, currentIndex + 1), 3) 
-        : Array(currentIndex + 1).fill(null);
-    const ma3Current = movingAverage3[movingAverage3.length - 1];
-
-    
-
-    // 수익 변동성 계산
-    const revenueVolatilityStd = calculateRevenueVolatility(sortedData.slice(0, currentIndex + 1), expectedAnnualRevenueCalculationStartDate);
-
-    const halfIndex = Math.floor(currentIndex / 2);
-    const initialPeriodData = sortedData.slice(0, halfIndex + 1);
-    const finalPeriodData = sortedData.slice(halfIndex, currentIndex + 1);
-
-    const initialMOVAvg = initialPeriodData.length
-        ? initialPeriodData.reduce((sum, data) => sum + (data.MOV ?? 0), 0) / initialPeriodData.length
-        : 0;
-
-    const finalMOVAvg = finalPeriodData.length
-        ? finalPeriodData.reduce((sum, data) => sum + (data.MOV ?? 0), 0) / finalPeriodData.length
-        : 0;
-
-    const startDate = sortedData[0]?.date ? new Date(sortedData[0].date) : null;
-    const endDate = currentData?.date ? new Date(currentData.date) : null;
-
-    if (!startDate || !endDate) {
-        throw new Error('Invalid date range');
-    }
-
-    const totalMonths = (endDate.getFullYear() - startDate.getFullYear()) * 12 + (endDate.getMonth() - startDate.getMonth());
-    const totalYears = totalMonths / 12;
-
-    const CAGR = (totalYears > 0 && initialMOVAvg > 0)
-        ? Math.pow(finalMOVAvg / initialMOVAvg, 1 / totalYears) - 1
-        : 0;
-
-    // 수익 다양성 지수 계산 (예시: Shannon Diversity Index)
-    const totalSum = Object.values(revenueTotals).reduce((a, b) => a + b, 0);
-    const categoryCount = Object.values(revenueTotals).length;
-
-    const revenueDiversityIndex = Object.values(revenueTotals).reduce((sum, val) => {
-        const proportion = val / totalSum;
-        return sum - (proportion > 0 ? proportion * Math.log(proportion) : 0);
-    }, 0);
-
-    const maxDiversityIndex = Math.log(categoryCount); // H_max = ln(N)
-    const normalizedDiversityIndex = revenueDiversityIndex / maxDiversityIndex;
-
-    const valuePerFan = (currentData.MOV / currentData.fv_t) * 10000;
-    const valuePerFanAvg = (valuePerFanSum / currentIndex) * 10000;
-
-    const expectedRevenueSpectrum = calculateExpectedRevenueSpectrum(activityRevenueAvgForExpectedAnnualRevenue, revenueVolatilityStd, valuationData.AV);
+    const expectedRevenueSpectrum = calculateHistoricalSpectrum(activityRevenueMap, activityRevenueAvg, albums);
+    const volatilityPercent = expectedRevenueSpectrum.spectrum;
     const expectedAnnualRevenue = calculateExpectedAnnualRevenue(
-                                    activityRevenueAvgForExpectedAnnualRevenue, 
+                                    activityRevenueAvg, 
                                     activityFrequency.activityFrequency, 
-                                    expectedRevenueSpectrum.combinedVolatility);
+                                    volatilityPercent);
+
+    // 수익 다양성 지표
+    const revenueProportions = {}; // 각 수익원의 비율
+    let diversityIndex = 0; // Shannon Diversity Index
+    let maxDiversityIndex = 0; // 최대 다각화 지수 (ln(N))
+    let normalizedDiversityIndex = 0;
+    if ( totalMOV > 0 ) {
+        Object.entries(revenueTotals).forEach(([key, value]) => {
+            if (value > 0) {
+                const proportion = value / totalMOV;
+                revenueProportions[key] = proportion;
+                diversityIndex -= proportion * Math.log(proportion); // Shannon Index 계산
+            }
+        });
+    
+        const categoryCount = Object.keys(revenueProportions).length;
+        maxDiversityIndex = Math.log(categoryCount);
+    
+        normalizedDiversityIndex = maxDiversityIndex > 0 ? diversityIndex / maxDiversityIndex : 0;
+    }
 
     return {    
         peakValue: peakData.value,
         peakDate: peakData.date ? peakData.date.slice(0, 7) : 'N/A',
-        totalValue: currentData ? currentData.MOV : 0,
-        activityRevenueAvgForExpectedAnnualRevenue,
-        activeGrowthRatesAvg,
-        ma6Current,
-        ma3Current,
-        revenueVolatilityStd,
+        currentValue: currentData ? currentData.MOV : 0,
         maxCoreRevenueLabel,
         maxCoreRevenueValue,
-        CAGR,
-        cumulativeMOV,
-        valuePerFan,
-        valuePerFanAvg,
-        revenueDiversityIndex,
+        totalMOV,
         normalizedDiversityIndex,
-        sortedData,
-        currentDate,
         currentData,
         activityFrequency,
         expectedAnnualRevenue,
-        expectedRevenueSpectrum
+        expectedRevenueSpectrum,
+        timeline,
     };
 };
