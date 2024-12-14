@@ -8,6 +8,7 @@ import React, { useState } from 'react';
 
 export default function ReportList() {
     const reports = useReports();
+    console.log('Report List : ', reports);
     const [chartLoading, setChartLoading] = useState(false);
     const [timelineData, setTimelineData] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
