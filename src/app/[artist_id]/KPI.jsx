@@ -145,7 +145,8 @@ const KPI = () => {
     const minRevenue = avgRevenue * (1 - spectrum);
     const maxRevenue = avgRevenue * (1 + spectrum);
     const revenueSpectrum = `-${Math.ceil((1 - minRevenue / avgRevenue) * 100)}% ~ ${Math.ceil((1 - avgRevenue / maxRevenue) * 100)}%`;
-    const totalValueMultiple = calculatedKPIs.currentData.MOV ? (calculatedKPIs.currentData.MOV + reportData.goal_fund) * (1 + calculatedKPIs.expectedRevenueSpectrum.spectrum) : 0;
+    const totalValueMultiple = calculatedKPIs.currentData.MOV ? calculatedKPIs.currentData.MOV + reportData.goal_fund : 0;
+    console.log('totalValueMultiple: ', totalValueMultiple);
 
     const riskLevel = calculateRiskLevelPercentage(
         reportData.goal_fund || 1,

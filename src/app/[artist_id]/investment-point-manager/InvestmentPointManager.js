@@ -150,7 +150,7 @@ const InvestmentPointManager = ({artist_id}) => {
     const filteredKPIData = Object.entries(kpiData).filter(([key, value]) => {
         return typeof value === 'number' || typeof value === 'string'; // 숫자나 문자열인 값만 포함
     });
-    const sortedData = kpiData.sortedData;
+    const sortedData = kpiData.timeline;
 
     const toggleKPISelection = (kpiKey) => {
         setSelectedKPIs((prev) => {
@@ -412,10 +412,7 @@ const InvestmentPointManager = ({artist_id}) => {
                                                 </div>
                                             )}
                                             {mediaItem.title && <p className="media-title">{mediaItem.title}</p>}
-                                            <a href={mediaItem.url} target="_blank" rel="noopener noreferrer" className="media-link">
-                                                {mediaItem.url}
-                                            </a>
-                                            <div className="media-actions">
+                                            <div className="media-actions grid grid-cols-3">
                                                 <button onClick={() => removeMedia(index)} className="btn btn-remove">Remove</button>
                                                 <button onClick={() => moveMedia(index, 'up')} disabled={index === 0} className="btn btn-move">⬆️</button>
                                                 <button onClick={() => moveMedia(index, 'down')} disabled={index === formData.media.length - 1} className="btn btn-move">⬇️</button>
@@ -501,7 +498,7 @@ const InvestmentPointManager = ({artist_id}) => {
                             type="text"
                             value={newMediaUrl}
                             onChange={(e) => setNewMediaUrl(e.target.value)}
-                            className="form-control"
+                            className="form-control mb-3"
                             placeholder="Enter media URL"
                         />
                         <button type="button" onClick={addMediaUrl} className="btn btn-primary">Add URL</button>

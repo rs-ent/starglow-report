@@ -57,11 +57,7 @@ const HistoryManager = ({ artist_id }) => {
   const handleAddBlock = (newBlock) => {
     let updatedHistory = [...historyData];
     if (insertionIndex !== null) {
-      if(insertionIndex === 0){
-        updatedHistory.splice(0, 0, newBlock);
-      } else {
-        updatedHistory.splice(insertionIndex + 1, 0, newBlock);
-      }
+      updatedHistory.splice(insertionIndex, 0, newBlock); 
       setInsertionIndex(null);
     } else {
       updatedHistory.push(newBlock);
@@ -123,6 +119,11 @@ const HistoryManager = ({ artist_id }) => {
       )
     : historyData;
 
+  const addInitialBlock = () => {
+    // 블록이 전혀 없을 때 Add Block 버튼을 누르면 insertionIndex를 0으로 설정
+    setInsertionIndex(0);
+  };
+
   if (loading) {
     return <div className="p-6 text-gray-700 animate-pulse">Loading analysis...</div>;
   }
@@ -165,7 +166,7 @@ const HistoryManager = ({ artist_id }) => {
           No blocks to display.
           <div className="mt-4">
             <button
-              onClick={() => setInsertionIndex(0)}
+              onClick={addInitialBlock}
               className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 flex items-center space-x-1 mx-auto"
             >
               <FaPlus />
@@ -175,7 +176,15 @@ const HistoryManager = ({ artist_id }) => {
         </div>
       )}
 
-      {/* 가장 상단에 블록이 있을 경우 맨 위 삽입도 지원 */}
+      {/* 블록이 없고 insertionIndex가 설정되었을 때(즉, 초기 블록 추가 상황) */}
+      {filteredData.length === 0 && insertionIndex !== null && editingBlockIndex === null && (
+        <div className="mt-4 border p-4 rounded bg-gray-50">
+          <p className="text-sm text-gray-500 mb-2">Inserting block at position {insertionIndex + 1}</p>
+          <BlocksEditor onSave={handleAddBlock} onCancel={() => setInsertionIndex(null)} />
+        </div>
+      )}
+
+      {/* 가장 상단에 블록이 있을 경우 맨 위 삽입 지원 */}
       {filteredData.length > 0 && (
         <div className="relative mt-4 group transition-all duration-300 ease-in-out">
           {editingBlockIndex === null && insertionIndex === null && (
@@ -269,7 +278,7 @@ const HistoryManager = ({ artist_id }) => {
                 </div>
               )}
 
-              {/* 인서션 인덱스가 실제 인덱스+1일 때 에디터 표시 */}
+              {/* 인서션 인덱스가 실제 인덱스일 때 에디터 표시 */}
               {editingBlockIndex === null && insertionIndex === actualIndex && (
                 <div className="mt-4 border p-4 rounded bg-gray-50">
                   <p className="text-sm text-gray-500 mb-2">Inserting block at position {insertionIndex + 1}</p>
