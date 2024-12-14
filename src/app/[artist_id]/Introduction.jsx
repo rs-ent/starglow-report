@@ -28,7 +28,34 @@ const Introduction = () => {
     const galleryRef = useRef(null);
     
     const introductionRaw = data?.introduction || '소개이다!';
-    const formattedIntroduction = introductionRaw.split('</p>').filter(Boolean);
+    const paragraphMatches = introductionRaw.match(/<p>(.*?)<\/p>/gs) || [];
+    const formattedIntroduction = paragraphMatches.map(block => {
+        // <p>, </p> 제거
+        return block.replace(/^<p>/, '').replace(/<\/p>$/, '');
+      });
+
+    const finalParagraphs = formattedIntroduction.map((paragraph, index) => {
+        const html = paragraph
+            .replace(
+                /<strong>(.*?)<\/strong>/g,
+                `<span class="font-bold relative inline-block">
+                <span class="underline absolute left-0 bottom-0 w-full h-1 bg-yellow-300 scale-x-0"></span>
+                $1
+                </span>`
+            )
+            .replace(/<br\s*\/?>/g, '<div class="mb-2"></div>');
+        
+        return (
+            <div
+                key={index}
+                ref={(el) => (textBlocksRef.current[index] = el)}
+                className={`relative inline-block text-sm font-light text-[var(--text-primary)] mb-2.5 ${html.trim() === '' ? 'h-4 block' : ''}`}
+                dangerouslySetInnerHTML={{ __html: html }}
+            />
+        );
+    });
+    console.log('Introduction Raw: ', introductionRaw);
+    console.log('Formatted Introduction: ', formattedIntroduction);
     const textBlocksRef = useRef([]);
 
     const membersRef = useRef(null);
@@ -270,29 +297,8 @@ const Introduction = () => {
             </div>
 
             {/* 간단한 소개글 */}
-            <div className="py-6 px-4 text-center">
-                {formattedIntroduction.map((block, index) => (
-                    <div
-                        key={index}
-                        ref={(el) => (textBlocksRef.current[index] = el)}
-                        className={`relative inline-block text-sm font-light text-[var(--text-primary)] mb-4 ${
-                            block.trim() === '' ? 'h-4 block' : ''
-                        }`}
-                        dangerouslySetInnerHTML={{
-                            __html: block
-                                .replace(
-                                    /<strong>(.*?)<\/strong>/g,
-                                    `
-                                    <span class="font-bold relative inline-block">
-                                        <span class="underline absolute left-0 bottom-0 w-full h-1 bg-yellow-300 scale-x-0"></span>
-                                        $1
-                                    </span>
-                                    `
-                                )
-                                .replace(/<br\s*\/?>/g, '<div class="h-4"></div>'), // <br>을 한 줄 띄움으로 변환
-                        }}
-                    />
-                ))}
+            <div className="py-6 px-4 text-center grid grid-cols-1 gap-0.5">
+                {finalParagraphs}
             </div>
             
             {isExpanded && (

@@ -54,7 +54,8 @@ const Outline = () => {
                         src={profilePicture} 
                         alt="프로필 사진" 
                         fill
-                        sizes="(max-width: 768px) 70vw, (max-width: 1200px) 40vw, 23vw"
+                        quality={100}
+                        sizes="(max-width: 768px) 100vw, 80vw"
                         className="object-cover"
                         loading='lazy'
                     />
