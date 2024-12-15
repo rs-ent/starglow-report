@@ -57,7 +57,7 @@ const HistoryManager = ({ artist_id }) => {
   const handleAddBlock = (newBlock) => {
     let updatedHistory = [...historyData];
     if (insertionIndex !== null) {
-      updatedHistory.splice(insertionIndex, 0, newBlock); 
+      updatedHistory.splice(insertionIndex + 1, 0, newBlock); 
       setInsertionIndex(null);
     } else {
       updatedHistory.push(newBlock);
