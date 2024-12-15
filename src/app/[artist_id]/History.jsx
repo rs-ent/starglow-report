@@ -27,32 +27,43 @@ const History = ({ openModal }) => {
     return (
         <div className="relative flex flex-col items-center p-1">
             {sectionTitles.length > 0 ? (
-                <div className="w-full grid grid-cols-2 relative">
-                    {sectionTitles.map((item, index) => (
-                        <div
-                            key={index}
-                            className={`flex-shrink-0 w-full p-1 cursor-pointer ${index === sectionTitles.length - 1 && sectionTitles.length % 2 !== 0 ? 'col-span-2' : ''}`}
-                            onClick={() => handleOpenModal(item.text)}
-                        >
-                            {/* Background Image with Blur and Overlay */}
-                            <div className="relative w-full h-28 overflow-hidden rounded-xl border">
-                                {/* Background Image */}
-                                <img
-                                    src={item.src}
-                                    alt={item.text || `Slide ${index + 1}`}
-                                    className="w-full h-full object-cover z-0"
-                                />
+                <div className="w-full grid grid-cols-1 sm:grid-cols-2">
+                    {sectionTitles.map((item, index) => {
+                        // 현재 항목이 마지막 항목인지 확인
+                        const isLastItem = index === sectionTitles.length - 1;
+                        // 이전 항목이 존재하고 fullSize인지 확인
+                        const isPrevFullSize = index > 0 ? sectionTitles[index - 1].fullSize : false;
+                        // 조건에 따라 fullSize 설정
+                        const shouldFullSize = item.fullSize || (isLastItem && isPrevFullSize);
 
-                                {/* Black Overlay */}
-                                <div className="absolute inset-0 bg-black bg-opacity-60 z-10"></div>
+                        return (
+                            <div
+                                key={index}
+                                className={`flex-shrink-0 w-full p-1 cursor-pointer col-span-1 ${
+                                    shouldFullSize ? 'sm:col-span-2' : ''
+                                }`}
+                                onClick={() => handleOpenModal(item.text)}
+                            >
+                                {/* Background Image with Blur and Overlay */}
+                                <div className="relative w-full h-24 overflow-hidden rounded-xl border">
+                                    {/* Background Image */}
+                                    <img
+                                        src={item.src}
+                                        alt={item.text || `Slide ${index + 1}`}
+                                        className="w-full h-full object-cover blur-xs z-0"
+                                    />
 
-                                {/* Centered Text */}
-                                <h2 className="absolute inset-0 flex items-center justify-center text-center text-white text-lg p-4 whitespace-break-spaces font-semibold z-20">
-                                    {item.text}
-                                </h2>
+                                    {/* Black Overlay */}
+                                    <div className={`absolute inset-0 bg-black ${shouldFullSize ? 'bg-opacity-60' : 'bg-opacity-50'} z-10`}></div>
+
+                                    {/* Centered Text */}
+                                    <h2 className="absolute inset-0 flex items-center justify-center text-center text-white text-lg p-4 whitespace-break-spaces font-semibold z-20">
+                                        {item.text}
+                                    </h2>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             ) : (
                 <p className="text-gray-500">No Section Titles available.</p>

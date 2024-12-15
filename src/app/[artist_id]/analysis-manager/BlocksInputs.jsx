@@ -63,6 +63,20 @@ const BlocksInputs = ({ type, data, onChange }) => {
             placeholder="Enter alt text for the image"
             className="p-2 border rounded w-full"
           />
+
+          {/* Full Size Button Checkbox */}
+          <div className="mt-4">
+            <label className="inline-flex items-center">
+              <input
+                type="checkbox"
+                name="fullSize"
+                checked={data.fullSize || false}
+                onChange={(e) => onChange({ fullSize: e.target.checked })}
+                className="mr-2"
+              />
+              Full Size Button
+            </label>
+          </div>
         </div>
       );
     case 'Title':
