@@ -239,17 +239,17 @@ const BlocksRenderer = ({ block }) => {
       const videoId = extractYouTubeId(props.src);
 
       return (
-        <div className="video-container my-12" role="region" aria-label="Video Block">
+        <div className="video-container my-9" role="region" aria-label="Video Block">
           {videoId ? (
             <iframe
-              className="w-3/4 mx-auto rounded-lg shadow-soft transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-5/6 h-60 mx-auto rounded-lg shadow-soft transition-transform transform focus:outline-none focus:ring-2 focus:ring-blue-500"
               src={`https://www.youtube.com/embed/${videoId}`}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               title="Embedded YouTube Video"
             ></iframe>
           ) : (
-            <div className="w-3/4 mx-auto text-center text-gray-500 p-4 bg-gray-100 rounded">
+            <div className="w-5/6 mx-auto text-center text-gray-500 p-4 bg-gray-100 rounded">
               Invalid or Missing Video URL
             </div>
           )}
