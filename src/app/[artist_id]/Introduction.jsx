@@ -54,21 +54,15 @@ const Introduction = () => {
             />
         );
     });
-    console.log('Introduction Raw: ', introductionRaw);
-    console.log('Formatted Introduction: ', formattedIntroduction);
     const textBlocksRef = useRef([]);
 
     const membersRef = useRef(null);
     const members = data?.members || [];
+    console.log(members);
 
-    const albums = valuationData.SV?.albums || [];
-    const representativeTracks = albums
-        .flatMap((album) =>
-        album.tracks.filter((track) => track.representative === "TRUE")
-        )
-        .slice(0, 5);
-
+    const albums = valuationData.SV?.sub_data || valuationData.SV?.albums || [];
     const teamMembers = data?.teamMembers || [];
+    console.log('valuationData SV', valuationData.SV);
 
     const visibleData = Object.entries(data?.additionalData || {})
     .filter(([key, value]) => value.visible) // visible이 true인 항목만 필터링
@@ -262,7 +256,7 @@ const Introduction = () => {
                     width={150}
                     height={150}
                     className="mx-auto object-contain"
-                    unoptimized // 이미지 최적화 해제
+                    unoptimized // 이미지 최적화 해제   
                 />
             </div>
 
@@ -304,41 +298,45 @@ const Introduction = () => {
             {isExpanded && (
                 <>
                 {/* 멤버 소개 */}
-                <h2 className="section-title">Members</h2>
-                <div className="relative overflow-x-scroll">
-                    
-                    <div
-                        ref={membersRef}
-                        className="flex gap-2 items-center h-full"
-                        style={{
-                            width: `calc(${members.length} * 200px)`, // 카드 너비 280px 기반으로 계산
-                        }}
-                    >
-                        {members.map((member, index) => (
+                {members.length > 0 && (
+                    <div>
+                        <h2 className="section-title">Members</h2>
+                        <div className="relative overflow-x-scroll">
+                            
                             <div
-                                key={member.id}
-                                className="flex-shrink-0 w-[200px] h-[250px] bg-[var(--background-muted)] rounded-md shadow-md relative"
+                                ref={membersRef}
+                                className="flex gap-2 items-center h-full"
+                                style={{
+                                    width: `calc(${members.length} * 200px)`, // 카드 너비 280px 기반으로 계산
+                                }}
                             >
-                                {/* 프로필 사진 */}
-                                <Image
-                                    src={member.profilePicture}
-                                    alt={member.name}
-                                    fill
-                                    sizes="(max-width: 768px) 70vw, (max-width: 1200px) 40vw, 23vw"
-                                    className="object-cover"
-                                    loading='lazy'
-                                />
-                                {/* 멤버 정보 */}
-                                <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-[var(--foreground)] to-transparent text-[var(--text-reverse)]">
-                                    <h3 className="text-base font-bold">{member.name}</h3>
-                                    <p className="text-xs font-light">
-                                        {member.tags.join(' · ')}
-                                    </p>
-                                </div>
+                                {members.map((member, index) => (
+                                    <div
+                                        key={member.id}
+                                        className="flex-shrink-0 w-[200px] h-[250px] bg-[var(--background-muted)] rounded-md shadow-md relative"
+                                    >
+                                        {/* 프로필 사진 */}
+                                        <Image
+                                            src={member.profilePicture}
+                                            alt={member.name}
+                                            fill
+                                            sizes="(max-width: 768px) 70vw, (max-width: 1200px) 40vw, 23vw"
+                                            className="object-cover"
+                                            loading='lazy'
+                                        />
+                                        {/* 멤버 정보 */}
+                                        <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-[var(--foreground)] to-transparent text-[var(--text-reverse)]">
+                                            <h3 className="text-base font-bold">{member.name}</h3>
+                                            <p className="text-xs font-light">
+                                                {member.tags.join(' · ')}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
+                        </div>
                     </div>
-                </div>
+                )}
                 
                 {/* 추가 내용 */}
                 {visibleData.length > 0 && (
@@ -352,7 +350,13 @@ const Introduction = () => {
                             >
                                 <span className="text-xs font-semibold text-[var(--text-primary)]">{item.displayKey}</span>
                                 <span className="text-xs text-[var(--text-secondary)] whitespace-pre-line text-right">
-                                    {item.value}
+                                    {typeof item.value === 'object' && !Array.isArray(item.value)
+                                        ? Object.entries(item.value)
+                                            .map(([key, val]) => `${key}: ${val}`)
+                                            .join(', ')
+                                        : Array.isArray(item.value)
+                                        ? item.value.join(', ')
+                                        : item.value}
                                 </span>
                             </div>
                         ))}
@@ -360,6 +364,7 @@ const Introduction = () => {
                 )}
 
                 {/* 앨범 소개 */}
+                {albums.length > 0 && (
                 <div className="my-10">
                     <h2 className="section-title">Discography</h2>
                     <div className="relative overflow-x-scroll">
@@ -370,7 +375,7 @@ const Introduction = () => {
                                 width: `calc(${members.length} * 200px)`, // 카드 너비 280px 기반으로 계산
                             }}
                         >
-                            {albums.map((album, index) => (
+                            {albums.sort((a,b) => new Date(b.release_date) - new Date(a.release_date)).map((album, index) => (
                                 <div
                                     key={index}
                                     className="flex-shrink-0 w-[200px] h-[200px] bg-[var(--background-muted)] rounded-md shadow-md relative"
@@ -396,11 +401,12 @@ const Introduction = () => {
                         </div>
                     </div>
                 </div>
+                )}
 
                 {/* 기획사 맨파워 */}
-                <h2 className="section-title mt-14">Company</h2>
-                <div>
-                    {teamMembers.length > 0 ? (
+                {teamMembers.length > 0 && (
+                    <div>
+                        <h2 className="section-title mt-14">Company</h2>
                         <div className="grid grid-cols-1 gap-6">
                             {teamMembers.map((member, index) => (
                                 <div key={index} className="rounded-lg border overflow-hidden flex h-full relative">
@@ -426,11 +432,10 @@ const Introduction = () => {
                                     </div>
                                 </div>
                             ))}
-                        </div>
-                    ) : (
-                        <p className="text-center text-gray-500">No team members to display.</p>
-                    )}
+                    </div>
+                    
                 </div>
+                )}
                 </>
             )}
 
