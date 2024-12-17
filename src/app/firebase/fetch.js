@@ -318,7 +318,7 @@ export async function fetchInvestmentPoints(artistId, type = 'All') {
     }
 }
 
-export async function addInvestmentPoint(data, artistId = "knk_20160303") {
+export async function addInvestmentPoint(data, artistId) {
     try {
         data['artist_id'] = artistId;
 

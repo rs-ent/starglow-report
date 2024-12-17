@@ -275,7 +275,7 @@ const InvestmentPointManager = ({artist_id}) => {
                 );
                 console.log('Investment point updated successfully!');
             } else {
-                const docId = await addInvestmentPoint(newPoint);
+                const docId = await addInvestmentPoint(newPoint, artist_id);
                 setInvestmentPoints([...investmentPoints, { id: docId, ...newPoint }]);
                 console.log('Investment point added successfully!');
             }
