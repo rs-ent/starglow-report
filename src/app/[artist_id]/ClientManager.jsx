@@ -54,16 +54,10 @@ const ClientManager = ({artist_id}) => {
       </section>
 
       {/* 리워드 섹션 */}
-      <section className="section-base">
-        <h2 className="section-title">Rewards</h2>
-        <Rewards />
-      </section>
+      <Rewards />
       
       {/* 투자 포인트 */}
-      <section className="section-base">
-        <h2 className="section-title">Investment Points</h2>
-        <InvestmentPoints type="Investment Point" />
-      </section>
+      <InvestmentPoints type="Investment Point" />
 
       {/* 히스토리 */}
       <section className="section-base">
@@ -77,10 +71,7 @@ const ClientManager = ({artist_id}) => {
       )}
       
       {/* 리스크 */}
-      <section className="section-base">
-        <h2 className="section-title">Risks</h2>
-        <InvestmentPoints type="Risk" />
-      </section>
+      <InvestmentPoints type="Risk" />
 
       {/* 로드맵 */}
       <section className="section-base">
