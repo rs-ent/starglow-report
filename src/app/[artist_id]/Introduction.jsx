@@ -58,11 +58,9 @@ const Introduction = () => {
 
     const membersRef = useRef(null);
     const members = data?.members || [];
-    console.log(members);
 
     const albums = valuationData.SV?.sub_data || valuationData.SV?.albums || [];
     const teamMembers = data?.teamMembers || [];
-    console.log('valuationData SV', valuationData.SV);
 
     const visibleData = Object.entries(data?.additionalData || {})
     .filter(([key, value]) => value.visible) // visible이 true인 항목만 필터링

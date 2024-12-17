@@ -170,7 +170,7 @@ const getLineColor = (index) => {
 const renderMarker = (marker, index, sortedData) => {
   if(marker.type === 'box' && marker.xMax - marker.xMin <= 2) {
     marker.type = 'line';
-    const xValue = Math.ceil((marker.xMax + marker.xMin) / 2);
+    const xValue = Math.ceil((parseInt(marker.xMax, 10) + parseInt(marker.xMin, 10)) / 2);
     marker.xValue = xValue;
   }
     
