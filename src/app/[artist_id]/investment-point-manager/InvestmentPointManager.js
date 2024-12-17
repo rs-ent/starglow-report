@@ -5,33 +5,29 @@ import { fetchInvestmentPoints, addInvestmentPoint, deleteData, updateData } fro
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../firebase/firebase';
 import { v4 as uuidv4 } from 'uuid';
+import dynamic from 'next/dynamic';
+import { useKPI } from '../../../context/GlobalData';
 
 import MagicWithOpenAI from './InvestmentPointAI';
 import './investmentPointManager.css';
-import { useKPI } from '../../../context/GlobalData';
-
+import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import zoomPlugin from 'chartjs-plugin-zoom';
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, annotationPlugin, zoomPlugin);
-import { Line } from 'react-chartjs-2';
 
-import dynamic from 'next/dynamic';
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, annotationPlugin, zoomPlugin);
+
 const CreateLineChart = dynamic(() => import('./CreateLineChart'), { ssr: false });
 
-const predefinedColors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
+const predefinedColors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'];
+
+// 차트 데이터 구성
 const getChartData = (chartConfig, sortedData) => {
     const labels = sortedData
         .filter((data) => {
             const date = new Date(data.date);
             const { start, end } = chartConfig.dateRange || {};
-            if (!start || !end) {
-                console.error('Invalid dateRange:', chartConfig.dateRange);
-            }
-            return (
-                (!start || date >= new Date(start)) &&
-                (!end || date <= new Date(end))
-            );
+            return (!start || date >= new Date(start)) && (!end || date <= new Date(end));
         })
         .map((data) => new Date(data.date).toLocaleDateString());
 
@@ -41,28 +37,23 @@ const getChartData = (chartConfig, sortedData) => {
             .filter((data) => {
                 const date = new Date(data.date);
                 const { start, end } = chartConfig.dateRange || {};
-                if (!start || !end) {
-                    console.error('Invalid dateRange:', chartConfig.dateRange);
-                }
-                return (
-                    (!start || date >= new Date(start)) &&
-                    (!end || date <= new Date(end))
-                );
+                return (!start || date >= new Date(start)) && (!end || date <= new Date(end));
             })
             .map((data) => data[configItem.field]),
         borderColor: predefinedColors[index % predefinedColors.length],
-        backgroundColor: 'rgba(0, 0, 0, 0.1)',
+        backgroundColor: 'rgba(0, 0, 0, 0.05)',
         tension: 0.4,
     }));
 
     return { labels, datasets };
 };
 
+// 차트 옵션
 const getChartOptions = (chartConfig) => ({
     responsive: true,
     plugins: {
         legend: { display: true, position: 'top' },
-        title: { display: true, text: 'Chart Preview' },
+        title: { display: true, text: chartConfig?.chartTitle || 'Chart Preview' },
         annotation: {
             annotations: chartConfig.markers.reduce((acc, marker, index) => {
                 if (marker.type === 'point') {
@@ -71,12 +62,12 @@ const getChartOptions = (chartConfig) => ({
                         xValue: marker.xValue,
                         yValue: marker.yValue,
                         backgroundColor: marker.color || 'rgba(255, 99, 132, 0.3)',
-                        radius: marker.radius || 8,
+                        radius: marker.radius || 6,
                         label: {
                             content: marker.description || `Point ${index + 1}`,
                             enabled: !!marker.description,
                             position: 'center',
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            backgroundColor: '#333',
                             color: '#fff',
                             font: { size: 12 },
                             padding: 4,
@@ -89,14 +80,14 @@ const getChartOptions = (chartConfig) => ({
                         xMax: marker.xMax,
                         yMin: marker.yMin,
                         yMax: marker.yMax,
-                        backgroundColor: `rgba(${parseInt(marker.color.slice(1, 3), 16)}, ${parseInt(marker.color.slice(3, 5), 16)}, ${parseInt(marker.color.slice(5, 7), 16)}, ${marker.alpha || 0.3})`,
-                        borderColor: marker.borderColor || 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(100,100,100,0.1)',
+                        borderColor: '#666',
                         borderWidth: 1,
                         label: {
                             content: marker.description || `Box ${index + 1}`,
                             enabled: !!marker.description,
                             position: 'start',
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            backgroundColor: '#333',
                             color: '#fff',
                             font: { size: 12 },
                             padding: 4,
@@ -120,7 +111,41 @@ const getChartOptions = (chartConfig) => ({
     },
 });
 
-const InvestmentPointManager = ({artist_id}) => {
+// 유튜브 URL 파싱 함수 (shorts 포함)
+const extractYouTubeEmbedUrl = (url) => {
+    try {
+        let videoId = null;
+        const shortsRegex = /youtube\.com\/shorts\/([\w-]+)/;
+        const standardRegex = /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|.*&v=))([\w-]+)/;
+
+        // shorts URL 처리
+        const shortsMatch = url.match(shortsRegex);
+        if (shortsMatch && shortsMatch[1]) {
+            videoId = shortsMatch[1];
+            return `https://www.youtube.com/embed/${videoId}`;
+        }
+
+        // 일반 유튜브 URL 처리
+        const match = url.match(standardRegex);
+        if (match && match[1]) {
+            videoId = match[1];
+        }
+
+        if (videoId) {
+            // 시작시간 파라미터 t 지원
+            const urlObj = new URL(url);
+            const start = urlObj.searchParams.get('t');
+            return `https://www.youtube.com/embed/${videoId}${start ? `?start=${start}` : ''}`;
+        }
+
+        return url;
+    } catch (error) {
+        console.error('Invalid YouTube URL:', error);
+        return url;
+    }
+};
+
+const InvestmentPointManager = ({ artist_id }) => {
     const [investmentPoints, setInvestmentPoints] = useState([]);
     const [formData, setFormData] = useState({
         id: null,
@@ -128,11 +153,11 @@ const InvestmentPointManager = ({artist_id}) => {
         type: 'Investment Point',
         title: '',
         context: '',
-        media: [], // 이미지와 비디오를 통합하여 관리
-        mediaTitles: [], // 각각의 미디어 제목
-        chartConfig: null, // 차트 설정 포함
-        selectedKPIs: [],  // 선택된 KPI 포함
-        chartTitle: '', // 차트 제목
+        media: [],
+        mediaTitles: [],
+        chartConfig: null,
+        selectedKPIs: [],
+        chartTitle: '',
         source: '',
     });
     const [uploadFile, setUploadFile] = useState(null);
@@ -140,30 +165,13 @@ const InvestmentPointManager = ({artist_id}) => {
     const [mediaType, setMediaType] = useState('image');
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(false);
-    
     const [selectedKPIs, setSelectedKPIs] = useState([]);
-    
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [chartConfig, setChartConfig] = useState(null);
 
     const kpiData = useKPI();
-    const filteredKPIData = Object.entries(kpiData).filter(([key, value]) => {
-        return typeof value === 'number' || typeof value === 'string'; // 숫자나 문자열인 값만 포함
-    });
+    const filteredKPIData = Object.entries(kpiData).filter(([key, value]) => typeof value === 'number' || typeof value === 'string');
     const sortedData = kpiData.timeline;
-
-    const toggleKPISelection = (kpiKey) => {
-        setSelectedKPIs((prev) => {
-            if (prev.includes(kpiKey)) {
-                return prev.filter((key) => key !== kpiKey); // 이미 선택된 KPI를 해제
-            } else if (prev.length < 4) {
-                return [...prev, kpiKey]; // 최대 4개까지만 선택 가능
-            } else {
-                console.error('You can select up to 4 KPIs.');
-                return prev;
-            }
-        });
-    };
 
     useEffect(() => {
         if (artist_id) {
@@ -177,42 +185,47 @@ const InvestmentPointManager = ({artist_id}) => {
             const points = await fetchInvestmentPoints(artist_id);
             setInvestmentPoints(points);
         } catch (error) {
-            console.error('Fetch error:', error);
-            console.error('Error loading investment points.');
+            console.error('Error loading investment points:', error);
         } finally {
             setLoading(false);
         }
     };
 
+    const toggleKPISelection = (kpiKey) => {
+        setSelectedKPIs((prev) => {
+            if (prev.includes(kpiKey)) {
+                return prev.filter((key) => key !== kpiKey);
+            } else if (prev.length < 4) {
+                return [...prev, kpiKey];
+            } else {
+                alert('You can select up to 4 KPIs.');
+                return prev;
+            }
+        });
+    };
+
     const handleFileUpload = async () => {
-        if (!uploadFile) {
-            console.error('No file selected for upload.');
-            return;
-        }
-    
+        if (!uploadFile) return;
         try {
             const uniqueName = `${uuidv4()}_${uploadFile.name}`;
             const storageRef = ref(storage, `${mediaType}s/${uniqueName}`);
             await uploadBytes(storageRef, uploadFile);
             const downloadUrl = await getDownloadURL(storageRef);
-    
+
             setFormData((prevData) => ({
                 ...prevData,
                 media: [
                     ...prevData.media,
                     {
                         url: downloadUrl,
-                        type: mediaType, // 'image' 또는 'video'
-                        title: '', // 나중에 입력할 수 있도록 초기화
+                        type: mediaType,
+                        title: '',
                     },
                 ],
             }));
-    
             setUploadFile(null);
-            console.log('File uploaded successfully!');
         } catch (error) {
             console.error('File upload error:', error);
-            console.error(`Error uploading file: ${error.message}`);
         }
     };
 
@@ -226,71 +239,59 @@ const InvestmentPointManager = ({artist_id}) => {
     };
 
     const addMediaUrl = () => {
-        if (!newMediaUrl) {
-            console.error('URL cannot be empty.');
+        if (!newMediaUrl || !isValidUrl(newMediaUrl)) {
+            alert('Please provide a valid URL');
             return;
         }
-    
-        if (!isValidUrl(newMediaUrl)) {
-            console.error('Invalid URL format.');
-            return;
-        }
-    
+
         setFormData((prevData) => ({
             ...prevData,
             media: [
                 ...prevData.media,
                 {
                     url: newMediaUrl,
-                    type: mediaType, // 'image' 또는 'video'
-                    title: '', // 초기 제목은 비워둠
+                    type: mediaType,
+                    title: '',
                 },
             ],
         }));
-    
         setNewMediaUrl('');
-        console.log(`${mediaType.charAt(0).toUpperCase() + mediaType.slice(1)} URL added successfully!`);
     };
 
     const handleSave = async () => {
-        if (!formData.title || !formData.context) {
-            console.error('Title and context are required.');
+        if (!formData.title.trim() || !formData.context.trim()) {
+            alert('Title and context are required.');
             return;
         }
-    
+
+        const newPoint = {
+            ...formData,
+            id: formData.id || `IP-${new Date().toISOString()}`,
+            artist_id: artist_id,
+        };
+
         try {
-            const newPoint = {
-                ...formData,
-                id: formData.id || `IP-${new Date().toISOString()}`,
-                artist_id: artist_id,
-            };
-    
             if (isEditing) {
                 await updateData(formData.id, 'InvestmentPoint', newPoint);
-    
                 setInvestmentPoints((prev) =>
                     prev.map((point) =>
                         point.id === formData.id ? { ...point, ...newPoint } : point
                     )
                 );
-                console.log('Investment point updated successfully!');
             } else {
                 const docId = await addInvestmentPoint(newPoint, artist_id);
                 setInvestmentPoints([...investmentPoints, { id: docId, ...newPoint }]);
-                console.log('Investment point added successfully!');
             }
-    
             resetForm();
         } catch (error) {
-            console.error('Save error:', error);
-            console.error('Error saving investment point.');
+            console.error('Error saving investment point:', error);
         }
     };
 
     const resetForm = () => {
         setFormData({
             id: null,
-            type: 'Investment Point', // 초기값: 투자 포인트
+            type: 'Investment Point',
             title: '',
             context: '',
             media: [],
@@ -301,21 +302,22 @@ const InvestmentPointManager = ({artist_id}) => {
             source: '',
         });
         setIsEditing(false);
+        setSelectedKPIs([]);
+        setChartConfig(null);
     };
 
     const removeMedia = (index) => {
         setFormData((prevData) => ({
             ...prevData,
-            media: prevData.media.filter((_, i) => i !== index), // 해당 인덱스의 미디어 제거
-            mediaTitles: prevData.mediaTitles.filter((_, i) => i !== index), // 제목도 동기화
+            media: prevData.media.filter((_, i) => i !== index),
+            mediaTitles: prevData.mediaTitles.filter((_, i) => i !== index),
         }));
-        console.log('Media removed.');
     };
 
     const moveMedia = (index, direction) => {
         const newMedia = [...formData.media];
         const newTitles = [...formData.mediaTitles];
-    
+
         if (direction === 'up' && index > 0) {
             [newMedia[index], newMedia[index - 1]] = [newMedia[index - 1], newMedia[index]];
             [newTitles[index], newTitles[index - 1]] = [newTitles[index - 1], newTitles[index]];
@@ -323,7 +325,7 @@ const InvestmentPointManager = ({artist_id}) => {
             [newMedia[index], newMedia[index + 1]] = [newMedia[index + 1], newMedia[index]];
             [newTitles[index], newTitles[index + 1]] = [newTitles[index + 1], newTitles[index]];
         }
-    
+
         setFormData((prevData) => ({
             ...prevData,
             media: newMedia,
@@ -332,24 +334,20 @@ const InvestmentPointManager = ({artist_id}) => {
     };
 
     const handleDelete = async (id) => {
-        const confirm = window.confirm(`Are you sure you want to delete this investment point? ${id}`);
-        if (!confirm) return;
-    
+        if (!confirm('Delete this investment point?')) return;
+
         try {
             await deleteData(id, 'InvestmentPoint');
-            const updatedPoints = investmentPoints.filter(point => point.id !== id);
-            setInvestmentPoints(updatedPoints);
-            console.log('Investment point deleted successfully!');
+            setInvestmentPoints(investmentPoints.filter((point) => point.id !== id));
         } catch (error) {
-            console.error('Delete error:', error);
-            console.error('Error deleting investment point.');
+            console.error('Error deleting investment point:', error);
         }
     };
 
     const startEditing = (point) => {
-        setFormData({
-            ...point
-        });
+        setFormData({ ...point });
+        setSelectedKPIs(point.selectedKPIs || []);
+        setChartConfig(point.chartConfig || null);
         setIsEditing(true);
     };
 
@@ -359,92 +357,66 @@ const InvestmentPointManager = ({artist_id}) => {
             ...prevData,
             chartConfig: config,
         }));
-        console.log('Saved Chart Config:', config); // 저장된 차트 설정 확인
     };
-
-    const extractYouTubeId = (url) => {
-        try {
-            const youtubeRegex = /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|.*&v=))([\w-]{11})(?:.*t=(\d+))?/;
-            const match = url.match(youtubeRegex);
-            
-            if (match) {
-                const videoId = match[1]; // YouTube Video ID
-                const start = match[2];  // 시작 시간 (t 파라미터)
-                return `https://www.youtube.com/embed/${videoId}${start ? `?start=${start}` : ''}`;
-            } else {
-                console.error('Not a valid YouTube URL');
-                return url; // YouTube URL이 아니면 원본 URL 반환
-            }
-        } catch (error) {
-            console.error('Error processing URL:', error);
-            return url; // 잘못된 URL이면 원본 URL 반환
-        }
-    };   
 
     return (
         <div className="investment-point-manager">
-            <h1>Manage Investment Points for Artist: {artist_id}</h1>
+            <h1>Investment Point Management</h1>
 
-            <div className="existing-investment-points">
-                <h2>Existing Investment Points</h2>
+            <section className="existing-investment-points">
+                <h2>Existing Points</h2>
                 {loading ? (
-                    <p>Loading investment points...</p>
+                    <p className="loading">Loading...</p>
                 ) : investmentPoints.length > 0 ? (
                     <ul className="investment-point-list">
                         {investmentPoints.map((point) => (
                             <li key={point.id} className="investment-point-item">
-                                <h3>{point.title} ({point.type})</h3>
-                                <p>{point.context}</p>
-                                {point.media.map((mediaItem, index) => {
-                                    return (
-                                        <li key={`${mediaItem.url}-${index}`} className="media-item">
-                                            {mediaItem.type === 'image' ? (
-                                                <img src={mediaItem.url} alt={mediaItem.title || `Image ${index + 1}`} className="media-image" />
-                                            ) : (
-                                                <div className="video-container my-4">
-                                                    <iframe
-                                                        className="w-3/4 mx-auto rounded-lg shadow-soft transition-transform transform hover:scale-105"
-                                                        src={extractYouTubeId(mediaItem.url)}
-                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                                        allowFullScreen
-                                                        title="YouTube Video"
-                                                    ></iframe>
-                                                </div>
-                                            )}
-                                            {mediaItem.title && <p className="media-title">{mediaItem.title}</p>}
-                                            <div className="media-actions grid grid-cols-3">
-                                                <button onClick={() => removeMedia(index)} className="btn btn-remove">Remove</button>
-                                                <button onClick={() => moveMedia(index, 'up')} disabled={index === 0} className="btn btn-move">⬆️</button>
-                                                <button onClick={() => moveMedia(index, 'down')} disabled={index === formData.media.length - 1} className="btn btn-move">⬇️</button>
+                                <div className="item-header">
+                                    <h3>{point.title} ({point.type})</h3>
+                                    <div className="item-actions">
+                                        <button onClick={() => startEditing(point)} className="btn btn-primary">Edit</button>
+                                        <button onClick={() => handleDelete(point.id)} className="btn btn-remove">Delete</button>
+                                    </div>
+                                </div>
+                                <p className="item-context">{point.context}</p>
+                                {point.media.map((mediaItem, index) => (
+                                    <div key={`${mediaItem.url}-${index}`} className="media-block">
+                                        {mediaItem.type === 'image' ? (
+                                            <img src={mediaItem.url} alt={mediaItem.title || `Image ${index + 1}`} className="media-image" />
+                                        ) : (
+                                            <div className="media-video-wrapper">
+                                                <iframe
+                                                    className="media-video"
+                                                    src={extractYouTubeEmbedUrl(mediaItem.url)}
+                                                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                                                    allowFullScreen
+                                                    title="Video"
+                                                ></iframe>
                                             </div>
-                                        </li>
-                                    );
-                                })}
+                                        )}
+                                        {mediaItem.title && <p className="media-title">{mediaItem.title}</p>}
+                                    </div>
+                                ))}
                                 {point.chartConfig && (
                                     <div className="chart-preview">
                                         <Line data={getChartData(point.chartConfig, sortedData)} options={getChartOptions(point.chartConfig)} />
                                     </div>
                                 )}
-                                <div className="point-actions">
-                                    <button onClick={() => startEditing(point)} className="btn btn-edit">Edit</button>
-                                    <button onClick={() => handleDelete(point.id)} className="btn btn-delete">Delete</button>
-                                </div>
                             </li>
                         ))}
                     </ul>
                 ) : (
-                    <p>No investment points found for this artist.</p>
+                    <p>No points found.</p>
                 )}
-            </div>
+            </section>
 
-            <div className="add-investment-point">
-                <h2>{isEditing ? `Edit ${formData.type}` : `Add New ${formData.type}`}</h2>
+            <section className="add-investment-point">
+                <h2>{isEditing ? 'Edit Investment Point' : 'Add New Investment Point'}</h2>
 
                 <form onSubmit={(e) => e.preventDefault()} className="investment-form">
                     <div className="form-group">
-                        <label htmlFor="type">Select Type:</label>
+                        <label>Type:</label>
                         <select
-                            id="type"
                             value={formData.type}
                             onChange={(e) => setFormData((prevData) => ({ ...prevData, type: e.target.value }))}
                             className="form-control"
@@ -455,23 +427,20 @@ const InvestmentPointManager = ({artist_id}) => {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="title">Title:</label>
+                        <label>Title:</label>
                         <input
-                            id="title"
                             type="text"
-                            name="title"
                             value={formData.title}
                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                             required
                             className="form-control"
+                            placeholder="Enter title"
                         />
                     </div>
 
-                    {/* Media Upload Section */}
                     <div className="form-group">
-                        <label htmlFor="mediaType">Media Type:</label>
+                        <label>Media Type:</label>
                         <select
-                            id="mediaType"
                             value={mediaType}
                             onChange={(e) => setMediaType(e.target.value)}
                             className="form-control"
@@ -481,41 +450,40 @@ const InvestmentPointManager = ({artist_id}) => {
                         </select>
                     </div>
 
-                    <div className="form-group">
-                        <label>Upload Media:</label>
+                    <div className="form-group media-upload-group">
+                        <label>Upload File:</label>
                         <input
                             type="file"
                             accept={mediaType === 'image' ? 'image/*' : 'video/*'}
                             onChange={(e) => setUploadFile(e.target.files[0])}
-                            className="form-control-file"
+                            className="form-control"
                         />
                         <button type="button" onClick={handleFileUpload} className="btn btn-primary">Upload</button>
                     </div>
 
-                    <div className="form-group">
-                        <label>Add Media URL:</label>
+                    <div className="form-group media-url-group">
+                        <label>Or Add Media URL:</label>
                         <input
                             type="text"
                             value={newMediaUrl}
                             onChange={(e) => setNewMediaUrl(e.target.value)}
-                            className="form-control mb-3"
-                            placeholder="Enter media URL"
+                            className="form-control"
+                            placeholder="e.g. https://youtu.be/PK32nWq81xA"
                         />
                         <button type="button" onClick={addMediaUrl} className="btn btn-primary">Add URL</button>
                     </div>
 
-                    {/* Media List */}
                     {formData.media && formData.media.length > 0 && (
                         <ul className="media-list">
                             {formData.media.map((item, index) => (
                                 <li key={item.url} className="media-item">
-                                    <div className="media-details">
+                                    <div className="media-link-row">
                                         <a href={item.url} target="_blank" rel="noopener noreferrer" className="media-link">
-                                            {item.type === 'image' ? '🖼️' : '🎥'} {item.url}
+                                            {item.type === 'image' ? 'Image' : 'Video'} Link
                                         </a>
                                         <input
                                             type="text"
-                                            placeholder={`${item.type.charAt(0).toUpperCase() + item.type.slice(1)} Title`}
+                                            placeholder="Media Title"
                                             value={formData.mediaTitles[index] || ''}
                                             onChange={(e) => {
                                                 const newTitles = [...formData.mediaTitles];
@@ -525,13 +493,13 @@ const InvestmentPointManager = ({artist_id}) => {
                                                     mediaTitles: newTitles,
                                                 }));
                                             }}
-                                            className="form-control media-title-input"
+                                            className="form-control"
                                         />
                                     </div>
                                     <div className="media-actions">
                                         <button onClick={() => removeMedia(index)} className="btn btn-remove">Remove</button>
-                                        <button onClick={() => moveMedia(index, 'up')} disabled={index === 0} className="btn btn-move">⬆️</button>
-                                        <button onClick={() => moveMedia(index, 'down')} disabled={index === formData.media.length - 1} className="btn btn-move">⬇️</button>
+                                        <button onClick={() => moveMedia(index, 'up')} disabled={index === 0} className="btn btn-secondary">↑</button>
+                                        <button onClick={() => moveMedia(index, 'down')} disabled={index === formData.media.length - 1} className="btn btn-secondary">↓</button>
                                     </div>
                                 </li>
                             ))}
@@ -545,42 +513,35 @@ const InvestmentPointManager = ({artist_id}) => {
                             value={formData.source}
                             onChange={(e) => setFormData((prevData) => ({ ...prevData, source: e.target.value }))}
                             className="form-control"
-                            placeholder="Enter source"
+                            placeholder="Reference source or URL"
                         />
                     </div>
 
-                    {/* KPI Selection */}
-                    <div className="kpi-section">
-                        <h2>Select up to 4 KPIs</h2>
-                        <div className="kpi-scroll-container">
+                    {/*<div className="form-group">
+                        <h3>Select up to 4 KPIs</h3>
+                        <div className="kpi-list">
                             {filteredKPIData.map(([key, value]) => (
-                                <div className="kpi-card" key={key}>
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedKPIs.includes(key)}
-                                            onChange={() => toggleKPISelection(key)}
-                                        />
-                                        <div className="kpi-content">
-                                            <h3>{key}</h3>
-                                            <p>{typeof value === 'number' ? Number(value.toFixed(2)).toLocaleString() : value}</p>
-                                        </div>
-                                    </label>
-                                </div>
+                                <label key={key} className="kpi-item">
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedKPIs.includes(key)}
+                                        onChange={() => toggleKPISelection(key)}
+                                    />
+                                    <span>{key}: {typeof value === 'number' ? Number(value.toFixed(2)).toLocaleString() : value}</span>
+                                </label>
                             ))}
                         </div>
-                        <p className="selected-kpis">Selected KPIs: {selectedKPIs.join(', ')}</p>
-                    </div>
+                        <p className="selected-kpis">Selected: {selectedKPIs.join(', ') || 'None'}</p>
+                    </div>*/}
 
-                    {/* Create Line Chart Button */}
                     <button
-                        className="btn btn-primary"
+                        type="button"
+                        className="btn btn-chart"
                         onClick={() => setIsModalOpen(true)}
                     >
-                        Create Line Chart
+                        Create or Edit Chart
                     </button>
 
-                    {/* Modal for Chart Creation */}
                     {isModalOpen && (
                         <div className="modal">
                             <div className="modal-content">
@@ -594,26 +555,19 @@ const InvestmentPointManager = ({artist_id}) => {
                         </div>
                     )}
 
-                    {/* Chart Preview */}
                     {chartConfig && chartConfig.selectedFields && chartConfig.selectedFields.length > 0 && (
                         <div className="chart-preview">
-                            <h2>Chart Preview with Markers</h2>
-                            <div className="chart-container">
-                                <label>
-                                    Chart Title:
-                                    <input
-                                        type="text"
-                                        value={formData.chartTitle}
-                                        onChange={(e) => setFormData((prevData) => ({ ...prevData, chartTitle: e.target.value }))}
-                                        className="form-control"
-                                        placeholder="Enter chart title"
-                                    />
-                                </label>
-                                <Line
-                                    data={getChartData(chartConfig, sortedData)}
-                                    options={getChartOptions(chartConfig)}
-                                />
-                            </div>
+                            <input
+                                type="text"
+                                value={formData.chartTitle}
+                                onChange={(e) => setFormData((prevData) => ({ ...prevData, chartTitle: e.target.value }))}
+                                className="form-control"
+                                placeholder="Chart Title"
+                            />
+                            <Line
+                                data={getChartData(chartConfig, sortedData)}
+                                options={getChartOptions({ ...chartConfig, chartTitle: formData.chartTitle })}
+                            />
                             <button
                                 className="btn btn-secondary"
                                 onClick={() => setIsModalOpen(true)}
@@ -623,29 +577,27 @@ const InvestmentPointManager = ({artist_id}) => {
                         </div>
                     )}
 
-                    {/* Context Section */}
-                    <div className="context-section">
-                        <h2>Context</h2>
+                    <div className="form-group">
+                        <label>Context:</label>
                         <textarea
                             value={formData.context}
                             onChange={(e) => setFormData((prev) => ({ ...prev, context: e.target.value }))}
-                            placeholder="Enter your context here..."
-                            rows={6}
                             className="form-control"
-                        />
-                        <MagicWithOpenAI
-                            title={formData.title}
-                            context={formData.context}
-                            setContext={(enhancedContext) => setFormData((prev) => ({ ...prev, context: enhancedContext }))}
-                            kpiData={selectedKPIs}
-                            chartConfig={chartConfig}
+                            rows={6}
+                            placeholder="Enter context or notes here..."
                         />
                     </div>
+                    <MagicWithOpenAI
+                        title={formData.title}
+                        context={formData.context}
+                        setContext={(enhancedContext) => setFormData((prev) => ({ ...prev, context: enhancedContext }))}
+                        kpiData={selectedKPIs}
+                        chartConfig={chartConfig}
+                    />
 
-                    {/* Save and Cancel Buttons */}
                     <div className="form-actions">
                         <button type="button" onClick={handleSave} className="btn btn-primary">
-                            {isEditing ? `Update ${formData.type}` : `Save ${formData.type}`}
+                            {isEditing ? 'Update' : 'Save'}
                         </button>
                         {isEditing && (
                             <button type="button" onClick={resetForm} className="btn btn-secondary">
@@ -654,7 +606,7 @@ const InvestmentPointManager = ({artist_id}) => {
                         )}
                     </div>
                 </form>
-            </div>
+            </section>
         </div>
     );
 };

@@ -1,72 +1,151 @@
-/* investmentPointManager.css */
+body {
+  font-family: sans-serif;
+}
 
-/* 기본 설정 */
 .investment-point-manager {
   padding: 20px;
-  width: 100%;
+  max-width: 1000px;
   margin: 0 auto;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f5f5f5;
-  border-radius: 10px;
+  background: #f8f9fa;
+  border-radius: 8px;
 }
 
-.investment-point-manager h1,
-.investment-point-manager h2,
-.investment-point-manager h3,
-.investment-point-manager h4 {
+.investment-point-manager h1 {
+  text-align: center;
+  margin-bottom: 1.5em;
+  font-size: 1.8em;
+  font-weight: 600;
   color: #333;
-  margin-bottom: 15px;
 }
 
-/* 기존 투자 포인트 섹션 */
-.existing-investment-points {
-  margin-bottom: 40px;
+.existing-investment-points,
+.add-investment-point {
+  margin-bottom: 2em;
+}
+
+h2 {
+  font-size: 1.4em;
+  margin-bottom: 1em;
+  color: #333;
 }
 
 .investment-point-list {
-  list-style-type: none;
+  list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .investment-point-item {
-  background-color: #fff;
+  background: #fff;
   padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
 }
 
-.point-media {
-  margin-top: 15px;
-}
-
-.media-list {
-  list-style-type: none;
-  padding: 0;
-}
-
-.media-item {
+.item-header {
   display: flex;
-  align-items: center;
+  justify-content: space-between;
+  align-items: baseline;
   margin-bottom: 10px;
 }
 
-.media-image,
+.item-header h3 {
+  margin: 0;
+  font-size: 1.2em;
+  color: #222;
+}
+
+.item-actions .btn {
+  margin-left: 5px;
+}
+
+.item-context {
+  margin: 10px 0;
+  font-size: 0.95em;
+  line-height: 1.5;
+  color: #444;
+}
+
+.media-block {
+  margin: 15px 0;
+}
+
+.media-image {
+  max-width: 100%;
+  border-radius: 4px;
+}
+
+.media-video-wrapper {
+  position: relative;
+  padding-bottom: 56.25%; 
+  height: 0;
+}
+
 .media-video {
-  max-width: 200px;
-  border-radius: 5px;
-  margin-right: 15px;
+  position: absolute;
+  top:0;left:0;width:100%;height:100%;
+  border:0;
 }
 
 .media-title {
-  margin: 0 10px 0 0;
+  margin-top: 5px;
   font-weight: bold;
+  color: #333;
+}
+
+.investment-form {
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  font-size: 0.9em;
+  color: #333;
+}
+
+.form-control {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.media-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+}
+
+.media-item {
+  background: #f1f1f1;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.media-link-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
 .media-link {
   color: #007bff;
   text-decoration: none;
-  margin-right: 15px;
+  font-size: 0.9em;
+  white-space: nowrap;
 }
 
 .media-link:hover {
@@ -77,251 +156,144 @@
   margin-right: 5px;
 }
 
-.point-actions .btn {
-  margin-right: 10px;
+.kpi-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  background: #fafafa;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 4px;
 }
 
-/* 버튼 스타일 */
-.btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 5px;
+.kpi-item {
+  display: flex;
+  align-items: center;
+  font-size: 0.9em;
   cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.3s ease;
-  margin-top: 4px;
-  margin-bottom: 4px;
 }
 
-.btn-primary {
-  background-color: #007bff;
-  color: #fff;
-}
-
-.btn-primary:hover {
-  background-color: #0056b3;
-}
-
-.btn-secondary {
-  background-color: #6c757d;
-  color: #fff;
-}
-
-.btn-secondary:hover {
-  background-color: #5a6268;
-}
-
-.btn-danger {
-  background-color: #dc3545;
-  color: #fff;
-}
-
-.btn-danger:hover {
-  background-color: #c82333;
-}
-
-.btn-remove {
-  background-color: #dc3545;
-  color: #fff;
-}
-
-.btn-remove:hover {
-  background-color: #c82333;
-}
-
-.btn-edit {
-  background-color: #ffc107;
-  color: #fff;
-}
-
-.btn-edit:hover {
-  background-color: #e0a800;
-}
-
-.btn-move {
-  background-color: #17a2b8;
-  color: #fff;
-}
-
-.btn-move:hover {
-  background-color: #138496;
-}
-
-/* 폼 스타일 */
-.investment-form {
-  background-color: #fff;
-  padding: 25px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.form-control {
-  width: 100%;
-  padding: 10px 15px;
-  border: 1px solid #ced4da;
-  border-radius: 5px;
-  font-size: 1rem;
-  box-sizing: border-box;
-}
-
-.form-control-file {
-  margin-top: 10px;
-}
-
-.media-title-input {
-  margin-top: 5px;
+.kpi-item input {
+  margin-right: 10px;
 }
 
 .selected-kpis {
   margin-top: 10px;
-  font-style: italic;
+  font-size: 0.85em;
+  color: #555;
 }
 
-/* KPI 섹션 */
-.kpi-section {
-  margin-bottom: 20px;
-}
-
-.kpi-scroll-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  max-height: 200px;
-  overflow-y: auto;
-  padding: 10px;
-  border: 1px solid #ced4da;
-  border-radius: 5px;
-  background-color: #f8f9fa;
-}
-
-.kpi-card {
-  background-color: #e9ecef;
-  padding: 10px;
-  border-radius: 5px;
-  width: calc(25% - 10px);
-  box-sizing: border-box;
-  transition: background-color 0.3s ease;
-}
-
-.kpi-card:hover {
-  background-color: #dee2e6;
-}
-
-.kpi-content h3 {
-  margin: 0 0 5px 0;
-  font-size: 1rem;
-}
-
-.kpi-content p {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #6c757d;
-}
-
-/* 차트 미리보기 섹션 */
 .chart-preview {
-  margin-top: 30px;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+  background: #fafafa;
+  padding: 15px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
 }
 
-.chart-container label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 10px;
+.form-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
 }
 
-.chart-container .form-control {
-  width: 50%;
+.btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: 600;
+  margin-top: 6px;
+  margin-bottom: 3px;
+}
+
+.btn-chart {
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-top: 20px;
   margin-bottom: 20px;
+  background: #ff7b00;
+  color: #fff;
 }
 
-/* 컨텍스트 섹션 */
-.context-section {
-  margin-top: 30px;
+.btn-primary {
+  background: #007bff;
+  color: #fff;
 }
 
-.context-section textarea {
-  resize: vertical;
-  padding: 10px;
-  font-size: 1rem;
+.btn-primary:hover {
+  background: #0069d9;
 }
 
-/* 모달 스타일 */
+.btn-secondary {
+  background: #6c757d;
+  color: #fff;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+}
+
+.btn-remove {
+  background: #dc3545;
+  color: #fff;
+}
+
+.btn-remove:hover {
+  background: #c82333;
+}
+
+.loading {
+  text-align: center;
+  font-size: 1em;
+  color: #666;
+}
+
+/* Modal */
 .modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  right:0;
-  bottom:0;
-  background-color: rgba(0,0,0,0.5);
+  top:0; left:0; right:0; bottom:0;
+  background: rgba(0,0,0,0.4);
   display:flex;
   align-items:center;
   justify-content:center;
-  z-index:1000;
+  z-index:9999;
 }
 
 .modal-content {
-  background-color: #fff;
-  padding: 25px;
-  border-radius: 8px;
-  width: 80%;
-  max-width: 600px;
-  position: relative;
+  background:#fff;
+  padding:20px;
+  border-radius:5px;
+  position:relative;
+  width:90%;
+  max-width:500px;
 }
 
 .close-button {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
+  background:none;
+  border:none;
+  font-size:1.5em;
+  position:absolute;
+  top:10px; 
+  right:10px; 
+  cursor:pointer;
+  color: #333;
 }
 
-/* 반응형 디자인 */
-@media (max-width: 992px) {
-  .kpi-card {
-      width: calc(33.333% - 10px);
-  }
-}
-
+/* Responsive */
 @media (max-width: 768px) {
-  .kpi-card {
-      width: calc(50% - 10px);
+  .kpi-list {
+    grid-template-columns: 1fr 1fr;
   }
 
-  .media-item {
-      flex-direction: column;
-      align-items: flex-start;
-  }
-
-  .media-image,
-  .media-video {
-      max-width: 100%;
-      margin-bottom: 10px;
-  }
-}
-
-@media (max-width: 576px) {
-  .kpi-card {
-      width: 100%;
-  }
-
-  .chart-container .form-control {
-      width: 100%;
+  .media-link-row {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

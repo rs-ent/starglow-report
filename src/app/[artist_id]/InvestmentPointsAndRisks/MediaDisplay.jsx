@@ -7,22 +7,36 @@ import React from 'react';
 const MediaDisplay = ({ media, mediaTitles }) => {
   const gridColumns = media.length === 1 ? "grid-cols-1" : media.length === 2 ? "grid-cols-2" : "grid-cols-3";
 
-  const extractYouTubeId = (url) => {
+  const extractYouTubeEmbedUrl = (url) => {
     try {
-        const youtubeRegex = /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|.*&v=))([\w-]{11})(?:.*t=(\d+))?/;
-        const match = url.match(youtubeRegex);
-        
-        if (match) {
-            const videoId = match[1]; // YouTube Video ID
-            const start = match[2];  // 시작 시간 (t 파라미터)
-            return `https://www.youtube.com/embed/${videoId}${start ? `?start=${start}` : ''}`;
-        } else {
-            console.error('Not a valid YouTube URL');
-            return url; // YouTube URL이 아니면 원본 URL 반환
+        let videoId = null;
+        const shortsRegex = /youtube\.com\/shorts\/([\w-]+)/;
+        const standardRegex = /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|.*&v=))([\w-]+)/;
+
+        // shorts URL 처리
+        const shortsMatch = url.match(shortsRegex);
+        if (shortsMatch && shortsMatch[1]) {
+            videoId = shortsMatch[1];
+            return `https://www.youtube.com/embed/${videoId}`;
         }
+
+        // 일반 유튜브 URL 처리
+        const match = url.match(standardRegex);
+        if (match && match[1]) {
+            videoId = match[1];
+        }
+
+        if (videoId) {
+            // 시작시간 파라미터 t 지원
+            const urlObj = new URL(url);
+            const start = urlObj.searchParams.get('t');
+            return `https://www.youtube.com/embed/${videoId}${start ? `?start=${start}` : ''}`;
+        }
+
+        return url;
     } catch (error) {
-        console.error('Error processing URL:', error);
-        return url; // 잘못된 URL이면 원본 URL 반환
+        console.error('Invalid YouTube URL:', error);
+        return url;
     }
   };
 
@@ -47,7 +61,7 @@ const MediaDisplay = ({ media, mediaTitles }) => {
             <div className="relative w-full aspect-w-16 aspect-h-9">
               <iframe
                   className="w-full h-full rounded-md shadow-soft transition-transform transform"
-                  src={extractYouTubeId(item.url)}
+                  src={extractYouTubeEmbedUrl(item.url)}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   title="YouTube Video"
