@@ -27,11 +27,9 @@ const RoadMap = () => {
     const investorsBEPRevenue = report.goal_fund;
     const investorsShareRatio = report.investors_share_ratio;
     const bep = investorsBEPRevenue / investorsShareRatio;
-    const spectrum = kpiData.expectedRevenueSpectrum.spectrum;
     const avgRevenue = kpiData.expectedAnnualRevenue;
-    const minRevenue = avgRevenue * (1 - spectrum);
-    const maxRevenue = avgRevenue * (1 + spectrum);
-    const lossRevenue = bep * 0.8;
+    const minRevenue = kpiData.minRevenue;
+    const maxRevenue = kpiData.maxRevenue;
     
     const investorsAvgRevenue = avgRevenue * investorsShareRatio;
     const investorsMaxRevenue = maxRevenue * investorsShareRatio;

@@ -29,7 +29,7 @@ const calculateExpectedAnnualRevenue = (activeRevenueAvg, activityFrequency, dec
     return expectedAnnualRevenue;
 }
 
-function calculateHistoricalSpectrum(activityRevenueMap, revenueAvg, albums = []) {
+function calculateHistoricalSpectrum(activityRevenueMap, albums = []) {
 
     // 값 추출
     const values = Object.values(activityRevenueMap); // 연간 수익 배열
@@ -178,6 +178,8 @@ export const computeKPIs = (valuationData, timeline, currentIndex, currentData) 
                 .sort((a, b) => a - b);
 
     let previousMOV = 0;
+    const latestDate = new Date(timeline[currentIndex].date);
+    const latestYear = latestDate.getFullYear() + '';
     for (let i = 0; i <= currentIndex; i++) {
         const data = timeline[i];
         const currentDate = new Date(data.date);
@@ -216,15 +218,22 @@ export const computeKPIs = (valuationData, timeline, currentIndex, currentData) 
             return currentDate >= albumDate && currentDate <= threeMonthsLater;
         });
 
+        // 연도 차이에 따른 할인율 계산 (해당 차이만큼 6%씩 할인)
+        const yearDifference = parseInt(latestYear, 10) - parseInt(currentYear, 10);
+        const discountFactor = 1 - (0.06 * yearDifference);
+
+        const originalMOV = data.MOV ?? 0;
+        const discountedMOV = originalMOV * discountFactor;
+
         // 활동기 매출 합산
         if (isActivity) {
-            activityRevenueSum += data.MOV;
+            activityRevenueSum += discountedMOV;
             activityCount ++;
 
             if (activityRevenueMap[currentYear] && activityRevenueMap[currentYear] > 0) {
-                activityRevenueMap[currentYear] += data.MOV;
+                activityRevenueMap[currentYear] += discountedMOV;
             } else {
-                activityRevenueMap[currentYear] = data.MOV;
+                activityRevenueMap[currentYear] = discountedMOV;
             }
         }
 
@@ -237,8 +246,9 @@ export const computeKPIs = (valuationData, timeline, currentIndex, currentData) 
     // 연평균 활동 빈도 (totalReleases: 총 발매횟수 / activeYearsCount: 활동 연도 수 / activityFrequency: 활동 빈도)
     const activityFrequency = calculateActivityFrequency(albumReleaseDates);  
 
-    const expectedRevenueSpectrum = calculateHistoricalSpectrum(activityRevenueMap, activityRevenueAvg, albums);
+    const expectedRevenueSpectrum = calculateHistoricalSpectrum(activityRevenueMap, albums);
     const volatilityPercent = expectedRevenueSpectrum.spectrum;
+    console.log('volatilityPercent: ', volatilityPercent);
     const expectedAnnualRevenue = calculateExpectedAnnualRevenue(
                                     activityRevenueAvg, 
                                     activityFrequency.activityFrequency, 
@@ -264,6 +274,11 @@ export const computeKPIs = (valuationData, timeline, currentIndex, currentData) 
         normalizedDiversityIndex = maxDiversityIndex > 0 ? diversityIndex / maxDiversityIndex : 0;
     }
 
+    const maxRevenue = expectedAnnualRevenue * (1 + expectedRevenueSpectrum.spectrum);
+    const minRevenue = expectedAnnualRevenue * (1 - expectedRevenueSpectrum.spectrum) > 0 
+        ? expectedAnnualRevenue * (1 - expectedRevenueSpectrum.spectrum) 
+        : Math.min(...Object.values(activityRevenueMap));
+
     return {    
         peakValue: peakData.value,
         peakDate: peakData.date ? peakData.date.slice(0, 7) : 'N/A',
@@ -274,8 +289,11 @@ export const computeKPIs = (valuationData, timeline, currentIndex, currentData) 
         normalizedDiversityIndex,
         currentData,
         activityFrequency,
+        activityRevenueMap,
         expectedAnnualRevenue,
         expectedRevenueSpectrum,
+        maxRevenue,
+        minRevenue,
         timeline,
     };
 };
