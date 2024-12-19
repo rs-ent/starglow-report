@@ -220,7 +220,7 @@ export const computeKPIs = (valuationData, timeline, currentIndex, currentData) 
 
         // 연도 차이에 따른 할인율 계산 (해당 차이만큼 6%씩 할인)
         const yearDifference = parseInt(latestYear, 10) - parseInt(currentYear, 10);
-        const discountFactor = 1 - (0.06 * yearDifference);
+        const discountFactor = 1 - (0.03 * yearDifference);
 
         const originalMOV = data.MOV ?? 0;
         const discountedMOV = originalMOV * discountFactor;
