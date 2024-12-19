@@ -277,7 +277,7 @@ export const computeKPIs = (valuationData, timeline, currentIndex, currentData) 
     const maxRevenue = expectedAnnualRevenue * (1 + expectedRevenueSpectrum.spectrum);
     const minRevenue = expectedAnnualRevenue * (1 - expectedRevenueSpectrum.spectrum) > 0 
         ? expectedAnnualRevenue * (1 - expectedRevenueSpectrum.spectrum) 
-        : Math.min(...Object.values(activityRevenueMap));
+        : Math.min(...Object.values(activityRevenueMap)) * 0.8;
 
     return {    
         peakValue: peakData.value,
