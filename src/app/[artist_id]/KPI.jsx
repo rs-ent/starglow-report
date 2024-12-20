@@ -43,7 +43,7 @@ export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenu
             <ResponsiveContainer width="90%" height={200}>
                 <LineChart
                     data={data}
-                    margin={{ top: 15, right: 40, left: 0, bottom: 0 }}
+                    margin={{ top: 15, right: 50, left: 0, bottom: 0 }}
                 >
                     <XAxis dataKey="x" 
                             stroke="#A0A0A0" 
@@ -208,7 +208,7 @@ const KPI = () => {
                                     : `${formatNumber(kpi.value)}${kpi.suffix}`}
                             </p>
                         </div>
-                        {isExpanded && kpi.label === '예상기대수익 스펙트럼' && (
+                        {isExpanded && kpi.label === '연간 기대수익 스펙트럼' && (
                             revenueSpectrumChart(totalValueMultiple, spectrum, avgRevenue, minRevenue, maxRevenue)
                         )}
                     </div>

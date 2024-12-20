@@ -8,18 +8,12 @@ import React, { useState } from 'react';
 
 export default function ReportList() {
     const reports = useReports();
-    console.log('Report List : ', reports);
-    const [chartLoading, setChartLoading] = useState(false);
-    const [timelineData, setTimelineData] = useState([]);
+    const [artistId, setArtistId] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const setValuationChart = async ({artist_id}) => {
-        setChartLoading(true);
+    const setReportArtistId = async ({artist_id}) => {
         setIsModalOpen(false);
-        const data = await TimelineData(artist_id);
-        console.log('Timeline : ', data.timelineData);
-        setTimelineData(data.timelineData.timeline || []);
-        setChartLoading(false);
+        setArtistId(artist_id);
         setIsModalOpen(true); // 차트 데이터 로드 후 모달 열림
     };
 
@@ -81,10 +75,9 @@ export default function ReportList() {
                                         </button>
                                     </Link>
                                     <button className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                            onClick={() => setValuationChart({ artist_id: report.artist_id })}
-                                            disabled={chartLoading}
+                                            onClick={() => setReportArtistId({ artist_id: report.artist_id })}
                                     >
-                                        {chartLoading ? "Calculating..." : "Valuation"}
+                                        Valuation
                                     </button>
                                 </>
                             )}
@@ -94,8 +87,8 @@ export default function ReportList() {
             )}
 
             {/* 차트 */}
-            {isModalOpen && timelineData.length > 0 && (
-                <ChartModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} timelineData={timelineData}/>
+            {isModalOpen && (
+                <ChartModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} artist_id={artistId}/>
             )}
         </>
     )

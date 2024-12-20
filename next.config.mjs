@@ -12,6 +12,20 @@ const nextConfig = {
             'search.pstatic.net',
         ],
     },
+    webpack(config) {
+        config.module.rules.push({
+          test: /\.svg$/,
+          use: [
+            {
+              loader: '@svgr/webpack',
+              options: {
+                // 필요하다면 SVGR 옵션 추가
+              },
+            },
+          ],
+        });
+        return config;
+    },
 };
 
 export default nextConfig;
