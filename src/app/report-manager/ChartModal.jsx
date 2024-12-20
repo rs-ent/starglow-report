@@ -6,6 +6,7 @@ import { formatNumber } from "../utils/formatNumber";
 import { TimelineData } from "../processors/preprocessor";
 import { fetchData, saveData } from '../firebase/fetch';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { WEIGHT } from '../utils/constants';
 import DescriptionToolTip from './DescriptionToolTip';
 
 const LABEL_MAP = {
@@ -45,12 +46,19 @@ const ChartModal = ({ isModalOpen, setIsModalOpen, artist_id }) => {
         const data = await fetchData('valuation', { comp: 'docId', sign: '==', val: artist_id });
         if (data) {
             setDocId(data.id);
-            setWeights(data.WEIGHT || {}); 
+
+            // data.WEIGHT 있으면 사용, 없으면 기본값 WEIGHT 사용
+            const loadedWeights = data.WEIGHT && Object.keys(data.WEIGHT).length > 0 
+                ? data.WEIGHT 
+                : WEIGHT;
+
+            setWeights(loadedWeights);
             setValuationData(data || {});
             console.log('ValuationData : ', data);
         } else {
-            console.warn('해당 아티스트에 대한 valuation 문서를 찾지 못했습니다.');
-            setWeights({});
+            // Firestore에서 가져오지 못했으므로 기본값 사용
+            setWeights(WEIGHT);
+            console.warn('해당 아티스트에 대한 valuation 문서를 찾지 못했습니다. 기본값 사용');
         }
         setWeightLoading(false);
     };
