@@ -1,7 +1,6 @@
 'use client';
 
 import { useReports } from "../../context/ReportsData"
-import { TimelineData } from "../processors/preprocessor";
 import ChartModal from './ChartModal';
 import Link from 'next/link';
 import React, { useState } from 'react';
@@ -72,6 +71,11 @@ export default function ReportList() {
                                     <Link href={`/${report.artist_id}/rewards-manager`}>
                                         <button className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
                                             Rewards
+                                        </button>
+                                    </Link>
+                                    <Link href={`/${report.artist_id}/roadmap-manager`}>
+                                        <button className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
+                                            Roadmap
                                         </button>
                                     </Link>
                                     <button className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"

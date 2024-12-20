@@ -53,7 +53,7 @@ const Summary = () => {
                         <table className="min-w-full border-collapse border border-gray-300 text-center text-xs text-[var(--text-primary)]">
                             <tbody>
                                 {[
-                                    { label: "증권종류", value: "NFT" },
+                                    { label: "증권종류", value: "" },
                                     { label: "1 구좌 가격", value: "₩100,000" },
                                     { label: "최소 투자 금액", value: "₩500,000" },
                                     { label: "목표 모집 금액", value: "₩50,000,000" },

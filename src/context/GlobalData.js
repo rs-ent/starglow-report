@@ -6,7 +6,7 @@ import React, { createContext, useContext } from 'react';
 const DataContext = createContext(null);
 
 // Provider 컴포넌트
-export const DataProvider = ({ valuation, timelineData, kpiData, investmentData, milestones, artist_id, introduction, rewards, history, children }) => {
+export const DataProvider = ({ valuation, timelineData, kpiData, investmentData, milestones, artist_id, introduction, rewards, history, roadmap, children }) => {
     const reports = useReports();
     const report = reports.find(a => a.artist_id === artist_id);
     
@@ -21,6 +21,7 @@ export const DataProvider = ({ valuation, timelineData, kpiData, investmentData,
         introduction,
         rewards,
         history,
+        roadmap,
     };
 
     return (
@@ -107,4 +108,12 @@ export const useHistory = () => {
         throw new Error('useIntroduction must be used within a DataProvider');
     }
     return context.history;
+}
+
+export const useRoadmap = () => {
+    const context = useContext(DataContext);
+    if (!context) {
+        throw new Error('useIntroduction must be used within a DataProvider');
+    }
+    return context.roadmap;
 }

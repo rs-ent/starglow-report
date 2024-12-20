@@ -18,10 +18,11 @@ import {
     Legend,
 } from 'recharts';
 import { formatNumber } from '../utils/formatNumber';
-import { format } from 'date-fns';
+import { useRoadmap } from '../../context/GlobalData';
 
 const RoadMap = () => {
     const report = useReport();
+    const roadmap = useRoadmap();
     const kpiData = useKPI();
 
     const investorsBEPRevenue = report.goal_fund;
@@ -35,7 +36,7 @@ const RoadMap = () => {
     const investorsMaxRevenue = maxRevenue * investorsShareRatio;
     const investorsMinRevenue = minRevenue * investorsShareRatio;
 
-    const data = [
+    const defaultData = [
         { label: "음원/음반 발매", value: "정규 및 리메이크 앨범 등", spend: "600,000,000" },
         { label: "공연/행사 기획", value: "콘서트/투어/팬미팅 등", spend: "550,000,000" },
         { label: "콘텐츠 기획 및 제작", value: "유튜브 콘텐츠 등", spend: "142,000,000" },
@@ -44,6 +45,10 @@ const RoadMap = () => {
         { label: "홍보/마케팅", value: "유통사/소셜미디어 등", spend: "345,000,000"},
         { label: "기타", value: "식대/유류비 등", spend: "95,000,000"},
     ];
+
+    const data = (roadmap && Array.isArray(roadmap.investments) && roadmap.investments.length > 0)
+        ? roadmap.investments
+        : defaultData;
 
     const totalAmount = data.reduce((sum, row) => sum + Number(row.spend.replace(/,/g,'')), 0);
 
@@ -87,9 +92,9 @@ const RoadMap = () => {
 
     // RevenueChart에 사용할 데이터
     const revenueData = [
-        { name: '최대 예상 수익', Revenue: maxRevenue, Investors: investorsMaxRevenue },
-        { name: '평균 예상 수익', Revenue: avgRevenue, Investors: investorsAvgRevenue },
-        { name: '최소 예상 수익', Revenue: minRevenue, Investors: investorsMinRevenue },
+        { name: '최대 수익', Revenue: maxRevenue, Investors: investorsMaxRevenue },
+        { name: '평균 수익', Revenue: avgRevenue, Investors: investorsAvgRevenue },
+        { name: '최소 수익', Revenue: minRevenue, Investors: investorsMinRevenue },
         { name: '손익분기점', Revenue: bep, Investors: investorsBEPRevenue },
     ];
 
@@ -157,14 +162,13 @@ const RoadMap = () => {
         <div>
             {/* 투자 배분 원형 차트 */}
             <section className="mb-1 px-6">
-                <h3 className="text-basefont-bold text-[var(--primary)]">투자 배분율</h3>
+                <h3 className="text-basefont-bold text-[var(--primary)] py-2">투자 배분율</h3>
                 <InvestmentPieChart data={pieChartData} />
             </section>
 
             {/* 투자 배분 표 */}
             <section className="px-6">
                 <table className="min-w-full border-collapse border border-gray-300 text-center text-xs text-[var(--text-primary)]">
-                    {/* 헤더 */}
                     <thead>
                         <tr className="bg-gray-200">
                             <th className="py-2 px-4 border border-gray-300 font-bold">분류</th>
@@ -175,13 +179,13 @@ const RoadMap = () => {
                     <tbody>
                         {data.map((row, index) => (
                             <tr key={index}>
-                                <td className={row.type && row.type === "bold" ? "py-2 px-4 border font-bold bg-gray-100" : "py-2 px-4 border font-medium bg-gray-100"}>
+                                <td className="py-2 px-4 border font-medium bg-gray-100">
                                     {row.label}
                                 </td>
-                                <td className={row.type && row.type === "bold" ? "py-2 px-4 border font-bold" : "py-2 px-4 border"}>
+                                <td className="py-2 px-4 border">
                                     {row.value}
                                 </td>
-                                <td className={row.type && row.type === "bold" ? "py-2 px-4 border font-bold" : "py-2 px-4 border"}>
+                                <td className="py-2 px-4 border">
                                     {(Number(row.spend.replace(/,/g,'')) / totalAmount * 100).toFixed(0)}%
                                 </td>
                             </tr>
@@ -197,10 +201,22 @@ const RoadMap = () => {
                 <table className="min-w-full border-collapse border border-gray-300 text-center text-xs text-[var(--text-primary)]">
                     <thead>
                         <tr className="bg-gray-200">
-                            <th className="py-2 px-4 border border-gray-300 font-bold">매출 범주</th>
-                            <th className="py-2 px-4 border border-gray-300 font-bold">연간 매출</th>
-                            <th className="py-2 px-4 border border-gray-300 font-bold">투자자 수익 (매출액의 {(investorsShareRatio * 100).toFixed(0)}%)</th>
-                            <th className="py-2 px-4 border border-gray-300 font-bold">수익률</th>
+                            <th className="py-2 px-4 border border-gray-300 font-bold"
+                                style={{ width: '18%' }}>
+                                    매출 범주
+                            </th>
+                            <th className="py-2 px-4 border border-gray-300 font-bold"
+                                style={{ width: '25%' }}>
+                                    연간 추정 매출
+                            </th>
+                            <th className="py-2 px-4 border border-gray-300 font-bold"
+                                style={{ width: '25%' }}>
+                                    투자자 수익<br/>(매출액의 {(investorsShareRatio * 100).toFixed(0)}%)
+                            </th>
+                            <th className="py-2 px-4 border border-gray-300 font-bold"
+                                style={{ width: '15%' }}>
+                                    수익률
+                            </th>
                         </tr>
                     </thead>
                     <tbody>

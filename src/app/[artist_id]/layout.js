@@ -9,6 +9,7 @@ export default async function ArtistLayout({ children, params }) {
     const introduction = await fetchData('Introduction', { comp: 'docId', sign: '==', val: artist_id }, false);
     const rewards = await fetchData('Rewards', { comp: 'docId', sign: '==', val: artist_id}, false);
     const history = await fetchData('history', { comp: 'docId', sign: '==', val: artist_id}, false);
+    const roadmap = await fetchData('Roadmap', { comp: 'docId', sign: '==', val: artist_id}, false);
 
     return (
         <DataProvider 
@@ -21,6 +22,7 @@ export default async function ArtistLayout({ children, params }) {
             introduction={introduction}
             rewards={rewards}
             history={history}
+            roadmap={roadmap}
         >
             {children}
         </DataProvider>
