@@ -12,7 +12,7 @@ export default function Loading() {
         if (prev >= 100) return 100;
         return prev + 5;
       });
-    }, 450);
+    }, 350);
 
     return () => clearInterval(timer);
   }, []);
