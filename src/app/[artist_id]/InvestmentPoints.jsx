@@ -22,7 +22,7 @@ const InvestmentPoints = ({type = "Investment Point"}) => { // async 제거
         <>
         {investmentData.length > 0 && (
             <section className="section-base">
-                <h2 className="section-title">Investment Points</h2>
+                <h2 className="section-title">{type}s</h2>
                 <div className="space-y-4">
                     {investmentData.map((item, index) => (
                         <div

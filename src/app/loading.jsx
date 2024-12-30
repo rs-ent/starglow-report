@@ -4,12 +4,9 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 
 export default function Loading() {
-  // 임시로 "가짜 로딩 진행도"를 상태로 관리
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // 예시: 0.5초마다 5%씩 증가 → 20초 후 100% 도달
-    // 실제로는 fetch 진행도 등에 따라 제어 가능
     const timer = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) return 100;
