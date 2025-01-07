@@ -10,7 +10,7 @@ function randomRange(min, max) {
 
 export default function Background() {
   // 큰 빛 개수
-  const lightCount = 4;
+  const lightCount = 3;
   const [lights] = useState(() => {
     const temp = [];
     for (let i = 0; i < lightCount; i++) {
@@ -20,7 +20,7 @@ export default function Background() {
   });
 
   // 작은 입자 개수
-  const particleCount = 50;
+  const particleCount = 125;
   const [particles] = useState(() => {
     const temp = [];
     for (let i = 0; i < particleCount; i++) {
@@ -55,8 +55,8 @@ function FloatingLight() {
     async function moveOneCycle() {
       const nextX = `${randomRange(-10, 110)}vw`;
       const nextY = `${randomRange(-10, 110)}vh`;
-      const nextScale = randomRange(0.7, 1.5);
-      const nextOpacity = randomRange(0.6, 1.0);
+      const nextScale = randomRange(0.5, 2);
+      const nextOpacity = randomRange(0.4, 1.0);
       const duration = randomRange(25, 60);
 
       await controls.start({
@@ -78,7 +78,7 @@ function FloatingLight() {
   }, [controls]);
 
   // 초기값 설정
-  const initialScale = randomRange(0.5, 1.0);
+  const initialScale = randomRange(0.7, 1.4);
   const initialX = `${randomRange(0, 100)}vw`;
   const initialY = `${randomRange(0, 100)}vh`;
 
@@ -89,13 +89,13 @@ function FloatingLight() {
         width: "25vw",
         height: "25vw",
         background: "radial-gradient(circle, rgba(157,78,221,1), transparent 60%)",
-        filter: "blur(180px)",
+        filter: "blur(80px)",
       }}
       initial={{
         x: initialX,
         y: initialY,
         scale: initialScale,
-        opacity: 0.9,
+        opacity: 0.5,
       }}
       animate={controls}
     />
@@ -115,7 +115,7 @@ function FloatingParticle() {
       const nextX = `${randomRange(-10, 110)}vw`;
       const nextY = `${randomRange(-10, 110)}vh`;
       const nextScale = randomRange(0.1, 0.2);
-      const nextOpacity = randomRange(0.2, 0.7);
+      const nextOpacity = randomRange(0.2, 0.9);
       const duration = randomRange(50, 70);
 
       await controls.start({
@@ -137,7 +137,7 @@ function FloatingParticle() {
   }, [controls]);
 
   // 초기 위치
-  const initialScale = 0.2;
+  const initialScale = 0.1;
   const initialX = `${randomRange(0, 100)}vw`;
   const initialY = `${randomRange(0, 100)}vh`;
 
@@ -147,14 +147,13 @@ function FloatingParticle() {
       style={{
         width: "1.2vw",
         height: "1.2vw",
-        background: "rgba(255, 255, 255, 0.5)",
-        filter: "blur(1px)",
+        background: "rgba(255, 255, 255, 0.6)",
       }}
       initial={{
         x: initialX,
         y: initialY,
         scale: initialScale,
-        opacity: 0.3,
+        opacity: 0.5,
       }}
       animate={controls}
     />

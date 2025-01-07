@@ -31,8 +31,6 @@ const Introduction = () => {
     block.replace(/^<p>/, "").replace(/<\/p>$/, "")
   );
 
-  console.log('formattedIntroduction', formattedIntroduction);
-
   // underline 처리를 위한 HTML 전환
   const finalParagraphs = formattedIntroduction.map((paragraph, index) => {
     const html = paragraph
@@ -89,7 +87,7 @@ const Introduction = () => {
       <div className="text-center py-6">
         {/* 캐치프레이즈: 왼->오른쪽 + Blur */}
         <motion.h1
-          className="whitespace-pre-wrap text-3xl text-gradient tracking-tight leading-tight inline-block"
+          className="whitespace-pre-wrap text-3xl text-gradient tracking-tight leading-tight inline-block text-glow"
           initial={{ 
             x: -200,                // 왼쪽 밖에서 시작
             filter: "blur(12px)",    // 블러로 흐릿하게

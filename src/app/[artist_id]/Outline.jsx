@@ -114,7 +114,7 @@ const Outline = () => {
         <div>
             <section className="section-base-without-py6-px3">
                 {/* 로고 및 프로필 사진 */}
-                <div className="w-full aspect-w-16 aspect-h-9 shadow-soft overflow-hidden purple-glow-15">
+                <div className="w-full aspect-w-16 aspect-h-9 shadow-soft overflow-hidden purple-glow-5">
                     <div className="w-full h-full">
                         <Image
                             src={profilePicture}
@@ -136,11 +136,11 @@ const Outline = () => {
                         </div>
                         
                         {/* Artist Korean Name */}
-                        <h1 className="text-gradient text-4xl font-bold leading-none tracking-wide purple-text-glow-7">
+                        <h1 className="text-gradient text-4xl font-bold leading-none tracking-wide text-glow">
                             {reportData.artist_eng}
                         </h1>
                     </div>
-                    <h4 className='text-gradient text-sm text-left w-36 purple-text-glow-3'>
+                    <h4 className='text-gradient text-sm text-left w-36 purple-text-glow-5'>
                         {days + hours + minutes + seconds > 0
                             ? `D-${days}:${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
                             : 'Ended'

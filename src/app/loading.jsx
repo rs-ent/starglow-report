@@ -82,7 +82,18 @@ export default function Loading() {
   }, [mousePos]);
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden">
+    <div 
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center 
+                overflow-hidden backdrop-blur-md 
+                bg-black/60    /* 배경색 + 40% 불투명도 */
+                [background-blend-mode:overlay]" 
+      style={{
+        backgroundImage: 'url("/flow.png")',
+        backgroundPosition: "center",
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
       {/* 로고 */}
       <Image 
         src="/sgt_logo.png" 
