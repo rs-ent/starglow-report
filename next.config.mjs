@@ -10,6 +10,7 @@ const nextConfig = {
             'firebasestorage.googleapis.com',
             'cdnimg.melon.co.kr',
             'search.pstatic.net',
+            'i.scdn.co',
         ],
     },
     webpack(config) {

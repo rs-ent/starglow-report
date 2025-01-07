@@ -322,7 +322,7 @@ const RewardsManager = ({ artist_id }) => {
                             type="text"
                             value={newReward.condition}
                             onChange={(e) => handleInputChange('condition', e.target.value)}
-                            className="border rounded w-full p-2"
+                            className="border rounded w-full p-2 bg-transparent"
                             placeholder="Enter reward condition"
                         />
                     </div>
@@ -350,7 +350,7 @@ const RewardsManager = ({ artist_id }) => {
                                 type="number"
                                 value={selectedMockups[mockup.id]?.quantity || 1}
                                 onChange={(e) => handleQuantityChange(mockup.id, e.target.value)}
-                                className="border rounded w-full p-2"
+                                className="border rounded w-full p-2 bg-transparent"
                                 min="1"
                                 />
                             </div>
@@ -362,7 +362,7 @@ const RewardsManager = ({ artist_id }) => {
                                 type="text"
                                 value={selectedMockups[mockup.id]?.description || ''}
                                 onChange={(e) => handleDescriptionChange(mockup.id, e.target.value)}
-                                className="border rounded w-full p-2"
+                                className="border rounded w-full p-2 bg-transparent"
                                 placeholder="Enter description"
                                 />
                             </div>
@@ -379,7 +379,7 @@ const RewardsManager = ({ artist_id }) => {
                             type="file"
                             accept="image/*"
                             onChange={handleThumbUpload}
-                            className="border rounded w-full p-2"
+                            className="border rounded w-full p-2 bg-transparent"
                         />
                         {newReward.thumb && (
                             <img src={newReward.thumb} alt="Reward Thumbnail" className="mt-2 w-32 h-32 object-cover" />
@@ -393,7 +393,7 @@ const RewardsManager = ({ artist_id }) => {
                             type="text"
                             value={newReward.promotion}
                             onChange={(e) => handleInputChange('promotion', e.target.value)}
-                            className="border rounded w-full p-2"
+                            className="border rounded w-full p-2 bg-transparent"
                             placeholder="Enter promotion text"
                         />
                     </div>

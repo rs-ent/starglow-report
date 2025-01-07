@@ -594,3 +594,181 @@ button:hover {
   margin-top: 10px;
   font-size: 1rem;
 }
+
+.albums-section {
+  width: 100%;
+  overflow-x: auto; /* 가로 스크롤 */
+  margin-bottom: 40px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.albums-section-title {
+  font-size: 1.8rem;
+  color: #2a4365; /* 기존과 통일: 진한 파란색 */
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* 앨범들을 그리드 형태로 배치 */
+.albums-grid {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  flex-wrap: nowrap;
+}
+
+/* 앨범 하나의 카드 */
+.album-card {
+  flex: 0 0 200px;
+  min-height: 300px;
+  background-color: #f7fafc;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  flex: 0 0 200px;
+}
+
+/* 호버 시 살짝 올라가는 효과 */
+.album-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+}
+
+/* 앨범 이미지 영역 */
+.album-cover {
+  position: relative;
+  width: 100%;
+  background-color: #edf2f7; /* 이미지 없을 때도 구분되도록 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; 
+  aspect-ratio: 1/1; /* 정방형 레이아웃 (지원 안 하는 브라우저가 있으면 적절히 대체) */
+}
+
+.album-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 이미지 잘림 방지 */
+}
+
+.album-image-fallback {
+  font-size: 1rem;
+  color: #718096; /* 회색 톤 */
+}
+
+/* 앨범 정보 영역 */
+.album-info {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.album-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #2d3748;
+  margin: 0;
+}
+
+.album-release-date {
+  font-size: 0.9rem;
+  color: #4a5568;
+  margin: 0;
+}
+
+/* 앨범 편집 폼 (선택된 상태에서만 보일 수도 있음) */
+.album-edit-form {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.album-edit-form label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+  color: #4a5568;
+}
+
+.album-edit-form input[type="text"] {
+  margin-top: 4px;
+  padding: 8px;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background-color: #fff;
+  transition: border-color 0.2s ease;
+}
+
+.album-edit-form input[type="text"]:focus {
+  border-color: #63b3ed;
+  outline: none;
+}
+
+/* 앨범 액션 (체크박스 / 삭제 버튼 등) */
+.album-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 15px;
+  border-top: 1px solid #e2e8f0;
+  background-color: #fff;
+}
+
+.album-actions label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #4a5568;
+}
+
+.remove-album-button {
+  background-color: #e53e3e; /* 빨간색 */
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+/* 앨범 추가 버튼 래퍼 */
+.add-album-wrapper {
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* 앨범 추가 버튼 */
+.add-album-button {
+  background-color: #3182ce;
+  padding: 12px 18px;
+  font-size: 1rem;
+  border-radius: 8px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.add-album-button:hover {
+  background-color: #2b6cb0;
+  transform: translateY(-2px);
+}
+
+/* ============================= */
+/*  드래그 앤 드롭 시 시각 효과   */
+/* ============================= */
+
+/* 드래그 중 카드가 살짝 투명해지도록 (라이브러리에 따라 클래스명이 다를 수 있음) */
+.album-card.dragging {
+  opacity: 0.4;
+}
+
+/* 드래그 오버한 영역 시각 표시 (필요 시) */
+.dragging-over {
+  outline: 2px dashed #3182ce;
+  outline-offset: -10px;
+}

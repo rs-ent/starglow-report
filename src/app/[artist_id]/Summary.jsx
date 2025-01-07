@@ -1,41 +1,60 @@
 'use client';
 
 import React, {useState} from 'react';
+import { useReport } from '../../context/GlobalData';
 
 const Summary = () => {
 
     const [isExpanded, setIsExpanded] = useState(false);
+    const reportData = useReport();
 
+    const nft_price = reportData.nft_price || 0;
+    const ratio = reportData.investors_share_ratio || 0.4;
 
+    const project_launch_date = reportData.project_launch_date || "2025-12-31";
+    const launchDate = new Date(project_launch_date);
+    const launchDateString = (launchDate.getFullYear()) + '-' + (launchDate.getMonth() + 1 < 10 ? '0' + (launchDate.getMonth() + 1) : launchDate.getMonth() + 1) + '-' + (launchDate.getDate() < 10 ? '0' + launchDate.getDate() : launchDate.getDate());
+    const project_deadline_date = reportData.project_deadline_date || "2025-12-31";
+    const deadline = new Date(project_deadline_date);
+    const deadlineDateString = (deadline.getFullYear()) + '-' + (deadline.getMonth() + 1 < 10 ? '0' + (deadline.getMonth() + 1) : deadline.getMonth() + 1) + '-' + (deadline.getDate() < 10 ? '0' + deadline.getDate() : deadline.getDate());
+
+    const data = [
+        { label: "Project Launch", value: launchDateString },
+        { label: "Project Deadline", value: deadlineDateString },
+        { label: "Investment Terms", value: "12 Months"},
+        { label: "Duration", value: "Lump Sum" },
+        { label: "Distribution", value: `${ratio} of the Term’s Revenue`,},
+        { label: "Scheduled Settlement", value: "2027.04.02" },
+    ];
 
     return (
         <div>
             {/* 기본 투자 정보 섹션 */}
             <section>
-                <div className="relative z-10 grid grid-cols-2 items-center justify-center text-left py-3 px-6 border-b border-b-gray-200">
-                    <h4 className="text-[var(--primary)] text-sm">
-                        최소 투자 금액
+                <div className="relative z-10 grid grid-cols-2 items-center justify-center text-left py-3 px-6 border-b border-b-[var(--background-muted)]">
+                    <h4 className="text-[var(--primary)] text-xs">
+                        NFT Price
                     </h4>
-                    <p className="text-sm font-semibold text-right">
-                        ₩500,000
+                    <p className="text-xs font-semibold text-right">
+                        ₩{nft_price.toLocaleString()}
                     </p>
                 </div>
 
-                <div className="relative z-10 grid grid-cols-2 items-center justify-center text-left py-3 px-6 border-b border-b-gray-200">
-                    <h4 className="text-[var(--primary)] text-sm">
-                        모집 기간
+                <div className="relative z-10 grid grid-cols-2 items-center justify-center text-left py-3 px-6 border-b border-b-[var(--background-muted)]">
+                    <h4 className="text-[var(--primary)] text-xs">
+                        Period
                     </h4>
-                    <p className="text-sm font-semibold text-right">
-                        24.12.15 ~ 24.12.31
+                    <p className="text-xs font-semibold text-right">
+                        {launchDateString} ~ {deadlineDateString}
                     </p>
                 </div>
 
-                <div className="relative z-10 grid grid-cols-2 items-center justify-center text-left py-3 px-6 border-b border-b-gray-200">
-                    <h4 className="text-[var(--primary)] text-sm">
-                        증권만기일
+                <div className="relative z-10 grid grid-cols-2 items-center justify-center text-left py-3 px-6 border-b border-b-[var(--background-muted)]">
+                    <h4 className="text-[var(--primary)] text-xs">
+                        Maturity Date
                     </h4>
-                    <p className="text-sm font-semibold text-right">
-                        25.04.02
+                    <p className="text-xs font-semibold text-right">
+                        2027.04.02
                     </p>
                 </div>
             </section>
@@ -45,32 +64,19 @@ const Summary = () => {
                 {/* 투자 구조 섹션 */}
                 <section>
                     <div className="relative z-10 grid grid-cols-2 items-center justify-center text-left py-3 px-6 ">
-                        <h4 className="text-[var(--primary)] text-sm">
-                            투자구조
+                        <h4 className="text-[var(--primary)] text-xs">
+                            Investment Structure
                         </h4>
                     </div>
                     <div className="px-6">
-                        <table className="min-w-full border-collapse border border-gray-300 text-center text-xs text-[var(--text-primary)]">
+                        <table className="min-w-full border-collapse border border-gray-400 text-center text-xs text-[var(--text-primary)]">
                             <tbody>
-                                {[
-                                    { label: "증권종류", value: "" },
-                                    { label: "1 구좌 가격", value: "₩100,000" },
-                                    { label: "최소 투자 금액", value: "₩500,000" },
-                                    { label: "목표 모집 금액", value: "₩50,000,000" },
-                                    { label: "모집 시작일", value: "2024.12.15" },
-                                    { label: "모집 종료일", value: "2024.12.31" },
-                                    { label: "증권 발행일", value: "2025.01.02" },
-                                    { label: "증권 만기일", value: "2026.01.02" },
-                                    { label: "투자 기간", value: "12개월"},
-                                    { label: "상환 방법", value: "만기일시상환" },
-                                    { label: "손익 배당", value: "투자 기간 발생 총 매출의 35%" },
-                                    { label: "만기 정산 예정일", value: "2026.04.02" },
-                                ].map((row, index) => (
+                                {data.map((row, index) => (
                                     <tr key={index}>
-                                        <td className={row.type && row.type === "bold" ? "py-2 px-4 border border-gray-300 font-bold bg-gray-100" : "py-2 px-4 border border-gray-300 font-medium bg-gray-100"}>
+                                        <td className={index === data.length - 1 ? "text-xs py-2 px-4 bg-gray-900" : "text-xs py-2 px-4 border-b border-b-[var(--background-muted)] bg-gray-900"}>
                                             {row.label}
                                         </td>
-                                        <td className={row.type && row.type === "bold" ? "py-2 px-4 border font-bold" : "py-2 px-4 border"}>
+                                        <td className={index === data.length - 1 ? "text-xs py-2 px-4" : "text-xs py-2 px-4 border-b border-b-[var(--background-muted)]"}>
                                             {row.value}
                                         </td>
                                     </tr>
@@ -83,7 +89,7 @@ const Summary = () => {
             )}
             {/* 더보기 버튼 */}
             <button
-            className="expand-button mt-2"
+            className="expand-button mt-6"
             onClick={() => setIsExpanded(!isExpanded)}
             aria-expanded={isExpanded}
             >

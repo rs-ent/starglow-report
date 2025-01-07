@@ -1,50 +1,35 @@
-// src/app/components/client/Header.js
-'use client'; // 클라이언트 전용 컴포넌트
+"use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from "react";
+import Link from "next/link";
 
 export default function Header() {
-    const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
-    // 다크 모드 초기화
-    useEffect(() => {
-        const storedTheme = localStorage.getItem('theme');
-        if (storedTheme === 'dark') {
-            document.documentElement.classList.add('dark');
-            setIsDarkMode(true);
-        } else {
-            document.documentElement.classList.remove('dark');
-            setIsDarkMode(false);
-        }
-    }, []);
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
 
-    // 다크 모드 토글
-    const toggleDarkMode = () => {
-        if (isDarkMode) {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-        } else {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-        }
-        setIsDarkMode(!isDarkMode);
-    };
-
-    return (
-        <header className="sticky top-0 z-50 bg-[var(--background)] shadow-md backdrop-blur-lg">
-            <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-                <h1 className="text-[var(--primary)] font-[var(--font-heading)] text-xl">
-                    투자 리포트
-                </h1>
-                <nav className="flex space-x-4 items-center">
-                    <button
-                        onClick={toggleDarkMode}
-                        className="ml-4 px-3 py-1 rounded-lg border border-[var(--foreground)] bg-[var(--background)] text-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-all"
-                    >
-                        {isDarkMode ? 'Light Mode' : 'Dark Mode'}
-                    </button>
-                </nav>
-            </div>
-        </header>
-    );
+  return (
+    <header className="fixed top-0 w-full flex justify-between items-center px-4 text-white z-50">
+      <Link 
+        href="/" 
+        className="flex items-center space-x-0.5 hover:text-gray-300 transition-colors"
+        aria-label="Go Back"
+      >
+        <svg
+          className="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          viewBox="0 0 24 24"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          {/* 왼쪽 화살표 (→ SVG 경로를 원하는 다른 아이콘으로 교체 가능) */}
+          <path d="M15 19l-7-7 7-7" />
+        </svg>
+      </Link>
+    </header>
+  );
 }

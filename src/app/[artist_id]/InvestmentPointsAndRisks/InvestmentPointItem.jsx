@@ -20,7 +20,7 @@ const InvestmentPointItem = ({ data, timeline }) => {
 
   return (
     <section
-    className="investment-point-item bg-[var(--background)] rounded-lg p-4 space-y-4 transition-transform duration-300 max-h-[60dvh] overflow-y-scroll"
+    className="investment-point-item rounded-lg p-4 space-y-4 transition-transform duration-300 max-h-[60dvh] overflow-y-scroll"
     aria-label={`Investment Point: ${title}`}
     >
       {/* Media Display */}

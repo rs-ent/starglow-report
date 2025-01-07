@@ -14,12 +14,12 @@ const RewardItem = ({ reward }) => {
   };
 
   return (
-    <div className="flex flex-col bg-[var(--background-brushed)] rounded-xl border border-[var(--text-third)] p-4">
+    <div className="flex flex-col rounded-xl border border-[var(--text-third)] p-4">
       {/* 조건 */}
       <div className="my-1">
-        <p className="text-2xl text-[var(--primary)] font-extrabold italic mx-2">
+        <h2 className="text-2xl text-gradient italic mx-2">
           {reward.condition}
-        </p>
+        </h2>
       </div>
       {/* Gift 렌더링 영역 */}
       <div className="flex-shrink-0 w-full h-48 rounded-xl flex items-center justify-center overflow-hidden">
@@ -46,10 +46,10 @@ const RewardItem = ({ reward }) => {
           <button
             key={idx}
             onClick={() => selectGift(idx)}
-            className={`px-2 py-1 m-1 rounded-md border text-sm ${
+            className={`px-2 py-1 m-1 rounded-md border text-xs font-heading ${
               idx === selectedGiftIndex
-                ? 'bg-[var(--primary)] text-[var(--text-reverse)]'
-                : 'bg-[var(--background-brushed)] text-[var(--text-primary)]'
+                ? 'bg-[var(--foreground)] text-[var(--text-reverse)]'
+                : 'bg-transparent text-[var(--text-primary)]'
             }`}
           >
             {gift.description ? (

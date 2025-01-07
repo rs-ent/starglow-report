@@ -6,7 +6,6 @@ body {
   padding: 20px;
   max-width: 1000px;
   margin: 0 auto;
-  background: #f8f9fa;
   border-radius: 8px;
 }
 
@@ -15,7 +14,7 @@ body {
   margin-bottom: 1.5em;
   font-size: 1.8em;
   font-weight: 600;
-  color: #333;
+  color: #f2f2f2;
 }
 
 .existing-investment-points,
@@ -26,7 +25,7 @@ body {
 h2 {
   font-size: 1.4em;
   margin-bottom: 1em;
-  color: #333;
+  color: #f2f2f2;
 }
 
 .investment-point-list {
@@ -95,7 +94,6 @@ h2 {
 }
 
 .investment-form {
-  background: #fff;
   padding: 20px;
   border-radius: 6px;
   border: 1px solid #ddd;
@@ -110,7 +108,7 @@ h2 {
   margin-bottom: 5px;
   font-weight: 600;
   font-size: 0.9em;
-  color: #333;
+  color: #f2f2f2;
 }
 
 .form-control {
@@ -119,6 +117,8 @@ h2 {
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 0.9em;
+  background: transparent;
+  color: #f2f2f2;
 }
 
 .media-list {

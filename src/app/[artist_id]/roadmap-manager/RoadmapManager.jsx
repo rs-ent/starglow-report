@@ -222,7 +222,7 @@ export default function RoadmapManager({ artistId }) {
     return (
         <div className="min-h-screen p-10 bg-[var(--background)] flex flex-col lg:flex-row gap-6 transition-all">
             {/* 데이터 편집 섹션 */}
-            <div className="flex-1 bg-white/60 backdrop-blur-lg rounded-xl p-8 shadow-2xl border border-[var(--foreground-unfocus)] transition-all">
+            <div className="flex-1 backdrop-blur-lg rounded-xl p-8 shadow-2xl border border-[var(--foreground-unfocus)] transition-all">
                 <h1 className="text-3xl font-extrabold mb-8 text-center tracking-wide text-[var(--primary)]">
                     Roadmap Manager for <span className="text-[var(--accent)]">{artistId}</span>
                 </h1>
@@ -345,12 +345,12 @@ export default function RoadmapManager({ artistId }) {
             {/* 미리보기(프리뷰) 패널: PieChart 및 Table */}
             <div className="flex-1 flex flex-col gap-6">
                 {/* 투자 배분 차트 카드 */}
-                <div className="bg-white/60 backdrop-blur-lg rounded-xl p-6 shadow-2xl border border-[var(--foreground-unfocus)] transition-all">
+                <div className="backdrop-blur-lg rounded-xl p-6 shadow-2xl border border-[var(--foreground-unfocus)] transition-all">
                     <h3 className="text-lg font-bold text-[var(--primary)] mb-4">투자 배분율 미리보기</h3>
                     <InvestmentPieChart data={pieChartData} />
                     <table className="w-full border-collapse border border-gray-300 text-center text-xs text-[var(--text-primary)] mt-4">
                         <thead>
-                            <tr className="bg-gray-200">
+                            <tr className="bg-gray-800">
                                 <th className="py-2 px-4 border border-gray-300 font-bold">분류</th>
                                 <th className="py-2 px-4 border border-gray-300 font-bold">내용</th>
                                 <th className="py-2 px-4 border border-gray-300 font-bold">비중</th>
@@ -362,7 +362,7 @@ export default function RoadmapManager({ artistId }) {
                                 const ratio = totalAmount ? ((spendNum / totalAmount) * 100).toFixed(0) : 0;
                                 return (
                                     <tr key={index}>
-                                        <td className="py-2 px-4 border font-medium bg-gray-100">{row.label}</td>
+                                        <td className="py-2 px-4 border font-medium bg-gray-900">{row.label}</td>
                                         <td className="py-2 px-4 border">{row.value}</td>
                                         <td className="py-2 px-4 border">{ratio}%</td>
                                     </tr>

@@ -147,12 +147,12 @@ export const computeKPIs = (valuationData, timeline, currentIndex, currentData) 
 
     const revenueStreams = ['sv_t', 'rv_t', 'apv_t', 'cev_t', 'mcv_youtube', 'mds_t','mrv_t'];
     const revenueLabels = {
-        sv_t: '스트리밍',
-        rv_t: '앨범 판매',
-        cev_t: '공연/행사',
-        mcv_youtube: '유튜브 조회수',
-        mds_t: '굿즈/상품 판매',
-        mrv_t: '방송 출연'
+        sv_t: 'Streams',
+        rv_t: 'Retail Album Sales',
+        cev_t: 'Concert/Events',
+        mcv_youtube: 'Youtube',
+        mds_t: 'Merchandise Sales',
+        mrv_t: 'Broadcast Appearance'
     };
 
     let expectedAnnualRevenueCalculationStartDate = '';
@@ -248,7 +248,6 @@ export const computeKPIs = (valuationData, timeline, currentIndex, currentData) 
 
     const expectedRevenueSpectrum = calculateHistoricalSpectrum(activityRevenueMap, albums);
     const volatilityPercent = expectedRevenueSpectrum.spectrum;
-    console.log('volatilityPercent: ', volatilityPercent);
     const expectedAnnualRevenue = calculateExpectedAnnualRevenue(
                                     activityRevenueAvg, 
                                     activityFrequency.activityFrequency, 

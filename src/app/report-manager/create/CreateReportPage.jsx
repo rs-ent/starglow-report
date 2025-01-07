@@ -17,7 +17,8 @@ export default function CreateReportPage() {
         gallery: null,
         goal_fund: 200000000,
         image_alpha: "",
-        investor_count: 650,
+        pre_applier_count: 0,
+        investor_count: 0,
         investors_share_ratio: 0.4,
         macro_marketGrowth_comment: "-",
         main_color: "#FFB1B9",
@@ -27,12 +28,16 @@ export default function CreateReportPage() {
         sub_title: "크나큰 IPO 리포트",
         title: "KNK IPO REPORT",
         type: "아이돌",
-        
+        project_launch_date: "",
+        project_deadline_date: "",
+        minted_nft: 4000000,
+        nft_price: 50,
     });
 
     const [localPreview, setLocalPreview] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
+    const [dateError, setDateError] = useState(null);
 
     // docId가 있으면 해당 리포트 불러와서 formData 초기화
     useEffect(() => {
@@ -65,6 +70,53 @@ export default function CreateReportPage() {
             ...prev,
             [name]: newValue
         }));
+
+        if (name === 'project_launch_date' || name === 'project_deadline_date') {
+            const launchDate = 
+              name === 'project_launch_date' ? new Date(newValue) : new Date(formData.project_launch_date);
+            const deadlineDate = 
+              name === 'project_deadline_date' ? new Date(newValue) : new Date(formData.project_deadline_date);
+        
+            // 유효한 날짜인 경우에만 비교
+            if (!isNaN(launchDate) && !isNaN(deadlineDate)) {
+              if (launchDate >= deadlineDate) {
+                setDateError("Launch Date must be earlier than Deadline.");
+              } else {
+                setDateError(null); // 에러 없으면 해제
+              }
+            }
+        } else if( name === 'goal_fund'){
+            const goalFund = parseInt(newValue, 10);
+            if(goalFund > 0) {
+                const newPrice = goalFund / formData.minted_nft;
+                setFormData(prev => ({
+                    ...prev,
+                    goal_fund: goalFund,
+                    nft_price: parseFloat(newPrice),
+                }))
+            }
+        } else if (name === 'minted_nft') {
+            const mintedNftInt = parseInt(newValue, 10);
+            // minted_nft가 양수일 때만 계산
+            if (mintedNftInt > 0) {
+              const newPrice = formData.goal_fund / mintedNftInt;
+              setFormData(prev => ({
+                ...prev,
+                minted_nft: mintedNftInt,            // 사용자가 입력한 값
+                nft_price: parseFloat(newPrice)      // goal_fund / minted_nft
+              }));
+            }
+        } else if (name === 'nft_price') {
+            const nftPriceFloat = parseFloat(newValue);
+            if (nftPriceFloat > 0) {
+                const newMinted = formData.goal_fund / nftPriceFloat;
+                setFormData(prev => ({
+                ...prev,
+                nft_price: nftPriceFloat,
+                minted_nft: parseInt(newMinted, 10)  // 정수로 저장
+                }));
+            }
+        }
     };
 
     const handleFileChange = async (e) => {
@@ -97,6 +149,17 @@ export default function CreateReportPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const launchDate = new Date(formData.project_launch_date);
+        const deadlineDate = new Date(formData.project_deadline_date);
+
+        if (!isNaN(launchDate) && !isNaN(deadlineDate)) {
+            if (launchDate >= deadlineDate) {
+              alert("Project Launch Date must be earlier than Project Deadline.");
+              return; // 폼 제출 중단
+            }
+        }
+
         try {
             // docId가 있으면 업데이트, 없으면 새로 생성
             const savedDocId = await saveData('Report', formData, docId || null); 
@@ -119,7 +182,7 @@ export default function CreateReportPage() {
                         name="artist_eng" 
                         value={formData.artist_eng} 
                         onChange={handleChange} 
-                        className="border p-2 w-full rounded"
+                        className="border p-2 w-full rounded bg-transparent"
                     />
                 </div>
                 <div>
@@ -130,7 +193,7 @@ export default function CreateReportPage() {
                         name="artist_id" 
                         value={formData.artist_id} 
                         onChange={handleChange} 
-                        className="border p-2 w-full rounded"
+                        className="border p-2 w-full rounded bg-transparent"
                     />
                 </div>
                 <div>
@@ -141,7 +204,7 @@ export default function CreateReportPage() {
                         name="artist_kor" 
                         value={formData.artist_kor} 
                         onChange={handleChange} 
-                        className="border p-2 w-full rounded"
+                        className="border p-2 w-full rounded bg-transparent"
                     />
                 </div>
 
@@ -154,7 +217,7 @@ export default function CreateReportPage() {
                         name="title" 
                         value={formData.title} 
                         onChange={handleChange} 
-                        className="border p-2 w-full rounded"
+                        className="border p-2 w-full rounded bg-transparent"
                     />
                 </div>
                 <div>
@@ -165,7 +228,7 @@ export default function CreateReportPage() {
                         name="sub_title" 
                         value={formData.sub_title} 
                         onChange={handleChange} 
-                        className="border p-2 w-full rounded"
+                        className="border p-2 w-full rounded bg-transparent"
                     />
                 </div>
                 <div>
@@ -176,20 +239,39 @@ export default function CreateReportPage() {
                         name="type" 
                         value={formData.type} 
                         onChange={handleChange} 
-                        className="border p-2 w-full rounded"
+                        className="border p-2 w-full rounded bg-transparent"
+                    />
+                </div>
+
+                <div>
+                    <label className="block font-semibold mb-1" htmlFor="project_launch_date">Project Launch Date:</label>
+                    <input
+                        type="date"
+                        id="project_launch_date"
+                        name="project_launch_date"
+                        value={formData.project_launch_date}
+                        onChange={handleChange}
+                        className="border p-2 w-full rounded bg-transparent"
                     />
                 </div>
                 <div>
-                    <label className="block font-semibold mb-1" htmlFor="project_status">Project Status:</label>
-                    <input 
-                        type="text" 
-                        id="project_status" 
-                        name="project_status" 
-                        value={formData.project_status} 
-                        onChange={handleChange} 
-                        className="border p-2 w-full rounded"
+                    <label className="block font-semibold mb-1" htmlFor="project_deadline_date">Project Deadline:</label>
+                    <input
+                        type="date"
+                        id="project_deadline_date"
+                        name="project_deadline_date"
+                        value={formData.project_deadline_date}
+                        onChange={handleChange}
+                        className="border p-2 w-full rounded bg-transparent"
                     />
                 </div>
+
+                {dateError && (
+                    <p className="text-red-500 text-sm">
+                        {dateError}
+                    </p>
+                )}
+                
                 {/* Image Alpha 업로드 (파일 선택 시 즉시 업로드) */}
                 <div>
                     <label className="block font-semibold mb-1" htmlFor="image_alpha">Image Alpha:</label>
@@ -200,13 +282,6 @@ export default function CreateReportPage() {
                         onChange={handleFileChange}
                         className="block"
                     />
-
-                    {localPreview && (
-                        <div className="mt-2">
-                            <p>로컬 미리보기 (업로드 전/중):</p>
-                            <img src={localPreview} alt="Local Preview" className="w-64 h-auto rounded" />
-                        </div>
-                    )}
 
                     {uploading && (
                         <div className="mt-2">
@@ -229,7 +304,7 @@ export default function CreateReportPage() {
                         name="current_fund" 
                         value={formData.current_fund} 
                         onChange={handleChange} 
-                        className="border p-2 w-full rounded"
+                        className="border p-2 w-full rounded bg-transparent"
                     />
                 </div>
                 <div>
@@ -240,9 +315,47 @@ export default function CreateReportPage() {
                         name="goal_fund" 
                         value={formData.goal_fund} 
                         onChange={handleChange} 
-                        className="border p-2 w-full rounded"
+                        className="border p-2 w-full rounded bg-transparent"
                     />
                 </div>
+                <div>
+                    <label className="block font-semibold mb-1" htmlFor="investors_share_ratio">Minted NFT:</label>
+                    <input 
+                        type="number" 
+                        step="1"
+                        id="minted_nft" 
+                        name="minted_nft" 
+                        value={formData.minted_nft} 
+                        onChange={handleChange} 
+                        className="border p-2 w-full rounded bg-transparent"
+                    />
+                </div>
+
+                <div>
+                    <label className="block font-semibold mb-1" htmlFor="investors_share_ratio">Minimum NFT Price ($):</label>
+                    <input 
+                        type="number" 
+                        step="1"
+                        id="nft_price" 
+                        name="nft_price" 
+                        value={formData.nft_price} 
+                        onChange={handleChange} 
+                        className="border p-2 w-full rounded bg-transparent"
+                    />
+                </div>
+
+                <div>
+                    <label className="block font-semibold mb-1" htmlFor="investor_count">Pre Applier Count:</label>
+                    <input 
+                        type="number" 
+                        id="pre_applier_count" 
+                        name="pre_applier_count" 
+                        value={formData.pre_applier_count} 
+                        onChange={handleChange} 
+                        className="border p-2 w-full rounded bg-transparent"
+                    />
+                </div>
+
                 <div>
                     <label className="block font-semibold mb-1" htmlFor="investor_count">Investor Count:</label>
                     <input 
@@ -251,7 +364,7 @@ export default function CreateReportPage() {
                         name="investor_count" 
                         value={formData.investor_count} 
                         onChange={handleChange} 
-                        className="border p-2 w-full rounded"
+                        className="border p-2 w-full rounded bg-transparent"
                     />
                 </div>
                 <div>
@@ -263,40 +376,7 @@ export default function CreateReportPage() {
                         name="investors_share_ratio" 
                         value={formData.investors_share_ratio} 
                         onChange={handleChange} 
-                        className="border p-2 w-full rounded"
-                    />
-                </div>
-                <div>
-                    <label className="block font-semibold mb-1" htmlFor="melon_artist_id">Melon Artist ID:</label>
-                    <input 
-                        type="text" 
-                        id="melon_artist_id" 
-                        name="melon_artist_id" 
-                        value={formData.melon_artist_id} 
-                        onChange={handleChange} 
-                        className="border p-2 w-full rounded"
-                    />
-                </div>
-                <div>
-                    <label className="block font-semibold mb-1" htmlFor="macro_marketGrowth_comment">Macro Market Growth Comment:</label>
-                    <input 
-                        type="text" 
-                        id="macro_marketGrowth_comment" 
-                        name="macro_marketGrowth_comment" 
-                        value={formData.macro_marketGrowth_comment} 
-                        onChange={handleChange} 
-                        className="border p-2 w-full rounded"
-                    />
-                </div>
-                <div>
-                    <label className="block font-semibold mb-1" htmlFor="meso_circlechart_comment">Meso Circlechart Comment:</label>
-                    <input 
-                        type="text" 
-                        id="meso_circlechart_comment" 
-                        name="meso_circlechart_comment" 
-                        value={formData.meso_circlechart_comment} 
-                        onChange={handleChange} 
-                        className="border p-2 w-full rounded"
+                        className="border p-2 w-full rounded bg-transparent"
                     />
                 </div>
                 <div>

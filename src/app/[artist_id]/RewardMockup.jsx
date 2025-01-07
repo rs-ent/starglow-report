@@ -11,66 +11,104 @@ import { useReport, useRewards } from '../../context/GlobalData';
 
 const serifFont = 'https://threejs.org/examples/fonts/helvetiker_regular.typeface.json';
 
-function createCardRoundedEdges(width, height, depth, radius, smoothness, frontTextureUrl) {
-  // 제한 조건: 모서리 반경(radius)이 사각형 크기를 넘지 않도록 설정
+function createCardRoundedEdges(
+  width,
+  height,
+  depth,
+  radius,
+  smoothness,
+  frontTextureUrl
+) {
+  // radius 보정
   if (radius * 2 > width || radius * 2 > height) {
-    console.warn('Warning: radius is too large for the given width/height. Reducing radius.');
+    console.warn('Warning: radius is too large. Reducing...');
     radius = Math.min(width, height) / 2;
   }
 
+  // Shape 생성 (직사각형 + 둥근 모서리)
   const shape = new THREE.Shape();
-
-  // 네 모서리에 둥근 곡선 추가
-  shape.moveTo(radius, 0); // 왼쪽 아래에서 시작
-  shape.lineTo(width - radius, 0); // 아래쪽 직선
-  shape.absarc(width - radius, radius, radius, -Math.PI / 2, 0, false); // 오른쪽 아래 모서리
-  shape.lineTo(width, height - radius); // 오른쪽 직선
-  shape.absarc(width - radius, height - radius, radius, 0, Math.PI / 2, false); // 오른쪽 위 모서리
-  shape.lineTo(radius, height); // 위쪽 직선
-  shape.absarc(radius, height - radius, radius, Math.PI / 2, Math.PI, false); // 왼쪽 위 모서리
-  shape.lineTo(0, radius); // 왼쪽 직선
-  shape.absarc(radius, radius, radius, Math.PI, Math.PI * 1.5, false); // 왼쪽 아래 모서리
+  shape.moveTo(radius, 0);
+  shape.lineTo(width - radius, 0);
+  shape.absarc(width - radius, radius, radius, -Math.PI / 2, 0, false);
+  shape.lineTo(width, height - radius);
+  shape.absarc(width - radius, height - radius, radius, 0, Math.PI / 2, false);
+  shape.lineTo(radius, height);
+  shape.absarc(radius, height - radius, radius, Math.PI / 2, Math.PI, false);
+  shape.lineTo(0, radius);
+  shape.absarc(radius, radius, radius, Math.PI, Math.PI * 1.5, false);
 
   // Extrude 설정
   const extrudeSettings = {
-    depth: depth, // 사각형의 깊이
-    bevelEnabled: false, // bevel 비활성화
+    depth: depth,
+    bevelEnabled: false,
     steps: 1,
-    curveSegments: smoothness, // 곡선의 부드러움
+    curveSegments: smoothness,
+    // caps(앞+뒤) = materialIndex: 0
+    material: 0,
+    // side(측면) = materialIndex: 1
+    extrudeMaterial: 1,
   };
 
+  // ExtrudeGeometry 생성
   const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
   geometry.center();
 
-  // 텍스처 로드
+  // ----- 텍스처 로드 -----
   const textureLoader = new THREE.TextureLoader();
   const frontTexture = textureLoader.load(
-    frontTextureUrl, // URL을 사용하여 텍스처 로드
+    frontTextureUrl,
     () => console.log('Texture loaded successfully'),
     undefined,
     (err) => console.error('Error loading texture:', err)
   );
 
-  // 재질 배열 설정: 앞면, 뒷면, 측면
-  const materials = [
-    new THREE.MeshStandardMaterial({ map: frontTexture, roughness: 0.8, metalness: 0.3 }), // 그룹 0: 앞면
-    new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.8, metalness: 0.3 }), // 그룹 1: 뒷면
-    new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.8, metalness: 0.3 })  // 그룹 2+: 측면
-  ];
+  // ----- geometry.groups 구조 -----
+  // 기본적으로 그룹이 2개:
+  //   0: 측면 (materialIndex = 1)
+  //   1: 앞+뒤 (materialIndex = 0)
+  //
+  // 여기서 “앞면(front)”과 “뒷면(back)”을 나누기 위해 그룹 1을 둘로 쪼갠다.
+  //
+  // 예: 
+  //   const sideGroup = geometry.groups[0];    // 측면
+  //   const capGroup  = geometry.groups[1];    // 앞+뒤
+  //     capGroup.start, capGroup.count  → 삼각형 범위
+  //     앞면: 절반, 뒷면: 나머지 절반
+  //
 
-  // 메쉬 생성
-  const mesh = new THREE.Mesh(geometry, materials);
+  const sideGroup = geometry.groups[0]; // (materialIndex = 1)
+  const capGroup = geometry.groups[1];  // (materialIndex = 0) => 앞+뒤 통합
 
-  // 각 그룹의 materialIndex 설정
-  geometry.groups.forEach((group, index) => {
-    if (index === 0) {
-      group.materialIndex = 0; // 앞면
-    } else if (index === 1) {
-      group.materialIndex = 1; // 뒷면
-    } else {
-      group.materialIndex = 2; // 측면
-    }
+  const halfCount = capGroup.count / 2; // 앞, 뒤가 각각 절반
+
+  // [앞면]: 기존 capGroup을 절반만 사용
+  capGroup.count = halfCount;        
+  capGroup.materialIndex = 0; // 앞면 => texture
+
+  // [뒷면]: 새 그룹을 추가 (materialIndex = 2)
+  geometry.groups.push({
+    start: capGroup.start + halfCount,
+    count: halfCount,
+    materialIndex: 2,
   });
+
+  // ----- 재질 3개 구성 -----
+  // 인덱스별로: 0=앞면, 1=측면, 2=뒷면
+  const matFront = new THREE.MeshStandardMaterial({
+    map: frontTexture,
+    roughness: 0.8,
+    metalness: 0.3,
+  });
+  const matSide = new THREE.MeshStandardMaterial({
+    color: '#ffffff',
+    roughness: 0.8,
+    metalness: 0.3,
+  });
+  const matBack = new THREE.MeshStandardMaterial({
+    color: 0xff0000, // 빨강
+  });
+
+  const mesh = new THREE.Mesh(geometry, [matFront, matSide, matBack]);
 
   return mesh;
 }
@@ -400,39 +438,42 @@ const RewardMockup = ({ gift }) => {
   // Functions to create mockup objects with optional textures
   const textureLoader = new THREE.TextureLoader();
 
-  const createPhotoCard = () => {
+  function createPhotoCard() {
     const cardGroup = new THREE.Group();
   
-    // 카드 크기 및 둥근 모서리 반경
-    const cardWidth = 4.4; // 크레딧카드 너비
-    const cardHeight = 6.8; // 크레딧카드 높이
-    const cardDepth = 0.1; // 크레딧카드 두께
-    const cornerRadius = 0.6; // 모서리 반경
-    const smoothness = 8; // 곡선의 부드러움
-    
-    // 텍스처 URL 설정
+    // 카드 크기
+    const cardWidth = 4.4;
+    const cardHeight = 6.8;
+    const cardDepth = 0.1;
+    const cornerRadius = 0.6;
+    const smoothness = 8;
+  
+    // 임의 이미지 하나 고르기
     const randomIndex = Math.floor(Math.random() * imagePool.Photocard.length);
     const selectedImage = imagePool.Photocard[randomIndex];
-    const API_BASE_URL = typeof window !== 'undefined'
-      ? `${window.location.protocol}//${window.location.host}`
-      : '';
-    const proxiedImageUrl = `${API_BASE_URL}/api/image-proxy?url=${encodeURIComponent(selectedImage.url)}`;
   
-    // 1. 카드 본체 생성
+    // 서버 환경에 따라 프록시 URL 등 처리 (예: window.location.host)
+    const API_BASE_URL =
+      typeof window !== 'undefined'
+        ? `${window.location.protocol}//${window.location.host}`
+        : '';
+    const proxiedImageUrl = `${API_BASE_URL}/api/image-proxy?url=${encodeURIComponent(
+      selectedImage.url
+    )}`;
+  
+    // 앞면에만 텍스처, 뒷면/측면은 흰색
     const cardMesh = createCardRoundedEdges(
       cardWidth,
       cardHeight,
       cardDepth,
       cornerRadius,
       smoothness,
-      proxiedImageUrl // 텍스처 URL 전달
+      proxiedImageUrl
     );
   
-    // 2. 카드 메쉬를 그룹에 추가
     cardGroup.add(cardMesh);
-  
     return cardGroup;
-  };
+  }
 
   const createAlbum = () => {
     const geometry = new THREE.BoxGeometry(2, 2, 0.5);

@@ -27,11 +27,14 @@ const InvestmentPoints = ({type = "Investment Point"}) => { // async 제거
                     {investmentData.map((item, index) => (
                         <div
                             key={index}
-                            className="rounded-lg overflow-hidden shadow-md bg-[var(--background)] border border-[var(--border-muted)]"
+                            className="rounded-lg overflow-hidden bg-transparent shadow-md border border-[var(--border-mid)]"
                         >
                             {/* 제목 라벨 */}
                             <button
-                                className="w-full text-left p-4 bg-[var(--primary)] text-[var(--background)] font-medium hover:bg-opacity-90 transition-all"
+                                style={{
+                                    fontFamily: 'Conthrax',
+                                }}
+                                className="w-full text-left p-4 text-gradient text-base hover:bg-opacity-90 transition-all min-h-28"
                                 onClick={() => toggleItem(index)}
                             >
                                 {item.title}
@@ -49,7 +52,7 @@ const InvestmentPoints = ({type = "Investment Point"}) => { // async 제거
                                     transitionProperty: 'max-height, opacity, padding',
                                 }}
                             >
-                                <div className="bg-[var(--surface)] shadow-inner">
+                                <div className="shadow-inner border-t border-t-[var(--border-mid)]">
                                     <InvestmentPointItem
                                         data={item}
                                         timeline={kpiData.timeline}

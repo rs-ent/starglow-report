@@ -10,6 +10,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      backgroundImage: {
+        'glow-purple': 'radial-gradient(circle at center, #1a0b21, #101010 30%)',
+      },
       boxShadow: {
         'soft': '0 2px 8px rgba(0, 0, 0, 0.05)', // 심플하고 가벼운 느낌
         'strong': '0 4px 12px rgba(0, 0, 0, 0.1)', // 강조 요소에 적합
@@ -29,11 +32,22 @@ module.exports = {
       animation: {
         'spin-slow': 'spin 3s linear infinite', // 느린 회전
         'fade-in': 'fadeIn 0.5s ease-in-out', // 페이드 인 효과
+        'glow-move': 'glowMove 5s ease-in-out infinite alternate',
       },
       keyframes: {
         fadeIn: {
           from: { opacity: 0 },
           to: { opacity: 1 },
+        },
+        glowMove: {
+          '0%, 100%': {
+            // 초기·마지막: 중앙
+            'background-position': '50% 50%',
+          },
+          '50%': {
+            // 중간 지점: 약간 옆으로 이동
+            'background-position': '52% 53%',
+          },
         },
       },
       colors: {

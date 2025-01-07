@@ -3,6 +3,7 @@
 'use client';
 
 import React, { useState, useContext } from 'react';
+import Header from './Header';
 import KPI from './KPI';
 import InvestmentPoints from './InvestmentPoints';
 import History from './History';
@@ -29,63 +30,67 @@ const ClientManager = ({artist_id}) => {
   };
   
   return (
-    <div className="relative flex flex-col gap-4 pb-3">
+    <>
+      {/* 헤더 */}
+      <Header />
 
-      {/* 개요 */}
-      <section>
-        <Outline />
-      </section>
+      <div className="relative flex flex-col gap-4 pb-3">
+        {/* 개요 */}
+        <section>
+          <Outline />
+        </section>
 
-      {/* 소개 */}
-      <section className="section-base">
-        <Introduction />
-      </section>
-      
-      {/* KPI 섹션 */}
-      <section className="section-base">
-        <h2 className="section-title">Key Performance Indicators</h2>
-        <KPI />
-      </section>
+        {/* 소개 */}
+        <section className="section-base">
+          <Introduction />
+        </section>
+        
+        {/* KPI 섹션 */}
+        <section className="section-base">
+          <h2 className="section-title">Key Performance Indicators</h2>
+          <KPI />
+        </section>
 
-      {/* 투자요약 섹션 */}
-      <section className="section-base">
-        <h2 className="section-title">Investment Details</h2>
-        <Summary />
-      </section>
+        {/* 투자요약 섹션 */}
+        <section className="section-base">
+          <h2 className="section-title">Investment Details</h2>
+          <Summary />
+        </section>
 
-      {/* 리워드 섹션 */}
-      <Rewards />
-      
-      {/* 투자 포인트 */}
-      <InvestmentPoints type="Investment Point" />
+        {/* 리워드 섹션 */}
+        <Rewards />
+        
+        {/* 투자 포인트 */}
+        <InvestmentPoints type="Investment Point" />
 
-      {/* 히스토리 */}
-      <section className="section-base">
-          <h2 className="section-title">History Analysis</h2>
-          <History openModal={openHistoryModal} />
-      </section>
-      
-      {/* History Modal */}
-      {isHistoryModalOpen && (
-        <HistoryModal onClose={closeHistoryModal} contents={modalContents} />
-      )}
-      
-      {/* 리스크 */}
-      <InvestmentPoints type="Risk" />
+        {/* 히스토리 */}
+        <section className="section-base">
+            <h2 className="section-title">History Analysis</h2>
+            <History openModal={openHistoryModal} />
+        </section>
+        
+        {/* History Modal */}
+        {isHistoryModalOpen && (
+          <HistoryModal onClose={closeHistoryModal} contents={modalContents} />
+        )}
+        
+        {/* 리스크 */}
+        <InvestmentPoints type="Risk" />
 
-      {/* 로드맵 */}
-      <section className="section-base">
-        <h2 className="section-title">Roadmap</h2>
-        <RoadMap />
-      </section>
+        {/* 로드맵 */}
+        <section className="section-base">
+          <h2 className="section-title">Roadmap</h2>
+          <RoadMap />
+        </section>
 
-      {/* 위험도 */}
-      <section className="section-base">
-        <h2 className="section-title">Risk Level Analysis</h2>
-        <RiskLevel />
-      </section>
+        {/* 위험도 */}
+        <section className="section-base">
+          <h2 className="section-title">Risk Level Analysis</h2>
+          <RiskLevel />
+        </section>
 
-    </div>
+      </div>
+    </>
   );
 };
   

@@ -45,7 +45,7 @@ const History = ({ openModal }) => {
                                 onClick={() => handleOpenModal(item.text)}
                             >
                                 {/* Background Image with Blur and Overlay */}
-                                <div className="relative w-full h-24 overflow-hidden rounded-xl border">
+                                <div className="relative w-full h-24 overflow-hidden rounded-xl border border-[var(--border-mid)]">
                                     {/* Background Image */}
                                     <img
                                         src={item.src}
@@ -54,10 +54,10 @@ const History = ({ openModal }) => {
                                     />
 
                                     {/* Black Overlay */}
-                                    <div className={`absolute inset-0 bg-black ${shouldFullSize ? 'bg-opacity-60' : 'bg-opacity-50'} z-10`}></div>
+                                    <div className={`absolute inset-0 bg-black ${shouldFullSize ? 'bg-opacity-80' : 'bg-opacity-70'} z-10`}></div>
 
                                     {/* Centered Text */}
-                                    <h2 className="absolute inset-0 flex items-center justify-center text-center text-white text-lg p-4 whitespace-break-spaces font-semibold z-20">
+                                    <h2 className="absolute inset-0 flex items-center justify-center text-center text-[var(--text-primary)] text-glow-5 text-lg p-4 whitespace-break-spaces font-semibold z-20">
                                         {item.text}
                                     </h2>
                                 </div>

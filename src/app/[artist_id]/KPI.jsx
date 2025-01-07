@@ -39,11 +39,11 @@ export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenu
     ];
 
     return (
-        <div className="mx-auto  border-b border-b-gray-200">
-            <ResponsiveContainer width="90%" height={200}>
+        <div className="mx-auto  border-b border-b-[var(--background-muted)]">
+            <ResponsiveContainer width="95%" height={200}>
                 <LineChart
                     data={data}
-                    margin={{ top: 15, right: 50, left: 0, bottom: 0 }}
+                    margin={{ top: 15, right: 65, left: 0, bottom: 0 }}
                 >
                     <XAxis dataKey="x" 
                             stroke="#A0A0A0" 
@@ -60,7 +60,7 @@ export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenu
                         type="monotone"
                         dataKey="value"
                         name="평균 기대 수익"
-                        stroke="#83358f"
+                        stroke="#ffffff"
                         strokeWidth={1}
                         data={data.filter(d => d.label === '평균 기대 수익')}
                         dot={false}
@@ -69,7 +69,7 @@ export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenu
                         type="monotone"
                         dataKey="value"
                         name="최저 기대 수익"
-                        stroke="#5b1166"
+                        stroke="#555555"
                         strokeDasharray="5 5"
                         strokeWidth={1}
                         data={data.filter(d => d.label === '최저 기대 수익')}
@@ -79,7 +79,7 @@ export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenu
                         type="monotone"
                         dataKey="value"
                         name="최고 기대 수익"
-                        stroke="#5b1166"
+                        stroke="#555555"
                         strokeDasharray="5 5"
                         strokeWidth={1}
                         data={data.filter(d => d.label === '최고 기대 수익')}
@@ -92,10 +92,10 @@ export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenu
                         y={avgPoint3}
                         r={0} // 점 숨김
                         label={{
-                            value: `${formatNumber(avgPoint3)}`,
+                            value: `₩${formatNumber(avgPoint3)}`,
                             position: 'right',
                             fontSize: 10,
-                            fill: '#83358f',
+                            fill: '#ffffff',
                         }}
                     />
 
@@ -105,10 +105,10 @@ export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenu
                         y={lowerBoundPoint2}
                         r={0} // 점 숨김
                         label={{
-                            value: `${formatNumber(lowerBoundPoint2)}`,
+                            value: `₩${formatNumber(lowerBoundPoint2)}`,
                             position: 'right',
                             fontSize: 10,
-                            fill: '#5b1166',
+                            fill: '#999999',
                         }}
                     />
 
@@ -118,10 +118,10 @@ export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenu
                         y={upperBoundPoint2}
                         r={0} // 점 숨김
                         label={{
-                            value: `${formatNumber(upperBoundPoint2)}`,
+                            value: `₩${formatNumber(upperBoundPoint2)}`,
                             position: 'right',
                             fontSize: 10,
-                            fill: '#5b1166',
+                            fill: '#999999',
                         }}
                     />
                 </LineChart>
@@ -156,16 +156,14 @@ const KPI = () => {
 
     // 표시할 KPI 목록을 준비합니다.
     const allKPIs = useMemo(() => [
-        { label: '목표 모집 금액', value: reportData.goal_fund, suffix: '₩', importance: 10, higherIsBetter: true },
-        { label: `현재 가치`, value: totalValueMultiple, suffix: '₩', importance: 9, higherIsBetter: true },
-        { label: '위험도', value: riskLevel.differencePercentage, suffix: '%', importance: 10, higherIsBetter: false},
-        { label: '위험성평가', value: riskLevel.riskText, suffix: '상품', importance: 10, higherIsBetter: true},
-        { label: '연간 기대수익', value: calculatedKPIs.expectedAnnualRevenue, suffix: '₩', importance: 10, higherIsBetter: true},
-        { label: '연간 기대수익 스펙트럼', value: revenueSpectrum, suffix: '', importance: 10, higherIsBetter: true},
-        { label: '전성기 날짜', value: calculatedKPIs.peakDate.replace('-', '년 '), suffix: '월', importance: 8, higherIsBetter: false },
-        //{ label: '활동기 평균 매출 성장률', value: parseFloat((activeGrowthRatesAvg * 100).toFixed(2)), suffix: '%', importance: 6, higherIsBetter: true },
-        { label: '수익 다양성 지표', value: (calculatedKPIs.normalizedDiversityIndex * 100).toFixed(2), suffix: '%', importance: 5, higherIsBetter: false },
-        { label: '핵심 수익원', value: calculatedKPIs.maxCoreRevenueLabel, suffix: ' 수익', importance: 4, higherIsBetter: false },
+        { label: 'Current Month Value', value: totalValueMultiple, suffix: '₩', importance: 9, higherIsBetter: true },
+        { label: 'Risk Rating', value: riskLevel.differencePercentage, suffix: '%', importance: 10, higherIsBetter: false},
+        { label: 'Risk Level', value: riskLevel.riskText, suffix: '', importance: 10, higherIsBetter: true},
+        { label: 'Est. Revenue (YoY)', value: calculatedKPIs.expectedAnnualRevenue, suffix: '₩', importance: 10, higherIsBetter: true},
+        { label: 'Est. Revenue Spectrum', value: revenueSpectrum, suffix: '', importance: 10, higherIsBetter: true},
+        { label: 'Peak Date', value: calculatedKPIs.peakDate.replace('-', '.'), suffix: '', importance: 8, higherIsBetter: false },
+        { label: 'Revenue Diversity Ratio', value: (calculatedKPIs.normalizedDiversityIndex * 100).toFixed(2), suffix: '%', importance: 5, higherIsBetter: false },
+        { label: 'Core Revenue', value: calculatedKPIs.maxCoreRevenueLabel, suffix: '', importance: 4, higherIsBetter: false },
         
     ], [calculatedKPIs]);
 
@@ -198,17 +196,17 @@ const KPI = () => {
                     >
                     
                         {/* 카드 내용 */}
-                        <div className="relative z-10 grid grid-cols-2 items-center justify-center text-left py-3 px-6 border-b border-b-gray-200">
-                            <h4 className="text-[var(--primary)] text-sm">
+                        <div className="relative z-10 grid grid-cols-2 items-center justify-center text-left py-3 px-6 border-b border-b-[var(--background-muted)]">
+                            <h4 className="text-[var(--primary)] text-xs">
                                 {kpi.label}
                             </h4>
-                            <p className="text-sm font-semibold text-right">
+                            <p className="text-xs font-semibold text-right">
                                 {kpi.suffix === '₩'
                                     ? `₩${formatNumber(kpi.value)}`
                                     : `${formatNumber(kpi.value)}${kpi.suffix}`}
                             </p>
                         </div>
-                        {isExpanded && kpi.label === '연간 기대수익 스펙트럼' && (
+                        {isExpanded && kpi.label.includes('Spectrum') && (
                             revenueSpectrumChart(totalValueMultiple, spectrum, avgRevenue, minRevenue, maxRevenue)
                         )}
                     </div>

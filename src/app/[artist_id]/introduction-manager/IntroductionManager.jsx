@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { uploadFiles } from '../../firebase/fetch';
 import TextEditor from '../../components/client/TextEditor';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { useReport } from '../../../context/GlobalData';
+import { useReport, useValuation } from '../../../context/GlobalData';
 import { fetchArtist, fetchData ,saveData } from '../../firebase/fetch';
 import MemberManager from './MemberManager';
 import Toast from '../../components/client/Toast';
@@ -23,35 +23,6 @@ const IntroductionManager = ({ artist_id }) => {
       console.error('Fetch Saved Introduction Data Failed', e);
     }
   };
-
-  useEffect(() => {
-    // savedData가 로딩된 후 처리
-    if (savedData === null) {
-      // savedData 없음 -> BasicData 로드 시도
-      (async() => {
-        await loadBasicData();
-      })();
-    } else {
-      // savedData 있음
-      setCatchPhrase(savedData.catchPhrase || '');
-      setSubCatchPhrase(savedData.subCatchPhrase || '');
-      setLogo(savedData.logo || null);
-      setProfilePicture(savedData.profilePicture || null);
-      setIntroduction(savedData.introduction || '');
-      setGalleryImages(savedData.galleryImages || []);
-      setMembers(savedData.members || []);
-      setTeamMembers(savedData.teamMembers || []);
-
-      if (savedData.additionalData && Object.keys(savedData.additionalData).length > 0) {
-        setArtistData(savedData.additionalData);
-      } else {
-        // 추가 데이터 없으면 basic data 로드
-        (async() => {
-          await loadBasicData();
-        })();
-      }
-    }
-  }, [savedData]);
 
   useEffect(() => {
     loadSavedIntroductionData();
@@ -79,6 +50,144 @@ const IntroductionManager = ({ artist_id }) => {
   const [artistData, setArtistData] = useState({});
   const [newDataKey, setNewDataKey] = useState(''); // State for new data key
   const [newDataValue, setNewDataValue] = useState('');
+
+  const valuationData = useValuation();
+  const initialAlbums = valuationData.SV?.sub_data || valuationData.SV?.albums || [];
+  const [albums, setAlbums] = useState(initialAlbums);
+
+  useEffect(() => {
+    // savedData가 로딩된 후 처리
+    if (savedData === null) {
+      // savedData 없음 -> BasicData 로드 시도
+      (async() => {
+        await loadBasicData();
+      })();
+    } else {
+      // savedData 있음
+      setCatchPhrase(savedData.catchPhrase || '');
+      setSubCatchPhrase(savedData.subCatchPhrase || '');
+      setLogo(savedData.logo || null);
+      setProfilePicture(savedData.profilePicture || null);
+      setIntroduction(savedData.introduction || '');
+      setGalleryImages(savedData.galleryImages || []);
+      setAlbums(savedData.albums || initialAlbums);
+      setMembers(savedData.members || []);
+      setTeamMembers(savedData.teamMembers || []);
+
+      if (savedData.additionalData && Object.keys(savedData.additionalData).length > 0) {
+        setArtistData(savedData.additionalData);
+      } else {
+        // 추가 데이터 없으면 basic data 로드
+        (async() => {
+          await loadBasicData();
+        })();
+      }
+    }
+  }, [savedData]);
+
+  const albumFileInputRef = useRef(null);
+  const handleAlbumChange = (index, field, value) => {
+    setAlbums((prev) => {
+      // 1) 기존 albums 배열 복사
+      const updated = [...prev];
+      // 2) 해당 인덱스의 앨범에 field 값 덮어쓰기
+      updated[index] = {
+        ...updated[index],
+        [field]: value,
+      };
+      // 3) 업데이트된 배열 반환
+      return updated;
+    });
+  };
+
+  const handleRemoveAlbum = (index) => {
+    setAlbums((prevAlbums) => {
+      // 1) 기존 albums 배열 복사
+      const updated = [...prevAlbums];
+      // 2) 해당 인덱스의 앨범을 삭제
+      updated.splice(index, 1);
+      // 3) 업데이트된 배열 반환
+      return updated;
+    });
+  };
+
+  const handleAlbumDragEnd = (result) => {
+    if (!result.destination) return;
+  
+    if (result.source.index === result.destination.index) return;
+  
+    setAlbums((prevAlbums) => {
+      const updated = [...prevAlbums];
+      // 1) 드래그한 요소를 잘라내기
+      const [movedItem] = updated.splice(result.source.index, 1);
+      // 2) 새로운 위치에 삽입
+      updated.splice(result.destination.index, 0, movedItem);
+      return updated;
+    });
+  };
+
+  const handleToggleAlbumSelection = (index) => {
+    setAlbums((prevAlbums) => {
+      // 1) 기존 albums 배열을 복사
+      const updated = [...prevAlbums];
+      
+      // 2) 해당 인덱스의 앨범 isSelected 값을 반전
+      updated[index] = {
+        ...updated[index],
+        isSelected: !updated[index].isSelected,
+      };
+      
+      // 3) 업데이트된 배열 반환
+      return updated;
+    });
+  };
+
+  const handleAddAlbum = async (e) => {
+    // 사용자가 업로드한 파일 (단일 파일)
+    const file = e.target.files?.[0];
+    if (!file) return;
+  
+    // 파일 확장자 체크
+    const allowedExtensions = ['png', 'jpg', 'jpeg', 'webp'];
+    const extension = file.name.split('.').pop().toLowerCase();
+    if (!allowedExtensions.includes(extension)) {
+      alert(`Invalid file type: ${file.name}. Only ${allowedExtensions.join(', ')} are allowed.`);
+      return;
+    }
+  
+    // 업로드 진행률 초기화
+    setErrorMessage('');
+    setUploadProgress(0);
+  
+    try {
+      // 2) Firebase Storage 업로드 (기존 갤러리 업로드 로직 참고)
+      const [uploadedImage] = await uploadFiles(
+        [file],
+        `albums/${artist_id}/`, // 예: 앨범 이미지를 저장할 폴더 경로
+        (index, progress) => {
+          setUploadProgress(progress); // 업로드 진행률 업데이트
+        }
+      );
+  
+      // 3) 업로드가 성공하면, 새로운 앨범 객체를 생성하여 state에 추가
+      setAlbums((prev) => [
+        ...prev,
+        {
+          id: crypto.randomUUID(),      // 혹은 다른 랜덤 ID 생성 방식
+          album_title: 'New Album',     // 기본값
+          img_url: uploadedImage.downloadURL, // 업로드된 이미지 URL
+          release_date: '',
+          isSelected: false,
+          // 이후 필요한 필드들 (장르, 레이블 등)이 있다면 추가
+        },
+      ]);
+  
+      console.log('New album uploaded successfully:', uploadedImage.downloadURL);
+    } catch (error) {
+      console.error('Error uploading album image:', error);
+      alert('Failed to upload album image. Please try again.');
+    }
+  };
 
   const handleSave = () => {
     // Save logic here
@@ -242,6 +351,7 @@ const IntroductionManager = ({ artist_id }) => {
         profilePicture,
         introduction,
         galleryImages,
+        albums,
         members,
         teamMembers,
         additionalData: artistData,
@@ -294,7 +404,7 @@ const IntroductionManager = ({ artist_id }) => {
             <button onClick={() => setIsEditing(false)} className="cancel-button">Cancel</button>
           </div>
         ) : (
-          <div className="catchphrase-display">
+          <div className="catchphrase-display whitespace-pre-wrap">
             <p>{catchPhrase || 'No catchphrase yet. Click edit to add one!'}</p>
             <button onClick={() => setIsEditing(true)} className="edit-button">Edit</button>
           </div>
@@ -452,6 +562,129 @@ const IntroductionManager = ({ artist_id }) => {
             onUpdateMembers={handleUpdateMembers} // 콜백 전달
             artist_id={artist_id} // Firebase 업로드를 위한 ID 전달
             />
+      </section>
+
+      {/* ============================= */}
+      {/*      Albums Management       */}
+      {/* ============================= */}
+      <section className="albums-section">
+        <h2 className="albums-section-title">Albums Management</h2>
+
+        {/* 1) DragDropContext: 앨범 순서 드래그 앤 드롭 */}
+        <DragDropContext onDragEnd={handleAlbumDragEnd}>
+          <Droppable droppableId="albums-droppable" direction="horizontal">
+            {(provided) => (
+              <div
+                className="albums-grid"
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+              >
+                {albums.map((album, index) => (
+                  <Draggable
+                    key={album.id || index}
+                    draggableId={String(album.id || index)}
+                    index={index}
+                  >
+                    {(provided) => (
+                      <div
+                        className="album-card"
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        {/* 앨범 표지 영역 */}
+                        <div className="album-cover">
+                          {album.img_url ? (
+                            <img
+                              src={album.img_url}
+                              alt={album.album_title || 'New Album'}
+                              className="album-image"
+                            />
+                          ) : (
+                            <div className="album-image-fallback">No Image</div>
+                          )}
+                        </div>
+
+                        {/* 앨범 기본 정보 영역 */}
+                        <div className="album-info">
+                          <h3 className="album-title">
+                            {album.album_title || 'New Album'}
+                          </h3>
+                          <p className="album-release-date">
+                            {album.release_date || 'Unknown Release Date'}
+                          </p>
+
+                          {/* 앨범 편집(제목, 발매일 등) - 필요 시 details/summary or 모달로 확장 가능 */}
+                          {album.isSelected && (
+                            <div className="album-edit-form">
+                              <label>
+                                <span>Album Title:</span>
+                                <input
+                                  type="text"
+                                  value={album.album_title || ''}
+                                  onChange={(e) =>
+                                    handleAlbumChange(index, 'album_title', e.target.value)
+                                  }
+                                />
+                              </label>
+                              <label>
+                                <span>Release Date:</span>
+                                <input
+                                  type="text"
+                                  value={album.release_date || ''}
+                                  onChange={(e) =>
+                                    handleAlbumChange(index, 'release_date', e.target.value)
+                                  }
+                                />
+                              </label>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 체크박스 or 삭제 버튼 등 원하는 UI */}
+                        <div className="album-actions">
+                          <label>
+                            <input
+                              type="checkbox"
+                              checked={album.isSelected || false}
+                              onChange={() => handleToggleAlbumSelection(index)}
+                            />
+                            Selected
+                          </label>
+                          <button
+                            onClick={() => handleRemoveAlbum(index)}
+                            className="remove-album-button"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+
+        {/* 2) 앨범 추가 버튼 (이미지 업로드 → 새 앨범 생성) */}
+        <div className="add-album-wrapper">
+          {/* 숨겨진 파일 업로드 input */}
+          <input
+            type="file"
+            accept=".png,.jpg,.jpeg,.webp"
+            onChange={handleAddAlbum} 
+            style={{ display: 'none' }}
+            ref={albumFileInputRef}
+          />
+          <button
+            onClick={() => albumFileInputRef.current?.click()}
+            className="add-album-button"
+          >
+            + Add Album
+          </button>
+        </div>
       </section>
 
       {/* New Team Members Section */}

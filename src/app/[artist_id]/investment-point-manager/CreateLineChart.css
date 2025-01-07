@@ -15,23 +15,24 @@
 }
 
 .modal-content {
-    background: #ffffff;
+    background: #f2f2f2;
     border-radius: 8px;
-    max-width: 97%;
-    max-height: 95%;
+    max-width: 98%;
+    max-height: 97%;
     overflow-y: auto;
     padding: 2rem;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     box-sizing: border-box;
     font-family: 'Helvetica Neue', Arial, sans-serif;
     position: relative;
+    color: #222222;
 }
 
 .modal-content h2 {
     margin-top: 0;
     font-size: 1.5rem;
     font-weight: 600;
-    color: #333;
+    color: #f2f2f2;
 }
 
 .close-button {
@@ -39,10 +40,10 @@
     top: 1rem;
     right: 1rem;
     background: none;
-    border: none;
+    border: #222222;
     font-size: 1.2rem;
     cursor: pointer;
-    color: #999;
+    color: #222222;
     transition: color 0.2s ease;
 }
 
@@ -53,7 +54,7 @@
 label {
     display: inline-block;
     margin-bottom: 0.5rem;
-    color: #444;
+    color: #222222;
     font-size: 0.9rem;
     font-weight: 500;
 }
@@ -69,7 +70,7 @@ select {
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 0.9rem;
-    color: #333;
+    color: #222222;
     width: 100%;
     box-sizing: border-box;
 }
@@ -95,19 +96,19 @@ button {
 
 .save-button,
 .add-marker-button {
-    background: #4bc0c0;
-    color: #fff;
+    background: #222222;
+    color: #f2f2f2;
     margin-top: 1rem;
     margin-right: 0.5rem;
 }
 
 .save-button:hover,
 .add-marker-button:hover {
-    background: #3aa9a9;
+    background: #000000;
 }
 
 .close-button:hover {
-    color: #333;
+    color: #000000;
 }
 
 .modal-content > div > h3 {
@@ -116,7 +117,7 @@ button {
     font-weight: 600;
     border-bottom: 1px solid #eee;
     padding-bottom: 0.5rem;
-    color: #444;
+    color: #f2f2f2;
 }
 
 .modal-content div {
@@ -125,12 +126,12 @@ button {
 
 .modal-content .save-button {
     float: right;
-    background: #4bc0c0;
-    color: #fff;
+    background: #222222;
+    color: #f2f2f2;
 }
 
 .modal-content .save-button:hover {
-    background: #3aa9a9;
+    background: #000000;
 }
 
 .modal-content .close-button {
@@ -154,7 +155,7 @@ button {
     padding: 1rem;
     border-radius: 4px;
     margin-bottom: 1rem;
-    background: #f9f9f9;
+    background: #f2f2f2;
 }
 
 .marker-forms input {
@@ -167,13 +168,13 @@ button {
 }
 
 .marker-forms button {
-    background: #ff6384;
-    color: #fff;
+    background: #222222;
+    color: #f2f2f2;
     margin-top: 0.5rem;
 }
 
 .marker-forms button:hover {
-    background: #e55d78;
+    background: #000000;
 }
 
 @media (max-width: 768px) {

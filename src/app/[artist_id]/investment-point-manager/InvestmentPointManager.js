@@ -378,7 +378,7 @@ const InvestmentPointManager = ({ artist_id }) => {
                                         <button onClick={() => handleDelete(point.id)} className="btn btn-remove">Delete</button>
                                     </div>
                                 </div>
-                                <p className="item-context">{point.context}</p>
+                                <p className="item-context whitespace-pre-wrap">{point.context}</p>
                                 {point.media.map((mediaItem, index) => (
                                     <div key={`${mediaItem.url}-${index}`} className="media-block">
                                         {mediaItem.type === 'image' ? (
@@ -556,14 +556,15 @@ const InvestmentPointManager = ({ artist_id }) => {
                     )}
 
                     {chartConfig && chartConfig.selectedFields && chartConfig.selectedFields.length > 0 && (
+                        <>
+                        <input
+                            type="text"
+                            value={formData.chartTitle}
+                            onChange={(e) => setFormData((prevData) => ({ ...prevData, chartTitle: e.target.value }))}
+                            className="form-control"
+                            placeholder="Chart Title"
+                        />
                         <div className="chart-preview">
-                            <input
-                                type="text"
-                                value={formData.chartTitle}
-                                onChange={(e) => setFormData((prevData) => ({ ...prevData, chartTitle: e.target.value }))}
-                                className="form-control"
-                                placeholder="Chart Title"
-                            />
                             <Line
                                 data={getChartData(chartConfig, sortedData)}
                                 options={getChartOptions({ ...chartConfig, chartTitle: formData.chartTitle })}
@@ -575,6 +576,7 @@ const InvestmentPointManager = ({ artist_id }) => {
                                 Edit Chart
                             </button>
                         </div>
+                        </>
                     )}
 
                     <div className="form-group">
