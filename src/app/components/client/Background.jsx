@@ -20,7 +20,7 @@ export default function Background() {
   });
 
   // 작은 입자 개수
-  const particleCount = 75;
+  const particleCount = 50;
   const [particles] = useState(() => {
     const temp = [];
     for (let i = 0; i < particleCount; i++) {

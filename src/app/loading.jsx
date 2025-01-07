@@ -82,8 +82,6 @@ export default function Loading() {
   }, [mousePos]);
 
   return (
-    <>
-    <Background />
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden">
       {/* 로고 */}
       <Image 
@@ -107,6 +105,5 @@ export default function Loading() {
         {progress}%
       </div>
     </div>
-    </>
   );
 }
