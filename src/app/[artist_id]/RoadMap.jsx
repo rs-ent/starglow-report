@@ -38,27 +38,27 @@ const RoadMap = () => {
 
     const defaultData = [
         {
-          label: "Music/Album Release",
+          label: "Music/Album",
           value: "Full-length and Remake Albums",
           spend: "600,000,000",
         },
         {
-          label: "Concert/Event Planning",
+          label: "Concert/Event",
           value: "Concerts/Tours/Fan Meetings, etc.",
           spend: "550,000,000",
         },
         {
-          label: "Content Planning and Production",
+          label: "Contents",
           value: "YouTube and Other Media Content",
           spend: "142,000,000",
         },
         {
-          label: "Merchandise (MD) Production",
+          label: "Merchandise (MD)",
           value: "Photo Cards, Keychains, etc.",
           spend: "215,000,000",
         },
         {
-          label: "Management Activities",
+          label: "Management",
           value: "Film/TV/External Content, etc.",
           spend: "65,000,000",
         },
@@ -91,54 +91,105 @@ const RoadMap = () => {
         return b.spend - a.spend; // 나머지는 spend 기준으로 내림차순 정렬
     });
 
-    const COLORS = [
-        "#6A23D6", // 어두운 네온 퍼플
-        "#C4A708", // 톤다운 아쿠아 블루
-        "#F02D65", // 깊이감 있는 핑크 네온
-        "#E7D300", // 살짝 어두워진 형광 옐로
-        "#3348BB", // 짙은 코발트 블루
-        "#099971", // 어둡게 처리한 그린/민트
-        "#9E4AAC", // 짙은 보라빛 라일락
+    // 그라데이션 색상쌍 예시 (from -> to)
+    const GRADIENT_COLORS = [
+        {
+          from: 'rgba(106, 35, 214, 0.4)',
+          to: 'rgba(187, 134, 252, 0.9)',
+        },
+        {
+          from: 'rgba(9, 153, 113, 0.4)',
+          to: 'rgba(0, 255, 198, 0.9)',
+        },
+        {
+          from: 'rgba(240, 45, 101, 0.4)',
+          to: 'rgba(255, 109, 175, 0.9)',
+        },
+        {
+          from: 'rgba(51, 72, 187, 0.4)',
+          to: 'rgba(111, 134, 232, 0.9)',
+        },
+        {
+          from: 'rgba(158, 74, 172, 0.4)',
+          to: 'rgba(200, 119, 219, 0.9)',
+        },
+        {
+          from: 'rgba(196, 167, 8, 0.4)',
+          to: 'rgba(241, 215, 109, 0.9)',
+        },
+        {
+          from: 'rgba(231, 211, 0, 0.4)',
+          to: 'rgba(255, 245, 48, 0.9)',
+        },
     ];
-    const InvestmentPieChart = ({ data }) => {
+    
+    // PieChart 컴포넌트
+    function InvestmentPieChart({ data = sampleData }) {
         return (
-            <ResponsiveContainer width="100%" height={270}>
-                <PieChart>
-                    <defs>
-                        <filter id="neonShadow" x="-50%" y="-50%" width="200%" height="200%">
-                        <feDropShadow
-                            dx="0" dy="0" stdDeviation="5"
-                            floodColor="#fff" floodOpacity="0.35" 
-                        />
-                        </filter>
-                    </defs>
-                    <Pie
-                        data={data}
-                        dataKey="spend"
-                        nameKey="label"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={100}
-                        fill="#8884d8"
-                        fontSize={9}
-                        label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                        startAngle={90} // 시작 각도를 90도로 설정
-                        endAngle={-270}
-                        stroke="rgba(255,255,255,0.4)"
-                        strokeWidth={0}
+        <ResponsiveContainer width="100%" height={280}>
+            <PieChart>
+            <defs>
+                {/* 네온 쉐도우 필터 (원하시면 유지) */}
+                <filter id="neonShadow" x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow
+                    dx="0"
+                    dy="0"
+                    stdDeviation="5"
+                    floodColor="rgb(150,100,255)"
+                    floodOpacity="0.25"
+                />
+                </filter>
+    
+                {/* 각 파이 조각에 쓰일 그라데이션 정의 */}
+                {data.map((entry, index) => {
+                const gradientId = `gradientColor-${index}`;
+                const colorPair = GRADIENT_COLORS[index % GRADIENT_COLORS.length];
+                return (
+                    <linearGradient
+                    key={gradientId}
+                    id={gradientId}
+                    x1="0%"
+                    y1="0%"
+                    x2="100%"
+                    y2="100%"
                     >
-                        {data.map((entry, index) => (
-                            <Cell 
-                                key={`cell-${index}`}
-                                fill={COLORS[index % COLORS.length]}
-                                opacity={0.7}
-                            />
-                        ))}
-                    </Pie>
-                </PieChart>
-            </ResponsiveContainer>
+                    <stop offset="0%" stopColor={colorPair.from} />
+                    <stop offset="100%" stopColor={colorPair.to} />
+                    </linearGradient>
+                );
+                })}
+            </defs>
+    
+            <Pie
+                data={data}
+                dataKey="spend"
+                nameKey="label"
+                cx="50%"
+                cy="50%"
+                outerRadius={90}
+                fontSize={9}
+                label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                startAngle={90}   // 시작 각도
+                endAngle={-270}  // 시계 방향으로 360도
+                stroke="rgba(255,255,255,0.2)"
+                strokeWidth={0}
+                filter="url(#neonShadow)"
+            >
+                {data.map((entry, index) => {
+                const gradientId = `gradientColor-${index}`;
+                return (
+                    <Cell
+                        key={`cell-${index}`}
+                        fill={`url(#${gradientId})`}
+                        opacity={0.9}
+                    />
+                );
+                })}
+            </Pie>
+            </PieChart>
+        </ResponsiveContainer>
         );
-    };
+    }
 
     // RevenueChart에 사용할 데이터
     const revenueData = [
@@ -163,11 +214,19 @@ const RoadMap = () => {
         return (
             <div>
                 <ResponsiveContainer width="100%" height={200}>
+                    <defs>
+                        <filter id="neonShadow" x="-50%" y="-50%" width="200%" height="200%">
+                            <feDropShadow
+                            dx="0" dy="0" stdDeviation="5"
+                            floodColor="#fff" floodOpacity="0.5"
+                            />
+                        </filter>
+                    </defs>
                     <LineChart
                         data={formattedData}
                         margin={{ top: 20, right: 30, left: -10, bottom: 20 }}
                     >
-                        <CartesianGrid strokeDasharray="4 4" stroke="#333" />
+                        <CartesianGrid strokeDasharray="4 4" stroke="rgba(255,255,255,0.15)" />
                         
                         {/* X축: row.Revenue */}
                         <XAxis
@@ -191,7 +250,7 @@ const RoadMap = () => {
                                 fontSize: 10,
                                 fill: "white",
                             }}
-                            stroke="white"
+                            stroke="rgba(255,255,255,0.7)"
                             strokeDasharray="6 6"
                         />
 
@@ -199,8 +258,9 @@ const RoadMap = () => {
                         <Line
                             type="monotone"
                             dataKey="percentage"
-                            stroke="#9D4EDD"
-                            strokeWidth={1}
+                            stroke="rgba(188,71,251,0.5)"
+                            strokeWidth={2}
+                            filter="url(#neonShadow)"
                         />
                     </LineChart>
                 </ResponsiveContainer>
@@ -245,7 +305,7 @@ const RoadMap = () => {
             </section>
 
             {/* 매출 스펙트럼 및 투자자 수익 표 */}
-            <section className="mt-16 px-6">
+            <section className="mt-20 px-6">
                 <h3 className="text-base text-[var(--primary)] mb-2">Revenue Spectrum & Expected Returns</h3>
                 <PerformanceChart revenueData={revenueData} />
                 <table className="min-w-full border-collapse border border-gray-500 text-center text-xs text-[var(--text-primary)]">
