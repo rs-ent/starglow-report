@@ -39,7 +39,6 @@ const RiskLevel = () => {
         {
             name: 'Risk Level',
             value: percentage,
-            fill: '#6366F1', // 모던한 보라색 계열 색상 사용
         },
     ];
 
@@ -68,54 +67,59 @@ const RiskLevel = () => {
     // 5단계 위험 수준 정의
     const riskLevels = [
         {
-            min: 0,
-            max: 20,
-            borderColor: 'border-blue-500',
-            textColor: 'text-blue-600',
-            bgColor: 'bg-blue-600',
-            icon: <FaCheckCircle className="text-4xl text-[var(--text-reverse)]" />,
-            riskText: '초저위험',
-            description: '수익이 보장됩니다. 안정적인 수익 창출이 예상되며, 시장 변동에 대한 민감도가 낮습니다.',
+          min: 0,
+          max: 20,
+          borderColor: 'border-blue-500',
+          textColor: 'text-blue-600',
+          bgColor: 'bg-blue-600',
+          icon: <FaCheckCircle className="text-4xl text-[var(--text-reverse)]" />,
+          riskText: 'Ultra-Low Risk',
+          description:
+            'Profits are virtually guaranteed. Expected to generate stable returns with minimal sensitivity to market fluctuations.',
         },
         {
-            min: 20,
-            max: 40,
-            borderColor: 'border-green-500',
-            textColor: 'text-green-600',
-            bgColor: 'bg-green-600',
-            icon: <FaCheckCircle className="text-4xl text-[var(--text-reverse)]" />,
-            riskText: '저위험',
-            description: '수익이 어느 정도 보장됩니다. 수익이 꾸준히 발생할 가능성이 높으며, 리스크 요인이 제한적입니다.',
+          min: 20,
+          max: 40,
+          borderColor: 'border-green-500',
+          textColor: 'text-green-600',
+          bgColor: 'bg-green-600',
+          icon: <FaCheckCircle className="text-4xl text-[var(--text-reverse)]" />,
+          riskText: 'Low',
+          description:
+            'Profits are somewhat secured. Likely to produce steady returns, with limited risk factors.',
         },
         {
-            min: 40,
-            max: 60,
-            borderColor: 'border-yellow-500',
-            textColor: 'text-yellow-600',
-            bgColor: 'bg-yellow-600',
-            icon: <FaExclamationTriangle className="text-4xl text-[var(--text-reverse)]" />,
-            riskText: '중위험',
-            description: '수용적인 자세가 요구됩니다. 시장 상황과 내부 요인에 따라 수익 변동성이 존재합니다.',
+          min: 40,
+          max: 60,
+          borderColor: 'border-yellow-500',
+          textColor: 'text-yellow-600',
+          bgColor: 'bg-yellow-600',
+          icon: <FaExclamationTriangle className="text-4xl text-[var(--text-reverse)]" />,
+          riskText: 'Moderate',
+          description:
+            'Requires a reasonable acceptance of risk. Returns may fluctuate based on market conditions and internal factors.',
         },
         {
-            min: 60,
-            max: 80,
-            borderColor: 'border-orange-500',
-            textColor: 'text-orange-600',
-            bgColor: 'bg-orange-600',
-            icon: <FaExclamationTriangle className="text-4xl text-[var(--text-reverse)]" />,
-            riskText: '고위험',
-            description: '주의가 필요합니다. 수익 변동성이 크며, 외부 요인에 민감하게 반응할 수 있습니다.',
+          min: 60,
+          max: 80,
+          borderColor: 'border-orange-500',
+          textColor: 'text-orange-600',
+          bgColor: 'bg-orange-600',
+          icon: <FaExclamationTriangle className="text-4xl text-[var(--text-reverse)]" />,
+          riskText: 'High',
+          description:
+            'Caution is advised. Returns can be highly volatile and sensitive to external influences.',
         },
         {
-            min: 80,
-            max: 101,
-            borderColor: 'border-red-500',
-            textColor: 'text-red-600',
-            bgColor: 'bg-red-600',
-            icon: <FaTimesCircle className="text-4xl text-[var(--text-reverse)]" />,
-            riskText: '초고위험',
-            description: '신중한 투자 결정이 필요합니다. 예상치 못한 변동으로 인해 투자 원금 손실 가능성이 높습니다.',
+          min: 80,
+          max: 101,
+          borderColor: 'border-red-500',
+          textColor: 'text-red-600',
+          bgColor: 'bg-red-600',
+          icon: <FaTimesCircle className="text-4xl text-[var(--text-reverse)]" />,
+          riskText: 'Ultra-High',
+          description:
+            'Requires prudent investment decisions. Unforeseen fluctuations may lead to a high potential for principal loss.',
         },
     ];
 
@@ -145,7 +149,7 @@ const RiskLevel = () => {
                         y1={`${cy}%`}
                         x2={`${cx}%`}
                         y2={`${cy - radius}%`}
-                        stroke="#374151" // 중립적인 어두운 색상 사용
+                        stroke="rgba(255,255,255,0.7)" // 중립적인 어두운 색상 사용
                         strokeWidth="2"
                     />
                     <circle cx={`${cx}%`} cy={`${cy}%`} r="2%" fill="#374151" />
@@ -179,8 +183,23 @@ const RiskLevel = () => {
                                         endAngle={0}
                                         data={data}
                                     >
+                                        {/* 그라디언트 */}
+                                        <defs>
+                                            <radialGradient
+                                            id="gradientRiskLevel"
+                                            cx="50%"   // 중심점 X
+                                            cy="50%"   // 중심점 Y
+                                            r="50%"    // 반지름
+                                            fx="50%"   // 초점 X
+                                            fy="50%"   // 초점 Y
+                                            >
+                                            <stop offset="0%" stopColor="rgba(178, 65, 261, 0.8)" />
+                                            <stop offset="100%" stopColor="rgba(178, 65, 251, 0.3)" />
+                                            </radialGradient>
+                                        </defs>
                                         <RadialBar
-                                            background={{ fill: '#F1F1F1' }} // 연한 회색 배경
+                                            background={{ fill: 'rgba(255, 255, 255, 0.15)' }}
+                                            fill="url(#gradientRiskLevel)"
                                             dataKey="value"
                                             cornerRadius={3}
                                             clockWise
@@ -212,13 +231,13 @@ const RiskLevel = () => {
                             {/* 아이콘 */}
                             <div className="mb-1">{currentRiskLevel.icon}</div>
                             {/* 위험 수준 텍스트 */}
-                            <h2 className="text-base font-bold tracking-wide">
+                            <h2 className="text-[0.6rem] font-bold tracking-wide">
                                 {currentRiskLevel.riskText}
                             </h2>
                         </div>
                         {/* 상품 분류 텍스트 */}
                         <p className={`text-sm font-semibold mt-4 text-center text-[var(--text-primary)]`}>
-                            {currentRiskLevel.riskText} 상품
+                            {currentRiskLevel.riskText} Risk
                         </p>
                     </div>
                 </div>
@@ -227,25 +246,29 @@ const RiskLevel = () => {
                     {currentRiskLevel.description}
                 </p>
             </div>
-            {/* 참고 사항 섹션 */}
-            <div className='bg-gray-100 rounded-md p-2 m-3'>
-                <h2 className="text-sm font-semibold text-gray-500 mb-2 flex items-center">
-                    <FaInfoCircle className="text-gray-400 mr-2" />
-                    참고 사항
+            {/* Notes Section */}
+            <div className="bg-[rgba(255,255,255,0.1)] rounded-md p-2 m-3 border border-[var(--border-mid)]">
+                <h2 className="text-sm font-semibold text-[var(--text-primary)] mb-2 flex items-center">
+                    <FaInfoCircle className="text-[var(--text-primary)] mr-2" />
+                    Important Notice
                 </h2>
-                <p className="text-[var(--text-third)] text-[10px]">
-                    본 자료는 투자에 대한 조언이 아니며, 투자 결정은 투자자 본인의 판단에 따라 이루어져야 합니다.
-                    위험도는 시장 상황 및 기타 요인에 따라 변동될 수 있으며, 투자 전 반드시 신중한 검토와 전문가의 조언을 구하시기 바랍니다.
+                <p className="text-[var(--text-secondary)] text-[10px]">
+                    This material is not intended as investment advice, and any investment decision should be made at the investor’s own discretion.
+                    Risk levels may vary depending on market conditions and other factors; please conduct thorough research and seek
+                    professional guidance before investing.
                 </p>
+                </div>
+
+                {/* Additional Buttons */}
+                <div className="flex justify-end mt-2 space-x-2 w-11/12 mx-auto">
+                <button className="text-xs text-[var(--text-third)] underline" onClick={togglePopup}>
+                    Basis for Calculation
+                </button>
             </div>
-            {/* 추가된 버튼 */}
-            <div className="flex justify-end mt-2 space-x-2 w-11/12 mx-auto">
-                <button className="text-xs text-[var(--text-third)] underline" onClick={togglePopup}>산정 기준</button>
-                <button className="text-xs text-[var(--text-third)] underline">투자 위험 안내</button>
-            </div>
-            {/* 팝업 */}
+
+            {/* Popup */}
             {isPopupOpen && (
-                <CriteriaPopup isOpen={isPopupOpen} onClose={togglePopup} />
+            <CriteriaPopup isOpen={isPopupOpen} onClose={togglePopup} />
             )}
         </div>
     );

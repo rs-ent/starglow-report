@@ -125,14 +125,13 @@ const RoadMap = () => {
                         startAngle={90} // 시작 각도를 90도로 설정
                         endAngle={-270}
                         stroke="rgba(255,255,255,0.4)"
-                        strokeWidth={2}
+                        strokeWidth={0}
                     >
                         {data.map((entry, index) => (
                             <Cell 
                                 key={`cell-${index}`}
                                 fill={COLORS[index % COLORS.length]}
                                 opacity={0.7}
-                                style={{ filter: 'url(#neonShadow)'}}
                             />
                         ))}
                     </Pie>
@@ -221,7 +220,7 @@ const RoadMap = () => {
             <section className="px-6">
                 <table className="min-w-full border-collapse border border-gray-500 text-center text-xs text-[var(--text-primary)]">
                     <thead>
-                        <tr className="bg-gray-800">
+                        <tr className="bg-[rgba(255,255,255,0.2)]">
                             <th className="py-2 px-4 border border-gray-500 font-bold">Category</th>
                             <th className="py-2 px-4 border border-gray-500 font-bold">Details</th>
                             <th className="py-2 px-4 border border-gray-500 font-bold">Share</th>
@@ -230,7 +229,7 @@ const RoadMap = () => {
                     <tbody>
                         {data.map((row, index) => (
                             <tr key={index}>
-                                <td className="py-2 px-4 border border-gray-500 font-medium bg-gray-900">
+                                <td className="py-2 px-4 border border-gray-500 font-medium bg-[rgba(255,255,255,0.1)]">
                                     {row.label}
                                 </td>
                                 <td className="py-2 px-4 border border-gray-500">
@@ -251,7 +250,7 @@ const RoadMap = () => {
                 <PerformanceChart revenueData={revenueData} />
                 <table className="min-w-full border-collapse border border-gray-500 text-center text-xs text-[var(--text-primary)]">
                     <thead>
-                        <tr className="bg-gray-800">
+                        <tr className="bg-[rgba(255,255,255,0.2)]">
                             <th className="py-2 px-4 border border-gray-500 font-bold" style={{ width: '18%' }}>
                                 Revenue Category
                             </th>
@@ -273,7 +272,7 @@ const RoadMap = () => {
                             <tr
                                 key={index}
                             >
-                                <td className="py-2 px-4 border border-gray-500 font-medium bg-gray-900">
+                                <td className="py-2 px-4 border border-gray-500 font-medium bg-[rgba(255,255,255,0.1)]">
                                     {row.name}
                                 </td>
                                 <td className="py-2 px-4 border border-gray-500">

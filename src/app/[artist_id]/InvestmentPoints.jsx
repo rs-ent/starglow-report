@@ -27,7 +27,7 @@ const InvestmentPoints = ({type = "Investment Point"}) => { // async 제거
                     {investmentData.map((item, index) => (
                         <div
                             key={index}
-                            className="rounded-lg overflow-hidden bg-transparent shadow-md border border-[var(--border-mid)]"
+                            className="rounded-lg overflow-hidden bg-[rgba(255,255,255,0.05)] shadow-md border border-[var(--border-mid)]"
                         >
                             {/* 제목 라벨 */}
                             <button

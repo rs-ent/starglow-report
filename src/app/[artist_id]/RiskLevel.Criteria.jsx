@@ -15,40 +15,43 @@ import {
     FaInfoCircle,
 } from 'react-icons/fa';
 
+import 'katex/dist/katex.min.css';
+import { BlockMath } from 'react-katex';
+
 const CriteriaPage = ({ onClose }) => {
     const riskLevel = {
         percentage: 40,
-        text: '중위험',
-        description: '리스크 수용 자세가 필요합니다.',
-        color: '#FBBF24', // Tailwind CSS의 yellow-500
-        icon: <FaExclamationTriangle className="text-yellow-500 text-4xl" />,
+        text: 'Moderate Risk',
+        description: 'Requires an acceptance of potential risk.',
+        color: '#FBBF24', // Tailwind CSS yellow-500
+        icon: <FaExclamationTriangle className="text-yellow-500 text-sm" />,
     };
 
     const evaluationFactors = [
         {
-            factor: '과거 활동',
+            factor: 'Past Activities',
             description:
-                '소속사가 제공한 과거 활동 데이터를 기반으로 아티스트의 성과 및 성장 추이를 심층 분석하여, 향후 수익 창출 능력을 평가합니다.'
+                'Using historical data provided by the agency, we conduct an in-depth analysis of the artist’s performance and growth trends to assess their revenue-generating potential.',
         },
         {
-            factor: '시장 동향',
+            factor: 'Market Trends',
             description:
-                '해당 아티스트의 시장 내 위치와 성장 가능성을 분석하여, 향후 수익 창출 능력을 평가합니다.',
+                'We evaluate the artist’s position and growth prospects within the industry to estimate future revenue possibilities.',
         },
         {
-            factor: '활동 지표',
+            factor: 'Activity Indicators',
             description:
-                '최근 활동 빈도와 팬들과의 소통 수준을 고려하여, 아티스트의 현재 인기와 지속 가능성을 평가합니다.',
+                'We take into account the frequency of recent activities and fan interactions to gauge the artist’s current popularity and sustainability.',
         },
         {
-            factor: '팬덤 규모',
+            factor: 'Fan Base Size',
             description:
-                '팬카페 회원 수, SNS 팔로워 수 등 팬덤의 크기를 분석하여, 수익의 안정성과 성장 가능성을 예측합니다.',
+                'We analyze factors such as fan club membership and social media followers to predict revenue stability and growth potential.',
         },
         {
-            factor: '수익 다양성',
+            factor: 'Revenue Diversification',
             description:
-                '음원, 공연, 굿즈 등 다양한 수익원의 존재 여부를 확인하여, 수익 구조의 안정성을 평가합니다.',
+                'We verify the presence of multiple revenue sources—such as music releases, concerts, and merchandise—to assess the stability of the artist’s revenue structure.',
         },
     ];
 
@@ -60,9 +63,10 @@ const CriteriaPage = ({ onClose }) => {
             color: 'bg-blue-500',
             textColor: 'text-blue-600',
             icon: <FaCheckCircle className="text-blue-600 text-xl" />,
-            riskText: '초저위험',
-            description: '위험이 매우 낮은 안정적인 투자입니다.',
-            qualitative: '안정적인 수익 창출이 예상되며, 시장 변동에 대한 민감도가 낮습니다.',
+            riskText: 'Ultra-Low Risk',
+            description: 'An extremely stable investment with minimal risk.',
+            qualitative:
+                'Expected to generate stable returns with very low sensitivity to market fluctuations.',
         },
         {
             min: 20,
@@ -70,9 +74,10 @@ const CriteriaPage = ({ onClose }) => {
             color: 'bg-green-500',
             textColor: 'text-green-600',
             icon: <FaCheckCircle className="text-green-600 text-xl" />,
-            riskText: '저위험',
-            description: '위험이 낮아 비교적 안정적인 투자입니다.',
-            qualitative: '수익이 꾸준히 발생할 가능성이 높으며, 리스크 요인이 제한적입니다.',
+            riskText: 'Low Risk',
+            description: 'A relatively stable investment with low risk.',
+            qualitative:
+                'Likely to produce steady returns with limited risk factors.',
         },
         {
             min: 40,
@@ -80,9 +85,10 @@ const CriteriaPage = ({ onClose }) => {
             color: 'bg-yellow-500',
             textColor: 'text-yellow-600',
             icon: <FaExclamationTriangle className="text-yellow-600 text-xl" />,
-            riskText: '중위험',
-            description: '수익과 손실의 가능성이 모두 있는 투자입니다.',
-            qualitative: '시장 상황과 내부 요인에 따라 수익 변동성이 존재합니다.',
+            riskText: 'Moderate Risk',
+            description: 'An investment with the potential for both profits and losses.',
+            qualitative:
+                'Returns may fluctuate based on market conditions and internal factors.',
         },
         {
             min: 60,
@@ -90,9 +96,10 @@ const CriteriaPage = ({ onClose }) => {
             color: 'bg-orange-500',
             textColor: 'text-orange-600',
             icon: <FaExclamationTriangle className="text-orange-600 text-xl" />,
-            riskText: '고위험',
-            description: '손실 위험이 높아 신중한 접근이 필요합니다.',
-            qualitative: '수익 변동성이 크며, 외부 요인에 민감하게 반응할 수 있습니다.',
+            riskText: 'High Risk',
+            description: 'A high-risk investment requiring careful consideration.',
+            qualitative:
+                'Returns can be highly volatile and may be significantly affected by external factors.',
         },
         {
             min: 80,
@@ -100,9 +107,10 @@ const CriteriaPage = ({ onClose }) => {
             color: 'bg-red-500',
             textColor: 'text-red-600',
             icon: <FaTimesCircle className="text-red-600 text-xl" />,
-            riskText: '초고위험',
-            description: '손실 가능성이 매우 높아 매우 신중한 투자가 필요합니다.',
-            qualitative: '예상치 못한 변동으로 인해 투자 원금 손실 가능성이 높습니다.',
+            riskText: 'Ultra-High Risk',
+            description: 'An extremely high-risk investment demanding great caution.',
+            qualitative:
+                'Unanticipated fluctuations may result in a high likelihood of principal loss.',
         },
     ];
 
@@ -110,204 +118,237 @@ const CriteriaPage = ({ onClose }) => {
         <div className="fixed inset-0 flex items-center justify-center z-50">
             {/* 배경 블러 효과 */}
             <div
-                className="absolute inset-0 bg-black bg-opacity-30 backdrop-blur-sm"
+                className="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-lg"
                 onClick={onClose}
             ></div>
             {/* 팝업 컨테이너 */}
-            <div className="relative bg-white rounded-lg p-4 w-[90%] max-w-[480px] max-h-[90%] overflow-y-auto transition-transform duration-300 ease-in-out transform scale-100">
+            <div className="relative bg-[rgba(8,2,20,0.95)] rounded-lg w-[90%] max-w-[480px] max-h-[88%] overflow-y-scroll transition-transform duration-300 ease-in-out transform scale-100">
                 {/* 닫기 버튼 */}
                 <button
-                    className="absolute top-4 right-4 rounded-lg bg-[var(--primary)] text-[var(--text-reverse)] text-sm px-3 py-1"
+                    className="sticky top-0 w-full bg-[rgba(255,255,255,0.1)] text-[var(--text-secondary)] text-xs px-3 py-1 backdrop-blur-lg"
                     onClick={onClose}
                     aria-label="팝업 닫기"
+                    style={{
+                        fontFamily : 'Conthrax'
+                    }}
                 >
-                    닫기
+                    Close
                 </button>
-
-                {/* 헤더 섹션 */}
-                <header className="mb-6">
-                    <h1 className="text-xl font-bold mb-2 flex items-center">
-                        <FaInfoCircle className="text-blue-500 mr-2" />
-                        위험도 산정 기준
-                    </h1>
-                    <p className="text-gray-700 text-xs">
-                        당사는 전문적인 데이터 분석을 통해 투자 위험도를 제공합니다.
-                    </p>
-                </header>
-
-                {/* 투자 위험도 섹션 */}
-                <section className="mb-6 bg-[var(--background-brushed)] rounded-md p-2.5">
-                    <h2 className="text-lg font-semibold mb-2 flex items-center">
-                        <FaExclamationTriangle className="text-red-500 mr-2" />
-                        투자 위험도
-                    </h2>
-                    <p className="text-gray-700 text-xs mb-2">
-                        투자 위험도는 펀딩 후 예상되는 추정 수익과 목표 모집 금액 간의 관계를 기반으로 산정됩니다.
-                        이는 투자자가 목표한 수익을 달성할 가능성을 평가하는 지표로 활용됩니다.
-                    </p>
-                    <div className="bg-gray-200 p-2 rounded-sm mb-2">
-                        <p className="font-mono text-xs">
-                            위험도 = |목표 금액 - 최소 예상 매출| ÷ 목표 금액 + 가중치
+                
+                <div className='p-4'>
+                    {/* 헤더 섹션 */}
+                    <header className="mt-6 mb-6">
+                        <h1 className="text-lg font-bold mb-2 flex items-center">
+                            <FaInfoCircle className="text-[var(--primary)] mr-2" />
+                            Risk Assessment Criteria
+                        </h1>
+                        <p className="text-[var(--text-third)] text-xs">
+                            We provide investment risk assessments based on professional data analysis.
                         </p>
-                    </div>
-                    <p className="text-gray-700 text-xs mb-2">
-                        위 공식에서,
-                    </p>
-                    <ul className="list-disc list-inside mb-2 text-xs">
-                        <li>
-                            <strong>최소 예상 매출</strong>: 소속사가 제공한 데이터를 통해 추정한 최소 수익입니다.
-                        </li>
-                        <li>
-                            <strong>목표 금액(손익분기점)</strong>: 펀딩을 통해 조달할 자금이자 투자 수익의 최소 목표치입니다.
-                        </li>
-                    </ul>
-                    <p className="text-gray-700 text-xs">
-                        이 공식은 최소 예상 수익이 목표 금액과 얼마나 차이가 있는지를 백분율로 나타냅니다.
-                        위험도 값이 높을수록 목표 수익 달성에 어려움이 있을 수 있음을 의미합니다.
-                    </p>
-                    <p className="text-gray-700 text-xs">
-                        이 공식은 투자 리스크를 직관적으로 파악할 수 있도록 설계되었습니다.
-                        그러나 단순한 수치 비교로는 반영되지 않는 다양한 요인들이 존재하므로,
-                        당사의 고유한 평가 모델을 통해 추가적인 조정을 거쳐 최종적인 위험 등급을 산출합니다.
-                        이러한 조정은 시장 상황, 아티스트의 잠재력, 팬덤의 참여도 등 정성적 요소를 포함합니다.
-                    </p>
-                    <div className="flex items-center mt-4">
-                        <div style={{ width: 100, height: 100 }}>
-                            <ResponsiveContainer>
-                                <RadialBarChart
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius="80%"
-                                    outerRadius="100%"
-                                    startAngle={180}
-                                    endAngle={0}
-                                    barSize={10}
-                                    data={[
-                                        { name: 'Risk Level', value: riskLevel.percentage },
-                                    ]}
-                                >
-                                    <RadialBar
-                                        minAngle={15}
-                                        background
-                                        clockWise
-                                        dataKey="value"
-                                        fill={riskLevel.color}
-                                    />
-                                    <PolarAngleAxis
-                                        type="number"
-                                        domain={[0, 100]}
-                                        tick={false}
-                                        axisLine={false}
-                                    />
-                                </RadialBarChart>
-                            </ResponsiveContainer>
+                    </header>
+
+                    {/* 투자 위험도 섹션 */}
+                    <section className="mb-6 bg-[var(--background-brushed)] rounded-md p-2.5">
+                        <h2 className="text-base font-semibold mb-2 flex items-center">
+                            <FaExclamationTriangle className="text-red-500 mr-2" />
+                            Investment Risk
+                        </h2>
+                        <p className="text-[var(--text-secondary)] text-xs mb-2">
+                            Our calculation of investment risk is based on the relationship 
+                            between estimated revenue after funding and the target fundraising amount. 
+                            This serves as an indicator for the likelihood of achieving 
+                            the investor’s desired returns.
+                        </p>
+                        <div 
+                            className="bg-[rgba(255,255,255,0.2)] p-1 rounded-sm my-4 mx-2"
+                            style={{ overflowX: "auto" }}
+                        >
+                            <div style={{ 
+                                    transform: "scale(0.6)", 
+                                    transformOrigin: "left",
+                                }}>
+                            <BlockMath>
+                                {'\\text{Risk} = \\frac{\\left| \\text{Target Amount} - \\text{Minimum Estimated Revenue} \\right|}{\\text{Target Amount}} + \\text{Volatility Index}'}
+                            </BlockMath>
+                            </div>
                         </div>
-                        <div className="ml-4">
-                            {riskLevel.icon}
-                            <h3 className="text-base font-bold mt-1">{riskLevel.text}</h3>
-                            <p className="text-gray-700 text-xs mt-1">{riskLevel.description}</p>
+                        <h4 className="text-[var(--text-secondary)] text-xs mt-4 mb-2">
+                            In this formula:
+                        </h4>
+                        <ul className="list-disc list-inside mb-4 text-xs text-[var(--text-secondary)]">
+                            <li>
+                                <strong>Minimum Estimated Revenue</strong>: The lowest projected revenue, estimated using data from the agency.
+                            </li>
+                            <li>
+                                <strong>Target Amount (Break-Even Point)</strong>: The minimum financial goal to be raised through funding, representing the baseline for potential returns.
+                            </li>
+                        </ul>
+                        <p className="text-[var(--text-secondary)] text-xs mb-3">
+                            Essentially, this formula calculates the percentage difference between 
+                            the minimum estimated revenue and the target amount. 
+                            A higher risk value indicates greater difficulty in meeting the target returns.
+                        </p>
+                        <p className="text-[var(--text-secondary)] text-xs">
+                            While this formula offers an intuitive measure of investment risk, there are various 
+                            qualitative factors that simple numerical comparisons can’t capture. 
+                            Therefore, we use our unique evaluation model to apply additional adjustments 
+                            before determining the final risk rating. These adjustments include market conditions, 
+                            the artist’s potential, fan engagement levels, and other qualitative elements.
+                        </p>
+                        <div className="flex items-start mt-8 justify-start">
+                            <div style={{ width: 90, height: 70 }}>
+                                <ResponsiveContainer>
+                                    <RadialBarChart
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius="70%"
+                                        outerRadius="100%"
+                                        startAngle={180}
+                                        endAngle={0}
+                                        barSize={10}
+                                        data={[
+                                            { name: 'Risk Level', value: riskLevel.percentage },
+                                        ]}
+                                    >
+                                        <RadialBar
+                                            minAngle={15}
+                                            background
+                                            clockWise
+                                            dataKey="value"
+                                            fill={riskLevel.color}
+                                        />
+                                        <PolarAngleAxis
+                                            type="number"
+                                            domain={[0, 100]}
+                                            tick={false}
+                                            axisLine={false}
+                                        />
+                                    </RadialBarChart>
+                                </ResponsiveContainer>
+                            </div>
+                            <div className="ml-4 mt-1">
+                                <div className='flex'>
+                                <div className="mr-1 mt-1">{riskLevel.icon}</div>
+                                <h3 className="text-xs font-bold mt-1">{riskLevel.text}</h3>
+                                </div>
+                                <p className="text-[0.6rem] mt-0.5">{riskLevel.description}</p>
+                            </div>
                         </div>
-                    </div>
-                    <p className="text-gray-700 text-xs mt-2">
-                        현재 위험 수준은 위와 같으며, 이는 투자 결정 시 중요한 참고 자료로 활용될 수 있습니다.
-                    </p>
-                </section>
+                        <p className="text-[var(--text-secondary)] text-xs mt-2">
+                            The current risk level is as shown above. It can serve as a key reference 
+                            when making investment decisions.
+                        </p>
+                    </section>
 
-                {/* 평가 기준 섹션 */}
-                <section className="mb-6 bg-[var(--background-brushed)] rounded-md p-2.5">
-                    <h2 className="text-lg font-semibold mb-2 flex items-center">
-                        <FaBuilding className="text-indigo-500 mr-2" />
-                        평가 기준
-                    </h2>
-                    <p className="text-gray-700 text-xs mb-2">
-                        당사는 다양한 핵심 지표들을 활용하여 종합적인 평가를 수행합니다.
-                        아래는 주요 평가 요소와 그 설명입니다:
-                    </p>
-                    <table className="min-w-full bg-white text-xs">
-                        <thead>
-                            <tr>
-                                <th className="py-1 px-2 bg-gray-100 text-left text-gray-600 font-bold uppercase">
-                                    평가 요소
-                                </th>
-                                <th className="py-1 px-2 bg-gray-100 text-left text-gray-600 font-bold uppercase">
-                                    상세 설명
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {evaluationFactors.map((factor, index) => (
-                                <tr key={index} className="border-b">
-                                    <td className="py-1 px-2">{factor.factor}</td>
-                                    <td className="py-1 px-2">{factor.description}</td>
+                    {/* 평가 기준 섹션 */}
+                    <section className="mb-6 bg-[var(--background-brushed)] rounded-md p-2.5">
+                        <h2 className="text-base font-semibold mb-2 flex items-center">
+                            <FaBuilding className="text-indigo-500 mr-2" />
+                            Evaluation Criteria
+                        </h2>
+                        <p className="text-[var(--text-secondary)] text-xs mb-2">
+                            We conduct comprehensive assessments by leveraging various key indicators. 
+                            Below are the main evaluation factors and their descriptions:
+                        </p>
+                        <table className="min-w-full bg-[rgba(255,255,255,0.1)] text-xs my-6">
+                            <thead>
+                                <tr>
+                                    <th className="py-1 px-2 bg-[rgba(255,255,255,0.2)] text-left text-[var(--text-primary)] font-bold uppercase">
+                                        Factor
+                                    </th>
+                                    <th className="py-1 px-2 bg-[rgba(255,255,255,0.2)] text-left text-[var(--text-primary)] font-bold uppercase">
+                                        Description
+                                    </th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    <p className="text-gray-700 text-xs mt-2">
-                        이러한 평가 요소들은 정량적 데이터와 정성적 분석을 결합하여 투자 위험도를 보다 정확하게 산정하는 데 활용됩니다.
-                        각 요소는 투자 수익에 직간접적으로 영향을 미치며, 종합적인 판단을 위해 필수적으로 고려됩니다.
-                    </p>
-                </section>
+                            </thead>
+                            <tbody>
+                                {evaluationFactors.map((factor, index) => (
+                                    <tr key={index} className="border-b border-b-[rgba(255,255,255,0.25)]">
+                                        <td className="py-1 px-2">{factor.factor}</td>
+                                        <td className="py-1 px-2 text-[0.6rem]">{factor.description}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        <p className="text-[var(--text-secondary)] text-xs mt-2">
+                            We combine quantitative data and qualitative analysis for a more accurate 
+                            determination of the investment risk level. Each factor directly or indirectly 
+                            affects potential returns, and all are considered crucial to forming a well-rounded judgment.
+                        </p>
+                    </section>
 
-                {/* 위험 등급 표 섹션 */}
-                <section className="mb-6 bg-[var(--background-brushed)] rounded-md p-2.5">
-                    <h2 className="text-lg font-semibold mb-2 flex items-center">
-                        <FaInfoCircle className="text-blue-500 mr-2" />
-                        위험 등급 상세 설명
-                    </h2>
-                    <p className="text-gray-700 text-xs mb-2">
-                        아래 표는 각 위험 등급에 대한 상세한 설명과 산정 기준을 모호하게 정성적으로 나타냅니다.
-                        이를 통해 투자자는 각 등급이 의미하는 바를 직관적으로 이해할 수 있습니다.
-                    </p>
-                    <table className="min-w-full bg-white text-xs">
-                        <thead>
-                            <tr>
-                                <th className="py-1 px-2 bg-gray-100 text-left text-gray-600 font-bold"
-                                    style={{ width: '25%' }}>
-                                    등급
-                                </th>
-                                <th className="py-1 px-2 bg-gray-100 text-left text-gray-600 font-bold"
-                                    style={{ width: '20%' }}>
-                                    위험도 (%)
-                                </th>
-                                <th className="py-1 px-2 bg-gray-100 text-left text-gray-600 font-bold">
-                                    설명
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {riskLevels.map((level, index) => (
-                                <tr key={index} className="border-b justify-center items-center">
-                                    <td className="py-2 px-2 flex align-middle">
-                                        <div
-                                            className={`w-4 h-4 mr-2 rounded-full ${level.color}`}
-                                        ></div>
-                                        <span className={`${level.textColor} font-semibold`}>
-                                            {level.riskText}
-                                        </span>
-                                    </td>
-                                    <td className="py-2 px-2">
-                                        {level.min}-{level.max}%
-                                    </td>
-                                    <td className="py-2 px-2">{level.qualitative}</td>
+                    {/* 위험 등급 표 섹션 */}
+                    <section className="mb-6 bg-[var(--background-brushed)] rounded-md p-2.5">
+                        <h2 className="text-base font-semibold mb-2 flex items-center">
+                            <FaInfoCircle className="text-blue-500 mr-2" />
+                            Detailed Risk Levels
+                        </h2>
+                        <p className="text-[var(--text-secondary)] text-xs mb-2">
+                            The table below provides detailed descriptions of each risk level and 
+                            qualitative criteria. Through this, investors can intuitively understand 
+                            the implications of each level.
+                        </p>
+                        <table className="min-w-full bg-[rgba(255,255,255,0.1)] text-xs my-6">
+                            <thead>
+                                <tr>
+                                    <th
+                                        className="py-1 px-2 bg-[rgba(255,255,255,0.2)] text-left text-[var(--text-primary)] font-bold uppercase"
+                                        style={{ width: '30%' }}
+                                    >
+                                        Level
+                                    </th>
+                                    <th
+                                        className="py-1 px-2 bg-[rgba(255,255,255,0.2)] text-left text-[var(--text-primary)] font-bold uppercase"
+                                        style={{ width: '20%' }}
+                                    >
+                                        Risk (%)
+                                    </th>
+                                    <th className="py-1 px-2 bg-[rgba(255,255,255,0.2)] text-left text-[var(--text-primary)] font-bold uppercase">
+                                        Description
+                                    </th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </section>
+                            </thead>
+                            <tbody>
+                                {riskLevels.map((level, index) => (
+                                    <tr key={index} className="border-b border-b-[rgba(255,255,255,0.25)] justify-center items-center">
+                                        <td className="py-2 px-2 items-center">
+                                            <div className='flex'>
+                                                <div
+                                                    className={`w-4 h-4 mr-1 rounded-full ${level.color}`}
+                                                ></div>
+                                                <span className={`${level.textColor} font-semibold text-[0.7rem]`}>
+                                                    {level.riskText.replace(' Risk', '')}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className="py-2 px-2 text-[0.7rem]">
+                                            {level.min}-{level.max}%
+                                        </td>
+                                        <td className="py-2 px-2 text-[0.6rem]">{level.qualitative}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </section>
 
-                {/* 참고 사항 섹션 */}
-                <section className='bg-[var(--background-brushed)] rounded-md p-2.5'>
-                    <h2 className="text-lg font-semibold mb-2 flex items-center">
-                        <FaInfoCircle className="text-gray-500 mr-2" />
-                        참고 사항
-                    </h2>
-                    <p className="text-gray-700 text-xs">
-                        본 자료는 투자에 대한 조언이 아니며, 투자 결정은 투자자 본인의 판단에 따라 이루어져야 합니다.
-                        추정 수익과 위험도는 시장 상황 및 기타 요인에 따라 변동될 수 있으며,
-                        당사는 이에 대한 책임을 지지 않습니다. 투자 전 반드시 신중한 검토와 전문가의 조언을 구하시기 바랍니다.
-                    </p>
-                </section>
+                    {/* 참고 사항 섹션 */}
+                    <section className="bg-[var(--background-brushed)] rounded-md p-2.5">
+                        <h2 className="text-base font-semibold mb-2 flex items-center">
+                            <FaInfoCircle className="text-gray-500 mr-2" />
+                            Important Notice
+                        </h2>
+                        <p className="text-[var(--text-secondary)] text-xs mb-2">
+                            This material is not intended as investment advice; 
+                            any investment decision should be made at the sole discretion of the investor. 
+                        </p>
+
+                        <p className="text-[var(--text-secondary)] text-xs mb-2">
+                            Estimated returns and risk levels may vary according to market conditions 
+                            and other factors, and we bear no responsibility for these variations. 
+                            Please conduct thorough research and consult with professionals before investing.
+                        </p>
+                    </section>
+                </div>
             </div>
         </div>
     );

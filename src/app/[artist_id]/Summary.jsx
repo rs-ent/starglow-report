@@ -73,7 +73,7 @@ const Summary = () => {
                             <tbody>
                                 {data.map((row, index) => (
                                     <tr key={index}>
-                                        <td className={index === data.length - 1 ? "text-xs py-2 px-4 bg-gray-900" : "text-xs py-2 px-4 border-b border-b-[var(--background-muted)] bg-gray-900"}>
+                                        <td className={index === data.length - 1 ? "text-xs py-2 px-4 bg-[rgba(255,255,255,0.1)]" : "text-xs py-2 px-4 border-b border-b-[var(--background-muted)] bg-[rgba(255,255,255,0.1)]"}>
                                             {row.label}
                                         </td>
                                         <td className={index === data.length - 1 ? "text-xs py-2 px-4" : "text-xs py-2 px-4 border-b border-b-[var(--background-muted)]"}>

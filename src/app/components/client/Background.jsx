@@ -95,7 +95,7 @@ function FloatingLight() {
         x: initialX,
         y: initialY,
         scale: initialScale,
-        opacity: 0.5,
+        opacity: 0.8,
       }}
       animate={controls}
     />
@@ -153,7 +153,7 @@ function FloatingParticle() {
         x: initialX,
         y: initialY,
         scale: initialScale,
-        opacity: 0.5,
+        opacity: 0.8,
       }}
       animate={controls}
     />
