@@ -10,7 +10,7 @@ function randomRange(min, max) {
 
 export default function Background() {
   // 큰 빛 개수
-  const lightCount = 3;
+  const lightCount = 4;
   const [lights] = useState(() => {
     const temp = [];
     for (let i = 0; i < lightCount; i++) {
@@ -20,7 +20,7 @@ export default function Background() {
   });
 
   // 작은 입자 개수
-  const particleCount = 125;
+  const particleCount = 150;
   const [particles] = useState(() => {
     const temp = [];
     for (let i = 0; i < particleCount; i++) {
@@ -55,7 +55,7 @@ function FloatingLight() {
     async function moveOneCycle() {
       const nextX = `${randomRange(-10, 110)}vw`;
       const nextY = `${randomRange(-10, 110)}vh`;
-      const nextScale = randomRange(0.5, 2);
+      const nextScale = randomRange(0.4, 2.5);
       const nextOpacity = randomRange(0.4, 1.0);
       const duration = randomRange(25, 60);
 
@@ -115,7 +115,7 @@ function FloatingParticle() {
       const nextX = `${randomRange(-10, 110)}vw`;
       const nextY = `${randomRange(-10, 110)}vh`;
       const nextScale = randomRange(0.1, 0.2);
-      const nextOpacity = randomRange(0.2, 0.9);
+      const nextOpacity = randomRange(0.1, 1.0);
       const duration = randomRange(50, 70);
 
       await controls.start({
@@ -147,13 +147,13 @@ function FloatingParticle() {
       style={{
         width: "1.2vw",
         height: "1.2vw",
-        background: "rgba(255, 255, 255, 0.6)",
+        background: "rgba(255, 255, 255, 0.55)",
       }}
       initial={{
         x: initialX,
         y: initialY,
         scale: initialScale,
-        opacity: 0.8,
+        opacity: 0.6,
       }}
       animate={controls}
     />

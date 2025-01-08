@@ -23,7 +23,7 @@ const HistoryModal = ({ onClose, contents }) => {
         // scrollTop: 스크롤 컨테이너의 스크롤 양
         const scrollTop = scrollContainerRef.current.scrollTop;
         // 배경이 “조금만” 움직이도록 0.3 같은 배수를 곱함
-        parallaxRef.current.style.backgroundPositionY = `-${scrollTop * 0.3}px`;
+        parallaxRef.current.style.backgroundPositionY = `-${scrollTop * 0.2}px`;
         }
     };
 
@@ -46,8 +46,7 @@ const HistoryModal = ({ onClose, contents }) => {
                         backgroundImage: `url(${randomImage})`,
                         backgroundColor: "rgba(0, 0, 0, 0.1)",
                         backgroundBlendMode: "multiply",
-                        // 초기 Y 위치 0 (가운데 정렬)
-                        backgroundPosition: "top 0",
+                        backgroundPosition: "center 0",
                     }}
                 />
 
