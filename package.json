@@ -56,7 +56,7 @@
     "ml-random-forest": "^2.1.0",
     "ml.js": "^0.0.1",
     "mui": "^0.0.1",
-    "next": "15.0.3",
+    "next": "^15.1.4",
     "next-auth": "^4.24.10",
     "openai": "^4.73.0",
     "opentype.js": "^1.3.4",

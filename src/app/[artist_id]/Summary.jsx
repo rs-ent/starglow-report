@@ -36,7 +36,7 @@ const Summary = () => {
                         NFT Price
                     </h4>
                     <p className="text-xs font-semibold text-right">
-                        ₩{nft_price.toLocaleString()}
+                        $ {nft_price.toLocaleString()}
                     </p>
                 </div>
 

@@ -1,4 +1,3 @@
-// src/app/components/server/DefaultLayout.js
 import React from 'react';
 import Background from '../client/Background';
 

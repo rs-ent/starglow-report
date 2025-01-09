@@ -128,64 +128,47 @@ const RoadMap = () => {
         return (
         <ResponsiveContainer width="100%" height={280}>
             <PieChart>
-            <defs>
-                {/* 네온 쉐도우 필터 (원하시면 유지) */}
-                <filter id="neonShadow" x="-50%" y="-50%" width="200%" height="200%">
-                <feDropShadow
-                    dx="0"
-                    dy="0"
-                    stdDeviation="5"
-                    floodColor="rgb(150,100,255)"
-                    floodOpacity="0.25"
-                />
-                </filter>
-    
-                {/* 각 파이 조각에 쓰일 그라데이션 정의 */}
-                {data.map((entry, index) => {
-                const gradientId = `gradientColor-${index}`;
-                const colorPair = GRADIENT_COLORS[index % GRADIENT_COLORS.length];
-                return (
+                <defs>
+                    {data.map((entry, index) => (
                     <linearGradient
-                    key={gradientId}
-                    id={gradientId}
-                    x1="0%"
-                    y1="0%"
-                    x2="100%"
-                    y2="100%"
+                        key={index}
+                        id={`gradientColor-${index}`}
+                        x1="0%"
+                        y1="0%"
+                        x2="100%"
+                        y2="100%"
                     >
-                    <stop offset="0%" stopColor={colorPair.from} />
-                    <stop offset="100%" stopColor={colorPair.to} />
+                        <stop offset="0%" stopColor={GRADIENT_COLORS[index].from} />
+                        <stop offset="100%" stopColor={GRADIENT_COLORS[index].to} />
                     </linearGradient>
-                );
-                })}
-            </defs>
+                    ))}
+                </defs>
     
-            <Pie
-                data={data}
-                dataKey="spend"
-                nameKey="label"
-                cx="50%"
-                cy="50%"
-                outerRadius={90}
-                fontSize={9}
-                label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                startAngle={90}   // 시작 각도
-                endAngle={-270}  // 시계 방향으로 360도
-                stroke="rgba(255,255,255,0.2)"
-                strokeWidth={0}
-                filter="url(#neonShadow)"
-            >
-                {data.map((entry, index) => {
-                const gradientId = `gradientColor-${index}`;
-                return (
-                    <Cell
-                        key={`cell-${index}`}
-                        fill={`url(#${gradientId})`}
-                        opacity={0.9}
-                    />
-                );
-                })}
-            </Pie>
+                <Pie
+                    data={data}
+                    dataKey="spend"
+                    nameKey="label"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={90}
+                    fontSize={9}
+                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                    startAngle={90}   // 시작 각도
+                    endAngle={-270}  // 시계 방향으로 360도
+                    stroke="rgba(255,255,255,0.2)"
+                    strokeWidth={0}
+                >
+                    {data.map((entry, index) => {
+                    const gradientId = `gradientColor-${index}`;
+                    return (
+                        <Cell
+                            key={`cell-${index}`}
+                            fill={`url(#${gradientId})`}
+                            opacity={0.9}
+                        />
+                    );
+                    })}
+                </Pie>
             </PieChart>
         </ResponsiveContainer>
         );
@@ -214,14 +197,6 @@ const RoadMap = () => {
         return (
             <div>
                 <ResponsiveContainer width="100%" height={200}>
-                    <defs>
-                        <filter id="neonShadow" x="-50%" y="-50%" width="200%" height="200%">
-                            <feDropShadow
-                            dx="0" dy="0" stdDeviation="5"
-                            floodColor="#fff" floodOpacity="0.5"
-                            />
-                        </filter>
-                    </defs>
                     <LineChart
                         data={formattedData}
                         margin={{ top: 20, right: 30, left: -10, bottom: 20 }}
@@ -258,9 +233,8 @@ const RoadMap = () => {
                         <Line
                             type="monotone"
                             dataKey="percentage"
-                            stroke="rgba(188,71,251,0.5)"
+                            stroke="rgba(203,86,255,0.5)"
                             strokeWidth={2}
-                            filter="url(#neonShadow)"
                         />
                     </LineChart>
                 </ResponsiveContainer>

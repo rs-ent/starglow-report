@@ -20,7 +20,7 @@ export default function Background() {
   });
 
   // 작은 입자 개수
-  const particleCount = 150;
+  const particleCount = 50;
   const [particles] = useState(() => {
     const temp = [];
     for (let i = 0; i < particleCount; i++) {
@@ -32,13 +32,13 @@ export default function Background() {
   return (
     <div className="fixed top-0 left-0 z-0 pointer-events-none inset-0 overflow-hidden bg-gradient-to-br from-black via-[#120012] to-black">
       {/* 큰 빛 */}
-      {lights.map((light) => (
-        <FloatingLight key={light.id} />
+      {lights.map((light, index) => (
+        <FloatingLight key={light.id} index={index} randomX={randomRange(0, 100)} randomY={randomRange(0, 100)} />
       ))}
 
       {/* 작은 입자 */}
-      {particles.map((p) => (
-        <FloatingParticle key={p.id} />
+      {particles.map((p, index) => (
+        <FloatingParticle key={p.id} index={index} randomX={randomRange(0, 100)} randomY={randomRange(0, 100)} />
       ))}
     </div>
   );
@@ -47,11 +47,29 @@ export default function Background() {
 // ─────────────────────────────
 // 큰 빛 컴포넌트
 // ─────────────────────────────
-function FloatingLight() {
+function FloatingLight({ index, randomX, randomY }) {
   const controls = useAnimation();
 
+  // Provide a unique fallback based on index (for SSR)
+  const [initialState, setInitialState] = useState(() => ({
+    x: `${randomX}dvw`,
+    y: `${randomY}dvh`,
+    scale: 1,
+    opacity: 0.8,
+  }));
+
   useEffect(() => {
-    // 컴포넌트가 마운트된 이후에 moveOneCycle 함수가 정의됨
+    // After mount, randomize position for the client
+    setInitialState({
+      x: `${randomRange(0, 100)}vw`,
+      y: `${randomRange(0, 100)}vh`,
+      scale: randomRange(0.7, 1.4),
+      opacity: 0.8,
+    });
+  }, []);
+
+  useEffect(() => {
+    // Infinite animation cycle
     async function moveOneCycle() {
       const nextX = `${randomRange(-10, 110)}vw`;
       const nextY = `${randomRange(-10, 110)}vh`;
@@ -69,18 +87,12 @@ function FloatingLight() {
           ease: "easeInOut",
         },
       });
-      // 완료 후 재귀 호출
-      moveOneCycle();
+
+      moveOneCycle(); // Recur
     }
 
-    // 최초 호출
     moveOneCycle();
   }, [controls]);
-
-  // 초기값 설정
-  const initialScale = randomRange(0.7, 1.4);
-  const initialX = `${randomRange(0, 100)}vw`;
-  const initialY = `${randomRange(0, 100)}vh`;
 
   return (
     <motion.div
@@ -91,12 +103,7 @@ function FloatingLight() {
         background: "radial-gradient(circle, rgba(157,78,221,1), transparent 60%)",
         filter: "blur(80px)",
       }}
-      initial={{
-        x: initialX,
-        y: initialY,
-        scale: initialScale,
-        opacity: 0.8,
-      }}
+      initial={initialState}
       animate={controls}
     />
   );
@@ -105,12 +112,28 @@ function FloatingLight() {
 // ─────────────────────────────
 // 작은 입자(먼지) 컴포넌트
 // ─────────────────────────────
-function FloatingParticle() {
+function FloatingParticle({ index, randomX, randomY }) {
   const controls = useAnimation();
 
-  // 작은 입자도 같은 방식
+  // Unique fallback for SSR, offset by index
+  const [initialState, setInitialState] = useState(() => ({
+    x: `${randomX}dvw`,
+    y: `${randomY}dvh`,
+    scale: 0.1,
+    opacity: 0.7,
+  }));
+
   useEffect(() => {
-    // 컴포넌트가 마운트된 이후에 moveOneCycle 함수가 정의됨
+    // Randomize after mount
+    setInitialState({
+      x: `${randomRange(0, 100)}vw`,
+      y: `${randomRange(0, 100)}vh`,
+      scale: randomRange(0.1, 0.2),
+      opacity: 0.7,
+    });
+  }, []);
+
+  useEffect(() => {
     async function moveOneCycle() {
       const nextX = `${randomRange(-10, 110)}vw`;
       const nextY = `${randomRange(-10, 110)}vh`;
@@ -128,18 +151,12 @@ function FloatingParticle() {
           ease: "linear",
         },
       });
-      // 완료 후 재귀 호출
-      moveOneCycle();
+
+      moveOneCycle(); // Recur
     }
 
-    // 최초 호출
     moveOneCycle();
   }, [controls]);
-
-  // 초기 위치
-  const initialScale = 0.1;
-  const initialX = `${randomRange(0, 100)}vw`;
-  const initialY = `${randomRange(0, 100)}vh`;
 
   return (
     <motion.div
@@ -149,12 +166,7 @@ function FloatingParticle() {
         height: "1.2vw",
         background: "rgba(255, 255, 255, 0.55)",
       }}
-      initial={{
-        x: initialX,
-        y: initialY,
-        scale: initialScale,
-        opacity: 0.6,
-      }}
+      initial={initialState}
       animate={controls}
     />
   );

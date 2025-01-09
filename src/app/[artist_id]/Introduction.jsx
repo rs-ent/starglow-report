@@ -22,6 +22,7 @@ const Introduction = () => {
     stiffness: 280, // 높일수록 반발력(속도감) 강해짐
     damping: 20,    // 낮출수록 출렁거림이 커짐
     mass: 0.9,      // 질량. 작으면 가볍게 튐
+    duration: 1.5,
   };
 
   // 소개글
@@ -53,7 +54,7 @@ const Introduction = () => {
         // 뷰포트 진입 시 언더라인 등장
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.8 }}
+        viewport={{ once: false, amount: 0.8 }}
         variants={{
           hidden: { opacity: 0, y: 20 },
           visible: {
@@ -89,17 +90,18 @@ const Introduction = () => {
         <motion.h1
           className="whitespace-pre-wrap text-3xl text-gradient tracking-tight leading-tight inline-block text-glow"
           initial={{ 
-            x: -200,                // 왼쪽 밖에서 시작
             filter: "blur(12px)",    // 블러로 흐릿하게
-            opacity: 0.5,
+            opacity: 0.2,
           }}
           whileInView={{ 
-            x: 0, 
             filter: "blur(0px)",
             opacity: 1,
           }}
-          transition={springTransition}
-          viewport={{ once: true, amount: 0.8 }}
+          transition={{
+            duration: 1, // 천천히 페이드 (1.2초 예시)
+            ease: "easeOut",
+          }}
+          viewport={{ once: false, amount: 0.6 }}
         >
           {catchPhrase}
         </motion.h1>
@@ -108,20 +110,19 @@ const Introduction = () => {
         <motion.p
           className="mt-3 text-base text-[var(--text-secondary)] italic"
           initial={{
-            x: 200,                // 오른쪽 밖에서 시작
             filter: "blur(12px)",   // 블러
-            opacity: 0.3,
+            opacity: 0.2,
           }}
           whileInView={{
-            x: 0,
             filter: "blur(0px)",
             opacity: 1,
           }}
           transition={{
-            ...springTransition,
-            delay: 0.2, // 살짝 늦게 시작
+            duration: 1, // 천천히 페이드 (1.2초 예시)
+            ease: "easeOut",
+            delay: 0.5,
           }}
-          viewport={{ once: true, amount: 0.8 }}
+          viewport={{ once: false, amount: 0.6 }}
         >
           {subCatchPhrase}
         </motion.p>
