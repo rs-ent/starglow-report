@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useRef, useEffect } from 'react';
-import BlocksRenderer from './analysis-manager/BlocksRenderer'; // BlocksRenderer 가져오기
+import BlocksRenderer from '../analysis-manager/BlocksRenderer'; // BlocksRenderer 가져오기
 
 const HistoryModal = ({ onClose, contents }) => {
     if (!contents || contents.length === 0) return null;

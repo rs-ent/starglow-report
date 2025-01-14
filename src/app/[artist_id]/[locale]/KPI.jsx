@@ -2,9 +2,9 @@
 
 import React, { useState, useRef, useMemo } from 'react';
 import 'chart.js/auto';
-import { useReport, useKPI } from '../../context/GlobalData';
-import { calculateRiskLevelPercentage } from '../processors/riskLevel';
-import { formatNumber } from '../utils/formatNumber';
+import { useReport, useKPI } from '../../../context/GlobalData';
+import { calculateRiskLevelPercentage } from '../../processors/riskLevel';
+import { formatNumber } from '../../utils/formatNumber';
 import {
     LineChart,
     Line,
@@ -16,6 +16,30 @@ import {
     ReferenceDot,
     ResponsiveContainer,
 } from 'recharts';
+
+import { useParams } from "next/navigation";
+import { translations } from '../../../lib/translations';
+
+function formatYearMonth(yyyyMM, localeRaw = 'en') {
+    const locale = localeRaw === "en" ? "en-US" : "ko-KR"
+    const [yearStr, monthStr] = yyyyMM.split("-");
+    if (!yearStr || !monthStr) {
+      return "Invalid format"; // 형식 예외 처리
+    }
+  
+    const year = parseInt(yearStr, 10);
+    const month = parseInt(monthStr, 10);
+  
+    const date = new Date(year, month - 1, 1);
+  
+    const monthAbbr = date.toLocaleString(locale, { month: "short" });
+    
+    if (localeRaw === 'ko') {
+        return `${year}년 ${monthAbbr}`;
+    } else {
+        return `${monthAbbr}, ${year}`;
+    }
+}  
 
 export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenue, minRevenue, maxRevenue) => {
     // 데이터 계산
@@ -131,6 +155,9 @@ export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenu
 };
 
 const KPI = () => {
+    const { locale } = useParams(); 
+    const t = translations[locale] || translations.en;
+
     const [isExpanded, setIsExpanded] = useState(false);
     const containerRef = useRef(null);
     const reportData = useReport();
@@ -156,32 +183,24 @@ const KPI = () => {
 
     // 표시할 KPI 목록을 준비합니다.
     const allKPIs = useMemo(() => [
-        { label: 'Current Month Value', value: totalValueMultiple, suffix: '₩', importance: 9, higherIsBetter: true },
-        { label: 'Risk Rating', value: riskLevel.differencePercentage, suffix: '%', importance: 10, higherIsBetter: false},
-        { label: 'Risk Level', value: riskLevel.riskText, suffix: '', importance: 10, higherIsBetter: true},
-        { label: 'Est. Revenue (YoY)', value: calculatedKPIs.expectedAnnualRevenue, suffix: '₩', importance: 10, higherIsBetter: true},
-        { label: 'Est. Revenue Spectrum', value: revenueSpectrum, suffix: '', importance: 10, higherIsBetter: true},
-        { label: 'Peak Date', value: calculatedKPIs.peakDate.replace('-', '.'), suffix: '', importance: 8, higherIsBetter: false },
-        { label: 'Revenue Diversity Ratio', value: (calculatedKPIs.normalizedDiversityIndex * 100).toFixed(2), suffix: '%', importance: 5, higherIsBetter: false },
-        { label: 'Core Revenue', value: calculatedKPIs.maxCoreRevenueLabel, suffix: '', importance: 4, higherIsBetter: false },
+        { label: t.currentMonthValue, value: totalValueMultiple, suffix: '₩', importance: 9, higherIsBetter: true },
+        { label: t.riskRating, value: riskLevel.differencePercentage, suffix: '%', importance: 10, higherIsBetter: false},
+        { label: t.riskLevel, value: riskLevel.riskText[locale], suffix: '', importance: 10, higherIsBetter: true},
+        { label: t.estimatedRevenue, value: calculatedKPIs.expectedAnnualRevenue, suffix: '₩', importance: 10, higherIsBetter: true},
+        { label: t.revenueSpectrum, value: revenueSpectrum, suffix: '', importance: 10, higherIsBetter: true},
+        { label: t.peakDate, value: formatYearMonth(calculatedKPIs.peakDate, locale), suffix: '', importance: 8, higherIsBetter: false },
+        { label: t.revenueDiversityRatio, value: (calculatedKPIs.normalizedDiversityIndex * 100).toFixed(2), suffix: '%', importance: 5, higherIsBetter: false },
+        { label: t.coreRevenue, value: calculatedKPIs.maxCoreRevenueLabel[locale], suffix: '', importance: 4, higherIsBetter: false },
         
     ], [calculatedKPIs]);
 
     // 초기 표시할 8개의 KPI
-    const fixedKPIs = useMemo(() => allKPIs.slice(0, 6), [allKPIs]);
+    const fixedKPIs = useMemo(() => allKPIs.slice(0, 5), [allKPIs]);
 
     // 표시할 KPI 결정
     const displayedKPIs = useMemo(() => {
         return isExpanded ? allKPIs : fixedKPIs;
     }, [isExpanded, allKPIs, fixedKPIs]);
-
-    // KPI 아이템 클릭 핸들러
-    const handleKpiClick = (kpi) => {
-        setSelectedKPI({
-            ...kpi,
-            chartsData: getChartsDataForKPI(kpi.label),
-        });
-    };
 
     return (
         <div
@@ -192,21 +211,20 @@ const KPI = () => {
                 {displayedKPIs.map((kpi, index) => (
                     <div
                         key={index}
-                        onClick={() => handleKpiClick(kpi)}
                     >
                     
                         {/* 카드 내용 */}
                         <div className="relative z-10 grid grid-cols-2 items-center justify-center text-left py-3 px-6 border-b border-b-[var(--background-muted)]">
-                            <h4 className="text-[var(--primary)] text-xs">
+                            <h4 className="text-gradient text-xs">
                                 {kpi.label}
                             </h4>
-                            <p className="text-xs font-semibold text-right">
+                            <p className="text-xs font-semibold text-right purple-text-glow-5">
                                 {kpi.suffix === '₩'
                                     ? `₩${formatNumber(kpi.value)}`
                                     : `${formatNumber(kpi.value)}${kpi.suffix}`}
                             </p>
                         </div>
-                        {isExpanded && kpi.label.includes('Spectrum') && (
+                        {isExpanded && kpi.label === t.revenueSpectrum && (
                             revenueSpectrumChart(totalValueMultiple, spectrum, avgRevenue, minRevenue, maxRevenue)
                         )}
                     </div>

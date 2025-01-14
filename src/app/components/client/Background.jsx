@@ -64,7 +64,7 @@ function FloatingLight({ index, randomX, randomY }) {
       x: `${randomRange(0, 100)}vw`,
       y: `${randomRange(0, 100)}vh`,
       scale: randomRange(0.7, 1.4),
-      opacity: 0.8,
+      opacity: randomRange(0.6, 1.0),
     });
   }, []);
 
@@ -73,7 +73,7 @@ function FloatingLight({ index, randomX, randomY }) {
     async function moveOneCycle() {
       const nextX = `${randomRange(-10, 110)}vw`;
       const nextY = `${randomRange(-10, 110)}vh`;
-      const nextScale = randomRange(0.4, 2.5);
+      const nextScale = randomRange(0.4, 2.2);
       const nextOpacity = randomRange(0.4, 1.0);
       const duration = randomRange(25, 60);
 

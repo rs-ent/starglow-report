@@ -10,7 +10,7 @@ const ReportCard = ({ artistId, image, title, artistEng, artistKor }) => {
         <div className="perspective-1000">
             <div
                 ref={cardRef}
-                className="bg-white rounded-lg shadow-soft transition-transform duration-300 ease-out transform cursor-pointer"
+                className="border border-[var(--border-mid)] bg-white bg-opacity-5 rounded-lg shadow-soft transition-transform duration-300 ease-out transform cursor-pointer backdrop-blur-sm drop-shadow-md"
             >
                 <img
                     src={image}
@@ -19,8 +19,7 @@ const ReportCard = ({ artistId, image, title, artistEng, artistKor }) => {
                     loading="lazy"
                 />
                 <div className="p-6">
-                    <h2 className="text-2xl font-heading text-primary mb-2">{title}</h2>
-                    <h3 className="text-lg font-body text-secondary">{artistEng} ({artistKor})</h3>
+                    <h3 className="text-2xl">{artistEng}</h3>
                 </div>
             </div>
         </div>

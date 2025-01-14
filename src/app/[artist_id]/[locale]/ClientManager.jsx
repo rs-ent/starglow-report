@@ -11,9 +11,9 @@ import HistoryModal from './HistoryModal';
 import Outline from './Outline';
 import Introduction from './Introduction';
 import RiskLevel from './RiskLevel';
-import Rewards from './Rewards';
 import Summary from './Summary';
-import RoadMap from './RoadMap';
+import Rewards from './Rewards';
+import Estimation from './Estimation';
 
 const ClientManager = ({artist_id}) => {
   const [isHistoryModalOpen, setHistoryModalOpen] = useState(false);
@@ -77,10 +77,10 @@ const ClientManager = ({artist_id}) => {
         {/* 리스크 */}
         <InvestmentPoints type="Risk" />
 
-        {/* 로드맵 */}
+        {/* Estimation */}
         <section className="section-base">
-          <h2 className="section-title">Roadmap</h2>
-          <RoadMap />
+          <h2 className="section-title">Estimation</h2>
+          <Estimation />
         </section>
 
         {/* 위험도 */}

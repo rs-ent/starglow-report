@@ -4,17 +4,13 @@
 
 import React, { useState, useEffect } from 'react';
 import CountUp from 'react-countup';
-import { useReport, useIntroduction, useKPI } from '../../context/GlobalData';
-import { formatNumber } from '../utils/formatNumber';
+import { useReport, useIntroduction, useKPI } from '../../../context/GlobalData';
 import Image from 'next/image';
-import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
-import { FaCoins } from 'react-icons/fa';
-import { FaChartLine } from 'react-icons/fa';
-import { MdOutlineEmojiPeople } from 'react-icons/md';
-import { AiOutlineFundProjectionScreen } from 'react-icons/ai';
 import 'react-circular-progressbar/dist/styles.css';
-import { format } from 'date-fns';
 import ApplyButton from './Outline.ApplyButton';
+
+import { useParams } from "next/navigation";
+import { translations } from '../../../lib/translations';
 
 function getProjectStatus(launchDate, deadlineDate, currentDate) {
     if (!launchDate || !deadlineDate) {
@@ -25,24 +21,47 @@ function getProjectStatus(launchDate, deadlineDate, currentDate) {
     const dd = new Date(deadlineDate);
   
     if (isNaN(ld.getTime()) || isNaN(dd.getTime())) {
-      return "Unknown";
+      return {
+        'en': "",
+        'ko': ""
+      };
     }
   
     if (currentDate < ld) {
-      return "Scheduled";
+      return {
+        'en': 'Scheduled',
+        'ko': '예정됨',
+      }
     } else if (currentDate >= ld && currentDate <= dd) {
-      return "Ongoing";
+      return {
+        'en': 'Ongoing',
+        'ko': '진행중',
+      }
     } else if (currentDate > dd) {
-      return "Ended";
+      return{
+        'en': 'Ended',
+        'ko': '종료됨',
+      }
     }
   
-    return "Unknown";
+    return {
+        'en': "",
+        'ko': ""
+    };;
 }
 
 const Outline = () => {
+    const { locale } = useParams(); 
+    const t = translations[locale] || translations.en;
+
     const reportData = useReport();
     const kpiData = useKPI();
     const data = useIntroduction();
+
+    const artistName = {
+        'en': reportData.artist_eng,
+        'ko': reportData.artist_kor,
+    }
 
     const goal_fund = reportData.goal_fund;
     const investor_count = reportData.investor_count || 0;
@@ -54,16 +73,24 @@ const Outline = () => {
     const investorsShareRatio = reportData.investors_share_ratio;
     const investorsAvgRevenue = avgRevenue * investorsShareRatio;
     
-    const project_launch_date = reportData.project_launch_date || "2025-12-31";
-    const launchDate = new Date(project_launch_date);
-    const launchDateString = (launchDate.getFullYear() % 100) + '-' + (launchDate.getMonth() + 1 < 10 ? '0' + (launchDate.getMonth() + 1) : launchDate.getMonth() + 1) + '-' + (launchDate.getDate() < 10 ? '0' + launchDate.getDate() : launchDate.getDate());
-    const project_deadline_date = reportData.project_deadline_date || "2025-12-31";
-    const deadline = new Date(project_deadline_date);
-    const deadlineDateString = (deadline.getFullYear() % 100) + '-' + (deadline.getMonth() + 1 < 10 ? '0' + (deadline.getMonth() + 1) : deadline.getMonth() + 1) + '-' + (deadline.getDate() < 10 ? '0' + deadline.getDate() : deadline.getDate());
+    const nft_sales_start = reportData.nft_sales_start || "2025-01-31";
+    const nftSalesStart = new Date(nft_sales_start);
+    const nftSalesStartString = {
+        'en': (nftSalesStart.getMonth() + 1 < 10 ? '0' + (nftSalesStart.getMonth() + 1) : nftSalesStart.getMonth() + 1) + '.' + (nftSalesStart.getDate() < 10 ? '0' + nftSalesStart.getDate() : nftSalesStart.getDate()) + '.' + (nftSalesStart.getFullYear() % 100),
+        'ko': (nftSalesStart.getFullYear() % 100) + '.' + (nftSalesStart.getMonth() + 1 < 10 ? '0' + (nftSalesStart.getMonth() + 1) : nftSalesStart.getMonth() + 1) + '.' + (nftSalesStart.getDate() < 10 ? '0' + nftSalesStart.getDate() : nftSalesStart.getDate()),
+    };
+    const nft_sales_end = reportData.nft_sales_end || "2025-05-31";
+    const nftSalesEnd = new Date(nft_sales_end);
+    const nftSalesEndString = {
+        'en': (nftSalesEnd.getMonth() + 1 < 10 ? '0' + (nftSalesEnd.getMonth() + 1) : nftSalesEnd.getMonth() + 1) + '.' + (nftSalesEnd.getDate() < 10 ? '0' + nftSalesEnd.getDate() : nftSalesEnd.getDate()) + '.' + (nftSalesEnd.getFullYear() % 100),
+        'ko': (nftSalesEnd.getFullYear() % 100) + '.' + (nftSalesEnd.getMonth() + 1 < 10 ? '0' + (nftSalesEnd.getMonth() + 1) : nftSalesEnd.getMonth() + 1) + '.' + (nftSalesEnd.getDate() < 10 ? '0' + nftSalesEnd.getDate() : nftSalesEnd.getDate()),
+    };
+
     const today = new Date();
 
-    const projectStatus = getProjectStatus(project_launch_date, project_deadline_date, today);
+    const projectStatus = getProjectStatus(nftSalesStart, nftSalesEnd, today)[locale];
     const [isPre, setIsPre] = useState(true);
+    const [applyButtonLabel, setApplyButtonLabel] = useState('PRE APPLY');
 
     const [days, setDays] = useState(0);
     const [hours, setHours] = useState(0);
@@ -72,12 +99,14 @@ const Outline = () => {
     useEffect(() => {
 
         let targetDate;
-        if (today < launchDate) {
-            targetDate = launchDate;
+        if (today < nftSalesStart) {
+            targetDate = nftSalesStart;
             setIsPre(true);
+            setApplyButtonLabel(t.preApplyButtonLabel)
         } else {
-            targetDate = deadline;
+            targetDate = nftSalesEnd;
             setIsPre(false);
+            setApplyButtonLabel(t.applyButtonLabel)
         }
         
         const interval = setInterval(() => {
@@ -104,7 +133,7 @@ const Outline = () => {
       
         return () => clearInterval(interval);
 
-    }, [project_deadline_date]);
+    }, [nftSalesEndString]);
 
     const {
         profilePicture = null,
@@ -118,7 +147,7 @@ const Outline = () => {
                     <div className="w-full h-full">
                         <Image
                             src={profilePicture}
-                            alt="프로필 사진"
+                            alt="Profile Picture"
                             fill
                             quality={100}
                             sizes="(max-width: 768px) 100vw, 80vw"
@@ -137,7 +166,7 @@ const Outline = () => {
                         
                         {/* Artist Korean Name */}
                         <h1 className="text-gradient text-4xl font-bold leading-none tracking-wide text-glow">
-                            {reportData.artist_eng}
+                            {artistName[locale]}
                         </h1>
                     </div>
                     <h4 className='text-gradient text-sm text-left w-36 purple-text-glow-5'>
@@ -152,43 +181,59 @@ const Outline = () => {
             <section className="grid pb-4 items-center">
                 <div className="grid grid-cols-2">
                     <div className="text-left border-b border-b-[var(--border-mid)] border-r border-r-[var(--border-mid)]">
-                        <p className="text-sm text-[var(--text-secondary)] ml-6 mt-3">Glow Chance</p>
-                        <h2 className="text-glow text-lg ml-6 mb-3">{projectStatus}</h2>
+                        <p className="text-sm text-[var(--text-secondary)] ml-6 mt-3">
+                            {t.glowChance}
+                        </p>
+                        <h2 className="text-glow text-lg ml-6 mb-3">
+                            {projectStatus}
+                        </h2>
                     </div>
 
                     <div className="text-left border-b border-b-[var(--border-mid)]">
-                        <p className="text-sm text-[var(--text-secondary)] ml-6 mt-3">Period</p>
+                        <p className="text-sm text-[var(--text-secondary)] ml-6 mt-3">
+                            {t.period}
+                        </p>
                         <h2 className="text-glow text-base ml-6 mb-3">
-                            {launchDateString} ~ {deadlineDateString}
+                            {nftSalesStartString[locale]} ~ {nftSalesEndString[locale]}
                         </h2>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-2">
                     <div className="text-left border-b border-b-[var(--border-mid)] border-r border-r-[var(--border-mid)]">
-                        <p className="text-sm text-[var(--text-secondary)] ml-6 mt-3">Price</p>
-                        <h2 className="text-glow text-lg ml-6 mb-3">$ {nft_price.toFixed(2)}</h2>
+                        <p className="text-sm text-[var(--text-secondary)] ml-6 mt-3">
+                            {t.price}
+                        </p>
+                        <h2 className="text-glow text-lg ml-6 mb-3">
+                            $ {nft_price.toFixed(2)}
+                        </h2>
                     </div>
 
                     <div className="text-left border-b border-b-[var(--border-mid)]">
-                        <p className="text-sm text-[var(--text-secondary)] ml-6 mt-3">{isPre ? 'Awaiters' : 'Holders'}</p>
+                        <p className="text-sm text-[var(--text-secondary)] ml-6 mt-3">
+                            {isPre ? t.awaiters : t.holders}
+                        </p>
                         <h2 className="text-glow text-lg ml-6 mb-3">{isPre ? pre_applier_count : investor_count}</h2>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-2">
                     <div className="text-left border-b border-b-[var(--border-mid)] border-r border-r-[var(--border-mid)]">
-                        <p className="text-sm text-[var(--text-secondary)] ml-6 mt-3">Amount</p>
+                        <p className="text-sm text-[var(--text-secondary)] ml-6 mt-3">
+                            {t.amount}
+                        </p>
                         <h2 className="text-glow text-lg ml-6 mb-3">{minted_nft.toLocaleString()}</h2>
                     </div>
 
                     <div className="text-left border-b border-b-[var(--border-mid)]">
-                        <p className="text-sm text-[var(--text-secondary)] ml-6 mt-3">Estimated ROI</p>
+                        <p className="text-sm text-[var(--text-secondary)] ml-6 mt-3">
+                            {t.estimatedRoi}
+                        </p>
                         <h2 className="text-glow text-lg ml-6 mb-3">{(((investorsAvgRevenue - goal_fund) / goal_fund) * 100).toFixed(0)}%</h2>
                     </div>
                 </div>
 
-                <ApplyButton isPre={isPre} />
+                <ApplyButton isPre={isPre} label={applyButtonLabel} />
             </section>
         </div>
     );

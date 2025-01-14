@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { useReport, useIntroduction, useValuation } from "../../context/GlobalData";
+import { useReport, useIntroduction, useValuation } from "../../../context/GlobalData";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Textfit } from 'react-textfit';
 
 const Introduction = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -188,9 +187,9 @@ const Introduction = () => {
                         className="object-cover"
                         loading="lazy"
                       />
-                      <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-[var(--foreground)] to-transparent text-[var(--text-reverse)]">
-                        <h3 className="text-sm font-bold">{member.name}</h3>
-                        <p className="text-[0.6rem] font-light text-[var(--background-second)]">
+                      <div className="absolute bottom-0 left-0 w-full px-4 pb-3 bg-gradient-to-t from-black to-transparent bg-opacity-65">
+                        <h3 className="text-sm font-bold text-glow text-gradient mt-20">{member.name}</h3>
+                        <p className="text-[0.6rem] font-light text-[var(--text-secondary)] mt-1">
                           {member.tags.join(" · ")}
                         </p>
                       </div>

@@ -18,14 +18,12 @@ import {
 import 'katex/dist/katex.min.css';
 import { BlockMath } from 'react-katex';
 
-const CriteriaPage = ({ onClose }) => {
-    const riskLevel = {
-        percentage: 40,
-        text: 'Moderate Risk',
-        description: 'Requires an acceptance of potential risk.',
-        color: '#FBBF24', // Tailwind CSS yellow-500
-        icon: <FaExclamationTriangle className="text-yellow-500 text-sm" />,
-    };
+import { useParams } from "next/navigation";
+import { translations } from '../../../lib/translations';
+
+const CriteriaPage = ({ onClose, percentage }) => {
+    const { locale } = useParams(); 
+    const t = translations[locale] || translations.en;
 
     const evaluationFactors = [
         {
@@ -58,61 +56,106 @@ const CriteriaPage = ({ onClose }) => {
     // 위험 등급 데이터
     const riskLevels = [
         {
-            min: 0,
-            max: 20,
-            color: 'bg-blue-500',
-            textColor: 'text-blue-600',
-            icon: <FaCheckCircle className="text-blue-600 text-xl" />,
-            riskText: 'Ultra-Low Risk',
-            description: 'An extremely stable investment with minimal risk.',
-            qualitative:
-                'Expected to generate stable returns with very low sensitivity to market fluctuations.',
+          min: 0,
+          max: 20,
+          color: 'bg-blue-500',
+          textColor: 'text-blue-600',
+          icon: <FaCheckCircle className="text-blue-600 text-xl" />,
+          riskText: {
+            en: 'Ultra-Low Risk',
+            ko: '초저위험',
+          },
+          description: {
+            en: 'An extremely stable investment with minimal risk.',
+            ko: '매우 안정적인 투자이며, 위험이 극도로 낮습니다.',
+          },
+          qualitative: {
+            en: 'Expected to generate stable returns with very low sensitivity to market fluctuations.',
+            ko: '시장 변동에 대한 민감도가 매우 낮아, 안정적인 수익을 기대할 수 있습니다.',
+          },
         },
         {
-            min: 20,
-            max: 40,
-            color: 'bg-green-500',
-            textColor: 'text-green-600',
-            icon: <FaCheckCircle className="text-green-600 text-xl" />,
-            riskText: 'Low Risk',
-            description: 'A relatively stable investment with low risk.',
-            qualitative:
-                'Likely to produce steady returns with limited risk factors.',
+          min: 20,
+          max: 40,
+          color: 'bg-green-500',
+          textColor: 'text-green-600',
+          icon: <FaCheckCircle className="text-green-600 text-xl" />,
+          riskText: {
+            en: 'Low Risk',
+            ko: '저위험',
+          },
+          description: {
+            en: 'A relatively stable investment with low risk.',
+            ko: '비교적 안정적이며, 위험이 낮은 투자입니다.',
+          },
+          qualitative: {
+            en: 'Likely to produce steady returns with limited risk factors.',
+            ko: '위험 요소가 제한되어 꾸준한 수익을 기대할 수 있습니다.',
+          },
         },
         {
-            min: 40,
-            max: 60,
-            color: 'bg-yellow-500',
-            textColor: 'text-yellow-600',
-            icon: <FaExclamationTriangle className="text-yellow-600 text-xl" />,
-            riskText: 'Moderate Risk',
-            description: 'An investment with the potential for both profits and losses.',
-            qualitative:
-                'Returns may fluctuate based on market conditions and internal factors.',
+          min: 40,
+          max: 60,
+          color: 'bg-yellow-500',
+          textColor: 'text-yellow-600',
+          icon: <FaExclamationTriangle className="text-yellow-600 text-xl" />,
+          riskText: {
+            en: 'Moderate Risk',
+            ko: '중간 위험',
+          },
+          description: {
+            en: 'An investment with the potential for both profits and losses.',
+            ko: '이익과 손실이 모두 발생할 가능성이 있는 투자입니다.',
+          },
+          qualitative: {
+            en: 'Returns may fluctuate based on market conditions and internal factors.',
+            ko: '시장 상황과 내부 요인에 따라 수익률이 변동될 수 있습니다.',
+          },
         },
         {
-            min: 60,
-            max: 80,
-            color: 'bg-orange-500',
-            textColor: 'text-orange-600',
-            icon: <FaExclamationTriangle className="text-orange-600 text-xl" />,
-            riskText: 'High Risk',
-            description: 'A high-risk investment requiring careful consideration.',
-            qualitative:
-                'Returns can be highly volatile and may be significantly affected by external factors.',
+          min: 60,
+          max: 80,
+          color: 'bg-orange-500',
+          textColor: 'text-orange-600',
+          icon: <FaExclamationTriangle className="text-orange-600 text-xl" />,
+          riskText: {
+            en: 'High Risk',
+            ko: '고위험',
+          },
+          description: {
+            en: 'A high-risk investment requiring careful consideration.',
+            ko: '주의 깊은 검토가 필요한 고위험 투자입니다.',
+          },
+          qualitative: {
+            en: 'Returns can be highly volatile and may be significantly affected by external factors.',
+            ko: '수익 변동성이 크고, 외부 요인에 큰 영향을 받을 수 있습니다.',
+          },
         },
         {
-            min: 80,
-            max: 100,
-            color: 'bg-red-500',
-            textColor: 'text-red-600',
-            icon: <FaTimesCircle className="text-red-600 text-xl" />,
-            riskText: 'Ultra-High Risk',
-            description: 'An extremely high-risk investment demanding great caution.',
-            qualitative:
-                'Unanticipated fluctuations may result in a high likelihood of principal loss.',
+          min: 80,
+          max: 100,
+          color: 'bg-red-500',
+          textColor: 'text-red-600',
+          icon: <FaTimesCircle className="text-red-600 text-xl" />,
+          riskText: {
+            en: 'Ultra-High Risk',
+            ko: '초고위험',
+          },
+          description: {
+            en: 'An extremely high-risk investment demanding great caution.',
+            ko: '매우 주의가 필요한 극도로 높은 위험의 투자입니다.',
+          },
+          qualitative: {
+            en: 'Unanticipated fluctuations may result in a high likelihood of principal loss.',
+            ko: '예상치 못한 변동으로 원금 손실 가능성이 매우 큽니다.',
+          },
         },
     ];
+
+    const riskLevel =
+        riskLevels.find(
+            (level) => percentage >= level.min && percentage < level.max
+        ) || riskLevels[riskLevels.length - 1];
 
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50">
@@ -125,12 +168,9 @@ const CriteriaPage = ({ onClose }) => {
             <div className="relative bg-[rgba(8,2,20,0.95)] rounded-lg w-[90%] max-w-[480px] max-h-[88%] overflow-y-scroll transition-transform duration-300 ease-in-out transform scale-100">
                 {/* 닫기 버튼 */}
                 <button
-                    className="sticky top-0 w-full bg-[rgba(255,255,255,0.1)] text-[var(--text-secondary)] text-xs px-3 py-1 backdrop-blur-lg"
+                    className="sticky top-0 w-full font-heading bg-[rgba(255,255,255,0.1)] text-[var(--text-secondary)] text-xs px-3 py-1 backdrop-blur-lg"
                     onClick={onClose}
                     aria-label="팝업 닫기"
-                    style={{
-                        fontFamily : 'Conthrax'
-                    }}
                 >
                     Close
                 </button>
@@ -207,15 +247,29 @@ const CriteriaPage = ({ onClose }) => {
                                         endAngle={0}
                                         barSize={10}
                                         data={[
-                                            { name: 'Risk Level', value: riskLevel.percentage },
+                                            { name: 'Risk Level', value: percentage },
                                         ]}
                                     >
+                                        {/* 그라디언트 */}
+                                        <defs>
+                                            <radialGradient
+                                            id="gradientRiskLevel"
+                                            cx="50%"   // 중심점 X
+                                            cy="50%"   // 중심점 Y
+                                            r="50%"    // 반지름
+                                            fx="50%"   // 초점 X
+                                            fy="50%"   // 초점 Y
+                                            >
+                                            <stop offset="0%" stopColor="rgba(178, 65, 261, 0.8)" />
+                                            <stop offset="100%" stopColor="rgba(178, 65, 251, 0.3)" />
+                                            </radialGradient>
+                                        </defs>
                                         <RadialBar
                                             minAngle={15}
                                             background
                                             clockWise
                                             dataKey="value"
-                                            fill={riskLevel.color}
+                                            fill="url(#gradientRiskLevel)"
                                         />
                                         <PolarAngleAxis
                                             type="number"
@@ -229,9 +283,9 @@ const CriteriaPage = ({ onClose }) => {
                             <div className="ml-4 mt-1">
                                 <div className='flex'>
                                 <div className="mr-1 mt-1">{riskLevel.icon}</div>
-                                <h3 className="text-xs font-bold mt-1">{riskLevel.text}</h3>
+                                <h3 className="text-xs font-bold mt-1">{riskLevel.riskText[locale]}</h3>
                                 </div>
-                                <p className="text-[0.6rem] mt-0.5">{riskLevel.description}</p>
+                                <p className="text-[0.6rem] mt-0.5">{riskLevel.description[locale]}</p>
                             </div>
                         </div>
                         <p className="text-[var(--text-secondary)] text-xs mt-2">
@@ -317,14 +371,14 @@ const CriteriaPage = ({ onClose }) => {
                                                     className={`w-4 h-4 mr-1 rounded-full ${level.color}`}
                                                 ></div>
                                                 <span className={`${level.textColor} font-semibold text-[0.7rem]`}>
-                                                    {level.riskText.replace(' Risk', '')}
+                                                    {level.riskText[locale].replace(' Risk', '')}
                                                 </span>
                                             </div>
                                         </td>
                                         <td className="py-2 px-2 text-[0.7rem]">
                                             {level.min}-{level.max}%
                                         </td>
-                                        <td className="py-2 px-2 text-[0.6rem]">{level.qualitative}</td>
+                                        <td className="py-2 px-2 text-[0.6rem]">{level.qualitative[locale]}</td>
                                     </tr>
                                 ))}
                             </tbody>

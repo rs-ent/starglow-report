@@ -147,12 +147,30 @@ export const computeKPIs = (valuationData, timeline, currentIndex, currentData) 
 
     const revenueStreams = ['sv_t', 'rv_t', 'apv_t', 'cev_t', 'mcv_youtube', 'mds_t','mrv_t'];
     const revenueLabels = {
-        sv_t: 'Streams',
-        rv_t: 'Retail Album Sales',
-        cev_t: 'Concert/Events',
-        mcv_youtube: 'Youtube',
-        mds_t: 'Merchandise Sales',
-        mrv_t: 'Broadcast Appearance'
+        sv_t: {
+          en: 'Streams',
+          ko: '음원 스트리밍 수익'
+        },
+        rv_t: {
+          en: 'Retail Album Sales',
+          ko: '앨범 판매 수익'
+        },
+        cev_t: {
+          en: 'Concert/Events',
+          ko: '콘서트/이벤트 수익'
+        },
+        mcv_youtube: {
+          en: 'Media/Contents',
+          ko: '미디어/콘텐츠 수익'
+        },
+        mds_t: {
+          en: 'Merchandise Sales',
+          ko: '굿즈/MD 판매 수익'
+        },
+        mrv_t: {
+          en: 'Broadcast Appearance',
+          ko: '방송 출연 수익'
+        }
     };
 
     let expectedAnnualRevenueCalculationStartDate = '';

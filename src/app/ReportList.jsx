@@ -13,7 +13,7 @@ const ReportList = () => {
             {reports.map(report => (
                 <Link 
                     key={report.docId} 
-                    href={`/${report.artist_id}`}
+                    href={`/${report.artist_id}/en`}
                 >
                     <ReportCard
                         artistId={report.artist_id}

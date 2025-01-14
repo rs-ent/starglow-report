@@ -1,9 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useSwipeable } from 'react-swipeable';
-import { useHistory } from '../../context/GlobalData';
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'; // 화살표 아이콘을 위해 react-icons 사용
+import React from 'react';
+import { useHistory } from '../../../context/GlobalData';
 
 const History = ({ openModal }) => {
     const history = useHistory();
@@ -45,7 +43,7 @@ const History = ({ openModal }) => {
                                 onClick={() => handleOpenModal(item.text)}
                             >
                                 {/* Background Image with Blur and Overlay */}
-                                <div className="relative w-full h-24 overflow-hidden rounded-xl border border-[var(--border-mid)]">
+                                <div className="relative w-full h-24 overflow-hidden rounded-xl border border-[var(--border-mid)] opacity-90 shadow-md">
                                     {/* Background Image */}
                                     <img
                                         src={item.src}

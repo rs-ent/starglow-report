@@ -2,8 +2,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import InvestmentPointItem from './InvestmentPointsAndRisks/InvestmentPointItem';
-import { useKPI, useInvestmentPoints } from '../../context/GlobalData';
+import InvestmentPointItem from '../InvestmentPointsAndRisks/InvestmentPointItem';
+import { useKPI, useInvestmentPoints } from '../../../context/GlobalData';
 
 const InvestmentPoints = ({type = "Investment Point"}) => { // async 제거
     const pointsData = useInvestmentPoints();

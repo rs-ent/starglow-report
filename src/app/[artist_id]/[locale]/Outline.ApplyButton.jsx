@@ -1,9 +1,9 @@
 import React from 'react';
 
-const ApplyButton = ({ isPre }) => {
+const ApplyButton = ({ isPre, label }) => {
   return (
     <button className="button-feather-purple">
-      {isPre ? 'PRE APPLY' : 'GET NFT'}
+      {label}
     </button>
   );
 };

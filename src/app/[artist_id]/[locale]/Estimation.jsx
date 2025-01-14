@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useReport, useKPI } from '../../context/GlobalData';
+import { useReport, useKPI, useRoadmap } from '../../../context/GlobalData';
 import {
     LineChart,
     Line,
@@ -17,10 +17,15 @@ import {
     ReferenceLine,
     Legend,
 } from 'recharts';
-import { formatNumber } from '../utils/formatNumber';
-import { useRoadmap } from '../../context/GlobalData';
+import { formatNumber } from '../../utils/formatNumber';
 
-const RoadMap = () => {
+import { useParams } from "next/navigation";
+import { translations } from '../../../lib/translations';
+
+const Estimation = () => {
+    const { locale } = useParams(); 
+    const t = translations[locale] || translations.en;
+
     const report = useReport();
     const roadmap = useRoadmap();
     const kpiData = useKPI();
@@ -35,6 +40,11 @@ const RoadMap = () => {
     const investorsAvgRevenue = avgRevenue * investorsShareRatio;
     const investorsMaxRevenue = maxRevenue * investorsShareRatio;
     const investorsMinRevenue = minRevenue * investorsShareRatio;
+
+    const bepLabel = {
+        'en': 'Break-Even Point (BEP)',
+        'ko': '손익분기점',
+    }
 
     const defaultData = [
         {
@@ -175,18 +185,33 @@ const RoadMap = () => {
     }
 
     // RevenueChart에 사용할 데이터
+    const revenueDataName = {
+        'en': {
+            'max': 'Max',
+            'avg': 'Avg',
+            'min': 'Min',
+            'bep': 'BEP',
+        },
+        'ko': {
+            'max': '최대 매출',
+            'avg': '평균 매출',
+            'min': '최소 매출',
+            'bep': '손익분기점',
+        }
+    };
+
     const revenueData = [
-        { name: 'Max', Revenue: maxRevenue, Investors: investorsMaxRevenue },
-        { name: 'Avg', Revenue: avgRevenue, Investors: investorsAvgRevenue },
-        { name: 'Min', Revenue: minRevenue, Investors: investorsMinRevenue },
-        { name: 'BEP', Revenue: bep, Investors: investorsBEPRevenue },
+        { name: revenueDataName[locale]['max'], Revenue: maxRevenue, Investors: investorsMaxRevenue },
+        { name: revenueDataName[locale]['avg'], Revenue: avgRevenue, Investors: investorsAvgRevenue },
+        { name: revenueDataName[locale]['min'], Revenue: minRevenue, Investors: investorsMinRevenue },
+        { name: revenueDataName[locale]['bep'], Revenue: bep, Investors: investorsBEPRevenue },
     ];
 
     revenueData.sort((a, b) => b.Investors - a.Investors);
 
     const PerformanceChart = ({ revenueData }) => {
         // 손익분기점의 Revenue 값
-        const breakEvenRevenue = revenueData.find(row => row.name === 'BEP')?.Revenue || 1;
+        const breakEvenRevenue = revenueData.find(row => row.name === revenueDataName[locale]['bep'])?.Revenue || 1;
 
         // y축 퍼센트 계산
         const formattedData = revenueData.map(row => ({
@@ -220,7 +245,7 @@ const RoadMap = () => {
                         <ReferenceLine
                             y={0}
                             label={{
-                                value: "Break-Even Point (BEP)",
+                                value: bepLabel[locale],
                                 position: "insideTop",
                                 fontSize: 10,
                                 fill: "white",
@@ -246,7 +271,7 @@ const RoadMap = () => {
         <div>
             {/* 투자 배분 원형 차트 */}
             <section className="mb-1 px-6">
-                <h3 className="text-base text-[var(--primary)] py-2">Investment Allocation</h3>
+                <h3 className="text-base text-gradient py-2">{t.investmentAllocation}</h3>
                 <InvestmentPieChart data={pieChartData} />
             </section>
 
@@ -255,9 +280,15 @@ const RoadMap = () => {
                 <table className="min-w-full border-collapse border border-gray-500 text-center text-xs text-[var(--text-primary)]">
                     <thead>
                         <tr className="bg-[rgba(255,255,255,0.2)]">
-                            <th className="py-2 px-4 border border-gray-500 font-bold">Category</th>
-                            <th className="py-2 px-4 border border-gray-500 font-bold">Details</th>
-                            <th className="py-2 px-4 border border-gray-500 font-bold">Share</th>
+                            <th className="py-2 px-4 border border-gray-500 font-bold">
+                                {t.category}
+                            </th>
+                            <th className="py-2 px-4 border border-gray-500 font-bold">
+                                {t.details}
+                            </th>
+                            <th className="py-2 px-4 border border-gray-500 font-bold">
+                                {t.share}
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -280,24 +311,24 @@ const RoadMap = () => {
 
             {/* 매출 스펙트럼 및 투자자 수익 표 */}
             <section className="mt-20 px-6">
-                <h3 className="text-base text-[var(--primary)] mb-2">Revenue Spectrum & Expected Returns</h3>
+                <h3 className="text-base text-gradient mb-2">{t.revenueSpectrumAndExpectedRevenue}</h3>
                 <PerformanceChart revenueData={revenueData} />
                 <table className="min-w-full border-collapse border border-gray-500 text-center text-xs text-[var(--text-primary)]">
                     <thead>
                         <tr className="bg-[rgba(255,255,255,0.2)]">
                             <th className="py-2 px-4 border border-gray-500 font-bold" style={{ width: '18%' }}>
-                                Revenue Category
+                                {t.revenueCategory}
                             </th>
                             <th className="py-2 px-4 border border-gray-500 font-bold" style={{ width: '25%' }}>
-                                Estimated Revenue
+                                {t.estimatedRevenue}
                             </th>
                             <th className="py-2 px-4 border border-gray-500 font-bold" style={{ width: '25%' }}>
-                                Returns
+                                {t.returnsWithShare}
                                 <br />
-                                ({(investorsShareRatio * 100).toFixed(0)}% of Revenue)
+                                ({t.returnsWithSharePrefix}{(investorsShareRatio * 100).toFixed(0)}%{t.returnsWithShareSurffix})
                             </th>
                             <th className="py-2 px-4 border border-gray-500 font-bold" style={{ width: '15%' }}>
-                                Rate of Return
+                                {t.rateOfReturn}
                             </th>
                         </tr>
                     </thead>
@@ -327,4 +358,4 @@ const RoadMap = () => {
     );
 };
 
-export default RoadMap;
+export default Estimation;

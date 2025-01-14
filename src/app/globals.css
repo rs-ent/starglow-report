@@ -43,6 +43,20 @@ Mobile First + Simple is the Best + Professionalism*/
 }
 
 @font-face {
+  font-family: 'KimmBold';
+  src: url('/fonts/kimm_bold.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Neurimbo';
+  src: url('/fonts/Neurimbo.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
   font-family: 'Conthrax';
   src: url('/fonts/conthrax-sb.woff2') format('woff2');
   font-weight: normal;
@@ -68,7 +82,7 @@ Mobile First + Simple is the Best + Professionalism*/
   --border-end: #141414;
 
   /* 브랜드/포인트 컬러 */
-  --primary: ;   /* 기존 “딥 블루” 그대로 */
+  --primary: #9f33dd;   /* 기존 “딥 블루” 그대로 */
   --secondary: #4A5568; /* 그레이톤 - 다크모드에서도 큰 무리 없음 */
   --accent: #D4AF37;    /* 고급스러운 골드 (네온 느낌에도 잘 어울림) */
   --success: #2A4365;   /* 동일하게 딥 블루 */
@@ -88,9 +102,19 @@ Mobile First + Simple is the Best + Professionalism*/
 
   /* 폰트/트랜지션 */
   --font-body: 'Pretendard', sans-serif;
-  --font-heading: 'Conthrax', sans-serif;
+
   --transition-fast: 0.2s ease-in-out;
   --transition-slow: 0.4s ease-in-out;
+}
+
+/* 기본(영어) 폰트: Conthrax */
+:root:lang(en) {
+  --font-heading: 'Conthrax', sans-serif;
+}
+
+/* 한국어 폰트: Kimm */
+:root:lang(ko) {
+  --font-heading: 'KimmBold', sans-serif;
 }
 
 /* --- 기본 설정 --- */

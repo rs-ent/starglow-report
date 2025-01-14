@@ -28,8 +28,11 @@ export default function CreateReportPage() {
         sub_title: "크나큰 IPO 리포트",
         title: "KNK IPO REPORT",
         type: "아이돌",
-        project_launch_date: "",
-        project_deadline_date: "",
+        nft_sales_start: "",
+        nft_sales_end: "",
+        glow_start: "",
+        glow_end: "",
+        settlement_date: "",
         minted_nft: 4000000,
         nft_price: 50,
     });
@@ -244,23 +247,58 @@ export default function CreateReportPage() {
                 </div>
 
                 <div>
-                    <label className="block font-semibold mb-1" htmlFor="project_launch_date">Project Launch Date:</label>
+                    <label className="block font-semibold mb-1" htmlFor="nft_sales_start">NFT Sales Start Date:</label>
                     <input
                         type="date"
-                        id="project_launch_date"
-                        name="project_launch_date"
-                        value={formData.project_launch_date}
+                        id="nft_sales_start"
+                        name="nft_sales_start"
+                        value={formData.nft_sales_start}
                         onChange={handleChange}
                         className="border p-2 w-full rounded bg-transparent"
                     />
                 </div>
                 <div>
-                    <label className="block font-semibold mb-1" htmlFor="project_deadline_date">Project Deadline:</label>
+                    <label className="block font-semibold mb-1" htmlFor="nft_sales_end">NFT Sales End Date:</label>
                     <input
                         type="date"
-                        id="project_deadline_date"
-                        name="project_deadline_date"
-                        value={formData.project_deadline_date}
+                        id="nft_sales_end"
+                        name="nft_sales_end"
+                        value={formData.nft_sales_end}
+                        onChange={handleChange}
+                        className="border p-2 w-full rounded bg-transparent"
+                    />
+                </div>
+
+                <div>
+                    <label className="block font-semibold mb-1" htmlFor="glow_start">GLOW Start Date:</label>
+                    <input
+                        type="date"
+                        id="glow_start"
+                        name="glow_start"
+                        value={formData.glow_start}
+                        onChange={handleChange}
+                        className="border p-2 w-full rounded bg-transparent"
+                    />
+                </div>
+                <div>
+                    <label className="block font-semibold mb-1" htmlFor="glow_end">GLOW End Date:</label>
+                    <input
+                        type="date"
+                        id="glow_end"
+                        name="glow_end"
+                        value={formData.glow_end}
+                        onChange={handleChange}
+                        className="border p-2 w-full rounded bg-transparent"
+                    />
+                </div>
+
+                <div>
+                    <label className="block font-semibold mb-1" htmlFor="glow_end">Scheduled Settlement Date:</label>
+                    <input
+                        type="date"
+                        id="settlement_date"
+                        name="settlement_date"
+                        value={formData.settlement_date}
                         onChange={handleChange}
                         className="border p-2 w-full rounded bg-transparent"
                     />
