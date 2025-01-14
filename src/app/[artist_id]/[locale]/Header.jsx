@@ -51,9 +51,9 @@ export default function Header() {
               EN
             </Link>
             <Link
-              href={makePath("kr")}
+              href={makePath("ko")}
               className={`${
-                locale === "KR" ? "font-bold" : "font-normal"
+                locale === "KO" ? "font-bold" : "font-normal"
               } py-2 px-4 hover:bg-gray-700 text-left font-heading`}
             >
               KR
