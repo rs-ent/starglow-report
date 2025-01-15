@@ -10,7 +10,7 @@ function randomRange(min, max) {
 
 export default function Background() {
   // 큰 빛 개수
-  const lightCount = 1;
+  const lightCount = 4;
   const [lights] = useState(() => {
     const temp = [];
     for (let i = 0; i < lightCount; i++) {
@@ -20,7 +20,7 @@ export default function Background() {
   });
 
   // 작은 입자 개수
-  const particleCount = 5 ;
+  const particleCount = 200 ;
   const [particles] = useState(() => {
     const temp = [];
     for (let i = 0; i < particleCount; i++) {
