@@ -1,7 +1,4 @@
-"use client";
-
-import dynamic from 'next/dynamic';
-const Background = dynamic(() => import('../client/Background'), { ssr: false });
+import Background from '../client/Background';
 
 export default function DefaultLayout({ children }) {
     return (
