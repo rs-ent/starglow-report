@@ -10,7 +10,7 @@ function randomRange(min, max) {
 
 export default function Background() {
   // 큰 빛 개수
-  const lightCount = 4;
+  const lightCount = 1;
   const [lights] = useState(() => {
     const temp = [];
     for (let i = 0; i < lightCount; i++) {
@@ -20,7 +20,7 @@ export default function Background() {
   });
 
   // 작은 입자 개수
-  const particleCount = 100 ;
+  const particleCount = 5 ;
   const [particles] = useState(() => {
     const temp = [];
     for (let i = 0; i < particleCount; i++) {
@@ -32,12 +32,20 @@ export default function Background() {
   return (
     <div className="fixed top-0 left-0 z-0 pointer-events-none inset-0 overflow-hidden bg-gradient-to-br from-black via-[#120012] to-black">
       
+      {/* 큰 빛 */}
+      {lights.map((light, index) => (
+        <FloatingLight key={light.id} index={index} randomX={randomRange(0, 100)} randomY={randomRange(0, 100)} />
+      ))}
+
+      {/* 작은 입자 */}
+      {particles.map((p, index) => (
+        <FloatingParticle key={p.id} index={index} randomX={randomRange(0, 100)} randomY={randomRange(0, 100)} />
+      ))}
 
       <div className="absolute top-0 w-full h-full bg-[rgba(0,0,0,0.05)] backdrop-blur-xs" />
     </div>
   );
 }
-
 
 // ─────────────────────────────
 // 큰 빛 컴포넌트
