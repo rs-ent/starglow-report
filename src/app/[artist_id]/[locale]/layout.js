@@ -1,15 +1,16 @@
 // [src/app/[artist_id]/layout.js]
-import { Preprocessor } from '../../processors/preprocessor';
 import { DataProvider } from '../../../context/GlobalData';
-import { fetchData } from '../../firebase/fetch';
+
+export const revalidate = 3600;
 
 export default async function ArtistLayout({ children, params }) {
     const { artist_id, locale } = await params;
-    const data = await Preprocessor(artist_id);
-    const introduction = await fetchData('Introduction', { comp: 'docId', sign: '==', val: artist_id }, false);
-    const rewards = await fetchData('Rewards', { comp: 'docId', sign: '==', val: artist_id}, false);
-    const history = await fetchData('history', { comp: 'docId', sign: '==', val: artist_id}, false);
-    const roadmap = await fetchData('Roadmap', { comp: 'docId', sign: '==', val: artist_id}, false);
+
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const res = await fetch(`${baseUrl}/api/report-data?artistId=${artist_id}`, {
+        next: { revalidate: 3600 },
+    });
+    const data = await res.json();
 
     return (
         <html lang={locale}>
@@ -17,13 +18,12 @@ export default async function ArtistLayout({ children, params }) {
                 valuation={data.valuation}
                 timelineData={data.timelineData} 
                 kpiData={data.kpiData} 
-                investmentData={data.investmentData} 
-                milestones={data.milestones}
+                investmentPoints={data.investmentPoints} 
+                introduction={data.introduction}
+                rewards={data.rewards}
+                history={data.history}
+                roadmap={data.roadmap}
                 artist_id={artist_id}
-                introduction={introduction}
-                rewards={rewards}
-                history={history}
-                roadmap={roadmap}
                 locale={locale}
             >
                 {children}

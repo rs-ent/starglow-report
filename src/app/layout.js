@@ -5,10 +5,24 @@ import { Analytics } from "@vercel/analytics/react"
 import "./globals.css";
 
 export const metadata = {
-  title: "투자 리포트",
+  title: "STARGLOW 투자 리포트",
 };
 export default async function RootLayout({ children }) {
-  const reports = await fetchData('Report', null, true);
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+
+  const res = await fetch(`${baseUrl}/api/firestore`, {
+    method: 'POST',
+    next: { revalidate: 60 },
+    body: JSON.stringify({
+      method: 'fetchData',
+      args: {
+        collectionName: 'Report',
+        queryObj: { comp: '', sign: '==', val: '' },
+        fetchMultiples: true
+      }
+    })
+  });
+  const reports = await res.json();
   
   return (
     <html lang="en">

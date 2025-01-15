@@ -16,31 +16,6 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 import { serializeFirestoreData } from './serialize';
 
-/**
- * Firestore에서 데이터를 조건(query)에 따라 가져옵니다.
- *
- * @param {string} collectionName - Firestore 컬렉션 이름
- * @param {Object|null} query - 데이터를 필터링할 조건 객체. `null`을 전달하면 모든 데이터를 가져옵니다.
- * @param {string} query.comp - 조건을 적용할 필드 이름
- * @param {string} query.sign - Firestore 비교 연산자 (예: '==', '<', '>', '!=' 등)
- * @param {*} query.val - 비교할 값
- * @param {boolean} [fetchMultiples=false] - 여러 문서를 가져올지 여부. `true`이면 모든 문서를, `false`이면 첫 번째 문서만 반환합니다.
- * @returns {Promise<Object|Object[]>} - 단일 문서 객체(기본값) 또는 문서 배열
- *
- * @example
- * // 조건에 맞는 단일 문서 가져오기
- * const result = await fetchDataWithQuery('artists', {
- *   comparingField: 'genre',
- *   opStr: '==',
- *   targetValue: 'K-pop'
- * });
- * console.log(result);
- *
- * @example
- * // 조건 없이 컬렉션의 모든 문서 가져오기
- * const allData = await fetchDataWithQuery('artists', null, true);
- * console.log(allData);
- */
 export async function fetchData(
     collectionName,
     queryObj = { comp: '', sign: '==', val: '' }, // 기본값 설정
@@ -101,25 +76,6 @@ export async function fetchData(
     }
 }
 
-/**
- * Firestore에서 데이터를 저장하거나 업데이트합니다.
- * 데이터 저장 시 `created_at`과 `updated_at` 필드를 서버 타임스탬프로 자동 추가/업데이트합니다.
- *
- * @param {string} collectionName - Firestore 컬렉션 이름
- * @param {Object} data - 저장하거나 업데이트할 데이터 객체
- * @param {string|null} [docId=null] - 업데이트할 문서 ID. 없으면 새 문서를 생성합니다.
- * @returns {Promise<string>} - 성공 시 문서 ID 반환
- *
- * @example
- * // 새 데이터를 추가
- * const docId = await saveDataWithQuery('artists', { name: 'New Artist', genre: 'Pop' });
- * console.log('Added document ID:', docId);
- *
- * @example
- * // 기존 문서를 업데이트
- * const updatedDocId = await saveDataWithQuery('artists', { genre: 'Rock' }, 'existingDocId');
- * console.log('Updated document ID:', updatedDocId);
- */
 export async function saveData(collectionName, data, docId = null) {
     try {
         if (!collectionName || !data) {
@@ -152,46 +108,6 @@ export async function saveData(collectionName, data, docId = null) {
         throw error; // 오류 발생 시 호출한 함수로 다시 던짐
     }
 }
-
-/**
- * Firestore에서 조건에 맞는 문서를 삭제합니다.
- *
- * @param {string} collectionName - Firestore 컬렉션 이름
- * @param {Object} query - 삭제 조건 (필드, 연산자, 값)
- * @param {string} query.comparingField - 조건 필드
- * @param {string} query.opStr - 조건 연산자
- * @param {*} query.targetValue - 조건 값
- * @returns {Promise<number>} - 삭제된 문서 수 반환
- *
- * @example
- * // 특정 필드 조건에 맞는 문서 삭제
- * const deletedCount = await deleteDataWithQuery('artists', {
- *   comparingField: 'genre',
- *   opStr: '==',
- *   targetValue: 'K-pop'
- * });
- * console.log(`${deletedCount} documents deleted.`);
- 
-export async function deleteData(collectionName, queryObj) {
-    const { comparingField, opStr, targetValue } = queryObj;
-    const collectionRef = collection(db, collectionName);
-    const q = query(collectionRef, where(comparingField, opStr, targetValue));
-
-    try {
-        const querySnapshot = await getDocs(q); // 조건에 맞는 문서 검색
-        const batchDelete = querySnapshot.docs.map(async (docSnapshot) => {
-            const docRef = doc(db, collectionName, docSnapshot.id);
-            await deleteDoc(docRef); // 문서 삭제
-        });
-
-        await Promise.all(batchDelete); // 병렬로 삭제 수행
-        console.log(`${querySnapshot.size} documents deleted from ${collectionName}.`);
-        return querySnapshot.size; // 삭제된 문서 수 반환
-    } catch (error) {
-        console.error(`Error deleting documents from ${collectionName}:`, error);
-        throw error;
-    }
-}*/
 
 export async function fetchReports() {
     try {

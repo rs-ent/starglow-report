@@ -1,20 +1,19 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { useReport, useIntroduction, useValuation } from "../../../context/GlobalData";
+import React, { useState } from "react";
+import { useIntroduction, useValuation } from "../../../context/GlobalData";
 import Image from "next/image";
 import { motion } from "framer-motion";
 
 const Introduction = () => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const reportData = useReport();
   const valuationData = useValuation();
   const data = useIntroduction();
 
   // 캐치프레이즈 & 서브 캐치프레이즈
-  const catchPhrase = data?.catchPhrase || "엄청난 아티스트!";
-  const subCatchPhrase = data?.subCatchPhrase || "와우~!";
+  const catchPhrase = data?.catchPhrase || "";
+  const subCatchPhrase = data?.subCatchPhrase || "";
 
   const springTransition = {
     type: "spring",
@@ -25,7 +24,7 @@ const Introduction = () => {
   };
 
   // 소개글
-  const introductionRaw = data?.introduction || "소개이다!";
+  const introductionRaw = data?.introduction || "";
   const paragraphMatches = introductionRaw.match(/<p>(.*?)<\/p>/gs) || [];
   const formattedIntroduction = paragraphMatches.map((block) =>
     block.replace(/^<p>/, "").replace(/<\/p>$/, "")

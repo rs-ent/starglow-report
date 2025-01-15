@@ -1,4 +1,3 @@
-import React from 'react';
 import Background from '../client/Background';
 
 export default function DefaultLayout({ children }) {

@@ -50,6 +50,11 @@ function getProjectStatus(launchDate, deadlineDate, currentDate) {
     };;
 }
 
+function easeOutCirc(t, b, c, d) {
+    t = t / d - 1;
+    return c * Math.sqrt(1 - t * t) + b;
+}
+
 const Outline = () => {
     const { locale } = useParams(); 
     const t = translations[locale] || translations.en;
@@ -205,7 +210,16 @@ const Outline = () => {
                             {t.price}
                         </p>
                         <h2 className="text-glow text-lg ml-6 mb-3">
-                            $ {nft_price.toFixed(2)}
+                            <CountUp
+                                start={0}
+                                end={nft_price}
+                                decimals={2}          // 소수점 자릿수
+                                prefix="$ "           // 앞에 달러 기호 붙이기
+                                duration={1}          // 애니메이션 진행 시간(초 단위)
+                                easingFn={easeOutCirc}// Easing
+                                separator=","         // 천 단위 구분자(선택)
+                                decimal="."           // 소수점 구분 문자(선택)
+                            />
                         </h2>
                     </div>
 
@@ -213,7 +227,15 @@ const Outline = () => {
                         <p className="text-sm text-[var(--text-secondary)] ml-6 mt-3">
                             {isPre ? t.awaiters : t.holders}
                         </p>
-                        <h2 className="text-glow text-lg ml-6 mb-3">{isPre ? pre_applier_count : investor_count}</h2>
+                        <h2 className="text-glow text-lg ml-6 mb-3">
+                            <CountUp
+                                start={0}
+                                end={isPre ? pre_applier_count : investor_count}
+                                duration={1.5}          // 애니메이션 진행 시간(초 단위)
+                                easingFn={easeOutCirc}// Easing
+                                separator=","         // 천 단위 구분자(선택)
+                            />
+                        </h2>
                     </div>
                 </div>
 
@@ -222,14 +244,31 @@ const Outline = () => {
                         <p className="text-sm text-[var(--text-secondary)] ml-6 mt-3">
                             {t.amount}
                         </p>
-                        <h2 className="text-glow text-lg ml-6 mb-3">{minted_nft.toLocaleString()}</h2>
+                        <h2 className="text-glow text-lg ml-6 mb-3">
+                            <CountUp
+                                start={0}
+                                end={minted_nft}
+                                duration={2}          // 애니메이션 진행 시간(초 단위)
+                                easingFn={easeOutCirc}// Easing
+                                separator=","         // 천 단위 구분자(선택)
+                            />
+                        </h2>
                     </div>
 
                     <div className="text-left border-b border-b-[var(--border-mid)]">
                         <p className="text-sm text-[var(--text-secondary)] ml-6 mt-3">
                             {t.estimatedRoi}
                         </p>
-                        <h2 className="text-glow text-lg ml-6 mb-3">{(((investorsAvgRevenue - goal_fund) / goal_fund) * 100).toFixed(0)}%</h2>
+                        <h2 className="text-glow text-lg ml-6 mb-3">
+                            <CountUp
+                                start={0}
+                                end={(((investorsAvgRevenue - goal_fund) / goal_fund) * 100)}
+                                suffix="%"           // 앞에 달러 기호 붙이기
+                                duration={2.5}          // 애니메이션 진행 시간(초 단위)
+                                easingFn={easeOutCirc}// Easing
+                                separator=","         // 천 단위 구분자(선택)
+                            />
+                        </h2>
                     </div>
                 </div>
 

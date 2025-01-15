@@ -20,7 +20,7 @@ export default function Background() {
   });
 
   // 작은 입자 개수
-  const particleCount = 50;
+  const particleCount = 100 ;
   const [particles] = useState(() => {
     const temp = [];
     for (let i = 0; i < particleCount; i++) {
@@ -31,6 +31,7 @@ export default function Background() {
 
   return (
     <div className="fixed top-0 left-0 z-0 pointer-events-none inset-0 overflow-hidden bg-gradient-to-br from-black via-[#120012] to-black">
+      
       {/* 큰 빛 */}
       {lights.map((light, index) => (
         <FloatingLight key={light.id} index={index} randomX={randomRange(0, 100)} randomY={randomRange(0, 100)} />
@@ -40,6 +41,8 @@ export default function Background() {
       {particles.map((p, index) => (
         <FloatingParticle key={p.id} index={index} randomX={randomRange(0, 100)} randomY={randomRange(0, 100)} />
       ))}
+
+      <div className="absolute top-0 w-full h-full bg-[rgba(0,0,0,0.05)] backdrop-blur-xs" />
     </div>
   );
 }
@@ -52,8 +55,8 @@ function FloatingLight({ index, randomX, randomY }) {
 
   // Provide a unique fallback based on index (for SSR)
   const [initialState, setInitialState] = useState(() => ({
-    x: `${randomX}dvw`,
-    y: `${randomY}dvh`,
+    x: `${randomX}vw`,
+    y: `${randomY}vh`,
     scale: 1,
     opacity: 0.8,
   }));
@@ -74,7 +77,7 @@ function FloatingLight({ index, randomX, randomY }) {
       const nextX = `${randomRange(-10, 110)}vw`;
       const nextY = `${randomRange(-10, 110)}vh`;
       const nextScale = randomRange(0.4, 2.2);
-      const nextOpacity = randomRange(0.4, 1.0);
+      const nextOpacity = randomRange(0.3, 1.0);
       const duration = randomRange(25, 60);
 
       await controls.start({
@@ -117,8 +120,8 @@ function FloatingParticle({ index, randomX, randomY }) {
 
   // Unique fallback for SSR, offset by index
   const [initialState, setInitialState] = useState(() => ({
-    x: `${randomX}dvw`,
-    y: `${randomY}dvh`,
+    x: `${randomX}vw`,
+    y: `${randomY}vh`,
     scale: 0.1,
     opacity: 0.7,
   }));
@@ -139,7 +142,7 @@ function FloatingParticle({ index, randomX, randomY }) {
       const nextY = `${randomRange(-10, 110)}vh`;
       const nextScale = randomRange(0.1, 0.2);
       const nextOpacity = randomRange(0.1, 1.0);
-      const duration = randomRange(50, 70);
+      const duration = randomRange(80, 140);
 
       await controls.start({
         x: nextX,

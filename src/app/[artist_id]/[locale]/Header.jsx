@@ -12,7 +12,7 @@ export default function Header() {
   const makePath = (newLocale) => `/${artist_id}/${newLocale}`;
 
   return (
-    <header className="fixed top-0 w-full max-w-[480px] px-4 drop-shadow-md z-50 bg-[rgba(0,0,0,0.1)]">
+    <header className="fixed top-0 w-full max-w-[480px] px-4 drop-shadow-md z-50 bg-[rgba(0,0,0,0.05)] backdrop-blur-xs py-1">
       <div className="flex justify-between">
       <Link 
         href="/" 
@@ -34,7 +34,7 @@ export default function Header() {
       {/* 언어 선택 버튼: 누르면 드롭다운 열림/닫힘 */}
       <button
           onClick={toggle}
-          className="hover:text-[var(--primary)] transition-colors text-xs text-[var(--text-primary)]"
+          className="hover:text-[rgba(255,255,255,1)] transition-colors text-xs text-[rgba(255,255,255,0.6)]"
         >
           {locale.toUpperCase()} ▼
         </button>
