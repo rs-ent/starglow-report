@@ -1,6 +1,7 @@
 // [src/app/[artist_id]/layout.js]
 import { DataProvider } from '../../../context/GlobalData';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 3600;
 
 export default async function ArtistLayout({ children, params }) {
