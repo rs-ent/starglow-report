@@ -7,6 +7,7 @@ export default async function ArtistLayout({ children, params }) {
     const { artist_id, locale } = await params;
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    console.log("NEXT_PUBLIC_BASE_URL:", process.env.NEXT_PUBLIC_BASE_URL);
     const res = await fetch(`${baseUrl}/api/report-data?artistId=${artist_id}`, {
         next: { revalidate: 3600 },
     });
