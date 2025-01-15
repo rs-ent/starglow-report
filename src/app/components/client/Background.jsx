@@ -10,7 +10,7 @@ function randomRange(min, max) {
 
 export default function Background() {
   const lightCount = 4;       // 큰 빛(큰 광원)의 개수
-  const particleCount = 150;   // 작은 입자의 개수
+  const particleCount = 90;   // 작은 입자의 개수
 
   // 큰 빛 목록
   const [lights] = useState(() =>
@@ -127,7 +127,7 @@ function FloatingParticle() {
       style={{
         width: "1.2vw",
         height: "1.2vw",
-        background: "rgba(255, 255, 255, 0.4)",
+        background: "rgba(255, 255, 255, 0.6)",
       }}
       initial={init}
       animate={controls}
@@ -141,7 +141,7 @@ function getRandomTarget(prev) {
   return {
     x: `${randomRange(-10, 110)}vw`,
     y: `${randomRange(-10, 110)}vh`,
-    scale: randomRange(0.4, 2.2),
+    scale: randomRange(0.35, 2),
     opacity: randomRange(0.3, 1.0),
     duration: randomRange(60, 90),
   };
@@ -152,7 +152,7 @@ function getRandomParticleTarget(prev) {
   return {
     x: `${randomRange(-10, 110)}vw`,
     y: `${randomRange(-10, 110)}vh`,
-    scale: randomRange(0.1, 0.3),
+    scale: randomRange(0.1, 0.2),
     opacity: randomRange(0.1, 1.0),
     duration: randomRange(100, 200),
   };
