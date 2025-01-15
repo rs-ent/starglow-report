@@ -2,8 +2,6 @@ import { fetchData } from '../app/firebase/fetch';
 import { ReportsProvider } from '../context/ReportsData'; 
 import { Analytics } from "@vercel/analytics/react"
 
-import Transition from './Transition';
-
 import "./globals.css";
 
 export const metadata = {
