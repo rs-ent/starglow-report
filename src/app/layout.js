@@ -5,7 +5,7 @@ import { Analytics } from "@vercel/analytics/react"
 import "./globals.css";
 
 export const metadata = {
-  title: "STARGLOW 투자 리포트",
+  title: "STARGLOW REPORT",
 };
 export default async function RootLayout({ children }) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
