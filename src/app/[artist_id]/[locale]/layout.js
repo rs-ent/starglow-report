@@ -16,7 +16,7 @@ export default async function ArtistLayout({ children, params }) {
         <html lang={locale}>
             <DataProvider 
                 valuation={data.valuation}
-                timelineData={data.timelineData} 
+                timeline={data.timeline} 
                 kpiData={data.kpiData} 
                 investmentPoints={data.investmentPoints} 
                 introduction={data.introduction}

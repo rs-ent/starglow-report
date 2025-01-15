@@ -6,13 +6,13 @@ import React, { createContext, useContext } from 'react';
 const DataContext = createContext(null);
 
 // Provider 컴포넌트
-export const DataProvider = ({ valuation, timelineData, kpiData, investmentPoints, milestones, artist_id, introduction, rewards, history, roadmap, children }) => {
+export const DataProvider = ({ valuation, timeline, kpiData, investmentPoints, milestones, artist_id, introduction, rewards, history, roadmap, children }) => {
     const reports = useReports();
     const report = reports.find(a => a.artist_id === artist_id);
     
     const contextValue = {
         valuation,
-        timelineData,
+        timeline,
         kpiData,
         investmentPoints,
         milestones,
@@ -46,7 +46,7 @@ export const useTimeline = () => {
     if (!context) {
         throw new Error('useTimeline must be used within a DataProvider');
     }
-    return context.timelineData;
+    return context.timeline;
 };
 
 

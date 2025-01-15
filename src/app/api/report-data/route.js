@@ -19,7 +19,7 @@ export async function GET(request) {
 
         const result = {
             valuation: data.valuation,
-            timelineData: data.timelineData,
+            timeline: data.timeline,
             kpiData: data.kpiData,
             investmentPoints,
             introduction,
