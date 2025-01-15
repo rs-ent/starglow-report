@@ -154,6 +154,6 @@ function getRandomParticleTarget(prev) {
     y: `${randomRange(-10, 110)}vh`,
     scale: randomRange(0.1, 0.2),
     opacity: randomRange(0.1, 1.0),
-    duration: randomRange(100, 200),
+    duration: randomRange(75, 200),
   };
 }
