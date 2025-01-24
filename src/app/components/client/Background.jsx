@@ -10,7 +10,7 @@ function randomRange(min, max) {
 
 export default function Background() {
   const lightCount = 4;       // 큰 빛(큰 광원)의 개수
-  const particleCount = 90;   // 작은 입자의 개수
+  const particleCount = 150;   // 작은 입자의 개수
 
   // 큰 빛 목록
   const [lights] = useState(() =>
@@ -154,6 +154,6 @@ function getRandomParticleTarget(prev) {
     y: `${randomRange(-10, 110)}vh`,
     scale: randomRange(0.1, 0.2),
     opacity: randomRange(0.1, 1.0),
-    duration: randomRange(75, 200),
+    duration: randomRange(60, 200),
   };
 }
