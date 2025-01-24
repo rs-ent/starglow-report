@@ -79,7 +79,8 @@ const RiskLevel = () => {
         {
           min: 0,
           max: 20,
-          color: 'bg-blue-500',
+          color: 'rgba(59,130,246,1)',
+          color2: 'rgba(59,130,246,0.45)',
           textColor: 'text-blue-600',
           icon: <FaCheckCircle className="text-blue-600 text-xl" />,
           riskText: {
@@ -98,7 +99,8 @@ const RiskLevel = () => {
         {
           min: 20,
           max: 40,
-          color: 'bg-green-500',
+          color: 'rgba(34,147,94,1.0)',
+          color2: 'rgba(34,147,94,0.45)',
           textColor: 'text-green-600',
           icon: <FaCheckCircle />,
           riskText: {
@@ -117,7 +119,8 @@ const RiskLevel = () => {
         {
           min: 40,
           max: 60,
-          color: 'bg-yellow-500',
+          color: 'rgba(234,179,8,1.0)',
+          color2: 'rgba(234,179,8,0.45)',
           textColor: 'text-yellow-600',
           icon: <FaExclamationTriangle />,
           riskText: {
@@ -136,7 +139,8 @@ const RiskLevel = () => {
         {
           min: 60,
           max: 80,
-          color: 'bg-orange-500',
+          color: 'rgba(249,115,22,1.0)',
+          color2: 'rgba(249,115,22,0.45)',
           textColor: 'text-orange-600',
           icon: <FaExclamationTriangle />,
           riskText: {
@@ -155,7 +159,8 @@ const RiskLevel = () => {
         {
           min: 80,
           max: 100,
-          color: 'bg-red-500',
+          color: 'rgba(239,68,68,1.0)',
+          color2: 'rgba(239,68,68,0.45)',
           textColor: 'text-red-600',
           icon: <FaTimesCircle />,
           riskText: {
@@ -276,13 +281,17 @@ const RiskLevel = () => {
                     <div className=' w-11/12 mx-auto'>
                         {/* 위험 수준 표시 */}
                         <div
-                            className={`flex flex-col items-center mt-2 w-24 h-24 justify-center mx-auto rounded-full text-[var(--text-reverse)] ${currentRiskLevel.color} opacity-85`}
+                            className={`flex flex-col items-center mt-2 w-24 h-24 justify-center mx-auto rounded-full text-[var(--text-reverse)]`}
+                            style={{
+                                background: `linear-gradient(to bottom right, ${currentRiskLevel.color}, ${currentRiskLevel.color2})`,
+                                opacity: 0.9,
+                            }}
                         >
                             {/* 아이콘 */}
-                            <div className="mb-1">{currentRiskLevel.icon}</div>
+                            <div className="mb-1 text-[1.3rem]">{currentRiskLevel.icon}</div>
                             {/* 위험 수준 텍스트 */}
-                            <h2 className="text-[0.6rem] font-bold tracking-wide">
-                                {currentRiskLevel.riskText[locale]}
+                            <h2 className="text-[0.7rem] font-bold tracking-wide">
+                                {currentRiskLevel.riskText[locale].replace(' Risk', '')}
                             </h2>
                         </div>
                         {/* 상품 분류 텍스트 */}

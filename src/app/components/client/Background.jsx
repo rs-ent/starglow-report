@@ -10,7 +10,7 @@ function randomRange(min, max) {
 
 export default function Background() {
   const lightCount = 4;       // 큰 빛(큰 광원)의 개수
-  const particleCount = 150;   // 작은 입자의 개수
+  const particleCount = 95;   // 작은 입자의 개수
 
   // 큰 빛 목록
   const [lights] = useState(() =>
