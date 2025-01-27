@@ -15,7 +15,7 @@ import Summary from './Summary';
 import Rewards from './Rewards';
 import Estimation from './Estimation';
 
-const ClientManager = ({artist_id}) => {
+const ClientManager = ({artist_id, locale}) => {
   const [isHistoryModalOpen, setHistoryModalOpen] = useState(false);
   const [modalContents, setModalContents] = useState([]); // Modal에 전달할 데이터
 
@@ -66,12 +66,12 @@ const ClientManager = ({artist_id}) => {
         {/* 히스토리 */}
         <section className="section-base">
             <h2 className="section-title">History Analysis</h2>
-            <History openModal={openHistoryModal} />
+            <History openModal={openHistoryModal} locale={locale} />
         </section>
         
         {/* History Modal */}
         {isHistoryModalOpen && (
-          <HistoryModal onClose={closeHistoryModal} contents={modalContents} />
+          <HistoryModal onClose={closeHistoryModal} contents={modalContents} locale={locale} />
         )}
         
         {/* 리스크 */}

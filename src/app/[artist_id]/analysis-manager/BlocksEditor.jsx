@@ -1,5 +1,5 @@
 // src/app/[artist_id]/analysis-manager/BlocksEditor.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import BlocksInputs from './BlocksInputs';
 import BlocksRenderer from './BlocksRenderer';
 import Tooltip from 'rc-tooltip';
@@ -23,17 +23,57 @@ const BLOCK_TYPES = [
   {value:'Gallery', label:'갤러리', desc:'여러 이미지를 갤러리 형태로 표시'},
 ];
 
+function convertLegacyFields(data) {
+  if (!data) return data;
+
+  const newData = { ...data };
+
+  const fieldsToConvert = ['text', 'alt', 'content', 'cite'];
+  fieldsToConvert.forEach((field) => {
+    const val = newData[field];
+    if (typeof val === 'string') {
+      newData[field] = { ko: val, en: '' };
+    }
+  });
+
+  // 예시: items가 단순 array면 ko/en 객체로
+  if (Array.isArray(newData.items) && newData.items.length > 0) {
+    // 첫 번째 요소가 string이면 => 아직 ko/en 변환 안됐다고 가정
+    if (typeof newData.items[0] === 'string') {
+      newData.items = { ko: [...newData.items], en: [] };
+    }
+  }
+
+  return newData;
+}
+
 const BlocksEditor = ({ block = null, onSave, onCancel }) => {
   const defaultType = block ? block.type : BLOCK_TYPES[0].value;
   const [type, setType] = useState(defaultType);
   const [formData, setFormData] = useState(block || { type: defaultType });
   const [activeTab, setActiveTab] = useState('edit');
+  const [activeLanguage, setActiveLanguage] = useState('ko');
 
   const currentType = BLOCK_TYPES.find(bt => bt.value === type);
+
+  useEffect(() => {
+    if (block) {
+      const converted = convertLegacyFields(block);
+      setFormData(converted);
+      // block.type이 바뀌었다면 type도 동기화
+      if (converted.type) {
+        setType(converted.type);
+      }
+    }
+  }, [block]);
 
   const handleTypeSelect = (selectedType) => {
     setType(selectedType);
     setFormData({ ...formData, type: selectedType });
+  };
+
+  const handleLanguageChange = (lang) => {
+    setActiveLanguage(lang);
   };
 
   const handleInputChange = (data) => {
@@ -49,23 +89,45 @@ const BlocksEditor = ({ block = null, onSave, onCancel }) => {
   };
 
   return (
-    <div className="border p-4 rounded bg-white shadow-md max-w-lg transition-all">
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <p className="font-semibold mb-2">블록 타입 선택:</p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-60 overflow-auto p-2 border rounded">
+    <div className="
+      border border-[rgba(255,255,255,0.1)]
+      bg-[rgba(255,255,255,0.01)]
+      backdrop-blur-md
+      p-6
+      rounded-xl
+      shadow-2xl
+      max-w-lg
+      transition-all
+      text-[rgba(255,255,255,0.9)]
+    ">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Block Type Selector */}
+        <div>
+          <p className="font-semibold mb-2">Block Type:</p>
+          <div className="
+            grid grid-cols-3 gap-2 max-h-60 overflow-auto 
+            p-2 border border-[rgba(255,255,255,0.1)] rounded 
+            bg-[rgba(255,255,255,0.05)]
+          ">
             {BLOCK_TYPES.map((bt) => {
               const isSelected = bt.value === type;
               return (
                 <Tooltip key={bt.value} placement="top" overlay={bt.desc}>
                   <div
                     onClick={() => handleTypeSelect(bt.value)}
-                    className={`cursor-pointer p-2 border rounded transition-all text-sm 
-                      ${isSelected ? 'bg-blue-100 border-blue-500' : 'bg-gray-50 border-gray-300 hover:border-gray-400'}
+                    className={`
+                      cursor-pointer p-2 rounded transition-all text-sm shadow-sm
+                      border border-[rgba(255,255,255,0.1)]
+                      bg-[rgba(255,255,255,0.05)]
+                      hover:bg-[rgba(255,255,255,0.1)]
+                      hover:border-[rgba(255,255,255,0.2)]
+                      ${isSelected ? 'bg-[rgba(59,130,246,0.2)] border-[rgba(59,130,246,0.4)]' : ''}
                     `}
                   >
                     <div className="font-medium mb-1">{bt.label}</div>
-                    <div className="text-gray-500 text-xs line-clamp-2">{bt.desc}</div>
+                    <div className="text-[rgba(255,255,255,0.7)] text-xs line-clamp-2">
+                      {bt.desc}
+                    </div>
                   </div>
                 </Tooltip>
               );
@@ -73,40 +135,116 @@ const BlocksEditor = ({ block = null, onSave, onCancel }) => {
           </div>
         </div>
 
+        {/* Language Tab (Only in Edit Mode) */}
+        {activeTab === 'edit' && (
+          <div className="border-b border-[rgba(255,255,255,0.2)] flex space-x-2">
+            <button
+              type="button"
+              className={`
+                px-4 py-2 transition 
+                ${
+                  activeLanguage === 'ko'
+                    ? 'border-b-2 border-[var(--primary)] text-[var(--primary)]'
+                    : 'text-[rgba(200,200,200,0.8)]'
+                }
+              `}
+              onClick={() => handleLanguageChange('ko')}
+            >
+              한국어
+            </button>
+            <button
+              type="button"
+              className={`
+                px-4 py-2 transition
+                ${
+                  activeLanguage === 'en'
+                    ? 'border-b-2 border-[var(--primary)] text-[var(--primary)]'
+                    : 'text-[rgba(200,200,200,0.8)]'
+                }
+              `}
+              onClick={() => handleLanguageChange('en')}
+            >
+              English
+            </button>
+          </div>
+        )}
+
         {/* Edit / Preview Tabs */}
-        <div className="mb-4 border-b border-gray-300 flex space-x-2">
+        <div className="border-b border-[rgba(255,255,255,0.2)] flex space-x-2">
           <button
             type="button"
-            className={`px-4 py-2 ${activeTab === 'edit' ? 'border-b-2 border-blue-500 text-blue-700' : 'text-gray-600'}`}
+            className={`
+              px-4 py-2 transition
+              ${
+                activeTab === 'edit'
+                  ? 'border-b-2 border-[var(--primary)] text-[var(--primary)]'
+                  : 'text-[rgba(200,200,200,0.8)]'
+              }
+            `}
             onClick={() => setActiveTab('edit')}
           >
             Edit
           </button>
           <button
             type="button"
-            className={`px-4 py-2 ${activeTab === 'preview' ? 'border-b-2 border-blue-500 text-blue-700' : 'text-gray-600'}`}
+            className={`
+              px-4 py-2 transition
+              ${
+                activeTab === 'preview'
+                  ? 'border-b-2 border-[var(--primary)] text-[var(--primary)]'
+                  : 'text-[rgba(200,200,200,0.8)]'
+              }
+            `}
             onClick={() => setActiveTab('preview')}
           >
             Preview
           </button>
         </div>
 
-        {/* Edit Tab */}
-        {activeTab === 'edit' && (
-          <BlocksInputs type={type} data={formData} onChange={handleInputChange} />
+        {/* Main Editor Body */}
+        {activeTab === 'edit' ? (
+          <div className="mt-2">
+            <BlocksInputs
+              type={type}
+              data={formData}
+              onChange={handleInputChange}
+              currentLang={activeLanguage}
+            />
+          </div>
+        ) : (
+          <div className="mt-2 p-3 border border-[rgba(255,255,255,0.1)] rounded bg-[rgba(255,255,255,0.02)]">
+            <BlocksRenderer block={formData} />
+          </div>
         )}
 
-        {/* Preview Tab */}
-        {activeTab === 'preview' && (
-          <BlocksRenderer block={formData} />
-        )}
-
-        <div className="mt-4 flex space-x-2">
-          <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+        {/* Action Buttons */}
+        <div className="mt-4 flex space-x-2 justify-end">
+          <button
+            type="submit"
+            className="
+              px-4 py-2 rounded 
+              bg-[rgba(59,130,246,1)] 
+              text-[rgba(255,255,255,1)] 
+              hover:bg-[rgba(29,78,216,1)] 
+              transition shadow 
+              hover:shadow-lg
+            "
+          >
             Save Block
           </button>
           {onCancel && (
-            <button onClick={onCancel} type="button" className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+            <button
+              onClick={onCancel}
+              type="button"
+              className="
+                px-4 py-2 
+                bg-[rgba(209,213,219,1)] 
+                text-[rgba(55,65,81,1)] 
+                rounded 
+                hover:bg-[rgba(156,163,175,1)]
+                transition shadow
+              "
+            >
               Cancel
             </button>
           )}

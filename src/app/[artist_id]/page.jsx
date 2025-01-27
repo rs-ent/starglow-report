@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-export default function PollHome() {
+export default function LocaleSelection() {
     const { artist_id } = useParams();
     const router = useRouter();
 

@@ -82,9 +82,9 @@ Mobile First + Simple is the Best + Professionalism*/
   --border-end: #141414;
 
   /* 브랜드/포인트 컬러 */
-  --primary: #9f33dd;   /* 기존 “딥 블루” 그대로 */
+  --primary: rgba(245,207,57,0.9);   /* 기존 “딥 블루” 그대로 */
   --secondary: #4A5568; /* 그레이톤 - 다크모드에서도 큰 무리 없음 */
-  --accent: #D4AF37;    /* 고급스러운 골드 (네온 느낌에도 잘 어울림) */
+  --accent: rgba(217,195,255,0.9);    /* 고급스러운 골드 (네온 느낌에도 잘 어울림) */
   --success: #2A4365;   /* 동일하게 딥 블루 */
   --danger: #C53030;    /* 붉은 계열 경고 색상 */
   --warning: #D4AF37;   /* 골드 포인트 */

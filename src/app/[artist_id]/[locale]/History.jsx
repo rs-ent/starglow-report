@@ -2,9 +2,11 @@
 
 import React from 'react';
 import { useHistory } from '../../../context/GlobalData';
+import { safeLangValue } from '../../../script/convertLang';
 
-const History = ({ openModal }) => {
+const History = ({ openModal, locale = 'ko' }) => {
     const history = useHistory();
+    console.log(history);
 
     // SectionTitle 타입만 필터링
     const sectionTitles = history?.history.filter(item => item.type === 'SectionTitle') || [];
@@ -12,14 +14,18 @@ const History = ({ openModal }) => {
     // 모달에 전달할 데이터 생성
     const handleOpenModal = (sectionTitleText) => {
         const relatedContents = [];
-        const startIndex = history.history.findIndex(a => a.text === sectionTitleText);
+        const startIndex = history.history.findIndex(a => 
+            safeLangValue(a.text, locale) === sectionTitleText
+        );
+        if (startIndex === -1) return; // 혹시 못 찾으면 리턴
+
         relatedContents.push(history.history[startIndex]);
-        for(var i=startIndex+1; i<history.history.length; i++) {
-            if(history.history[i].type === 'SectionTitle') break;
+        for (let i = startIndex + 1; i < history.history.length; i++) {
+            if (history.history[i].type === 'SectionTitle') break;
             relatedContents.push(history.history[i]);
         }
 
-        openModal(relatedContents); // 모달에 contents 배열 전달
+        openModal(relatedContents);
     };
 
     return (
@@ -27,12 +33,12 @@ const History = ({ openModal }) => {
             {sectionTitles.length > 0 ? (
                 <div className="w-full grid grid-cols-1 sm:grid-cols-2">
                     {sectionTitles.map((item, index) => {
-                        // 현재 항목이 마지막 항목인지 확인
+                        
                         const isLastItem = index === sectionTitles.length - 1;
-                        // 이전 항목이 존재하고 fullSize인지 확인
                         const isPrevFullSize = index > 0 ? sectionTitles[index - 1].fullSize : false;
-                        // 조건에 따라 fullSize 설정
                         const shouldFullSize = item.fullSize || (isLastItem && isPrevFullSize);
+
+                        const titleText = safeLangValue(item.text, locale);
 
                         return (
                             <div
@@ -40,7 +46,7 @@ const History = ({ openModal }) => {
                                 className={`flex-shrink-0 w-full p-1 cursor-pointer col-span-1 ${
                                     shouldFullSize ? 'sm:col-span-2' : ''
                                 }`}
-                                onClick={() => handleOpenModal(item.text)}
+                                onClick={() => handleOpenModal(titleText)}
                             >
                                 {/* Background Image with Blur and Overlay */}
                                 <div className="relative w-full h-24 overflow-hidden rounded-xl border border-[var(--border-mid)] opacity-90 shadow-md">
@@ -56,7 +62,7 @@ const History = ({ openModal }) => {
 
                                     {/* Centered Text */}
                                     <h2 className="absolute inset-0 flex items-center justify-center text-center text-[var(--text-primary)] text-glow text-lg p-4 whitespace-break-spaces font-semibold z-20">
-                                        {item.text}
+                                        {titleText}
                                     </h2>
                                 </div>
                             </div>

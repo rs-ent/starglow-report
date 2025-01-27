@@ -3,7 +3,7 @@
 import React, { useMemo, useRef, useEffect } from 'react';
 import BlocksRenderer from '../analysis-manager/BlocksRenderer'; // BlocksRenderer 가져오기
 
-const HistoryModal = ({ onClose, contents }) => {
+const HistoryModal = ({ onClose, contents, locale }) => {
     if (!contents || contents.length === 0) return null;
 
     const images = [
@@ -70,7 +70,7 @@ const HistoryModal = ({ onClose, contents }) => {
                     
                     <div className="p-9">
                         {contents.map((block, index) => (
-                            <BlocksRenderer key={index} block={block} />
+                            <BlocksRenderer key={index} block={block} locale={locale} />
                         ))}
                     </div>
                 </div>

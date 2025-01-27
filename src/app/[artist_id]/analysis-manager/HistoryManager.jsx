@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useReport } from '../../../context/GlobalData';
 import { fetchData, saveData } from '../../firebase/fetch';
 import BlocksRenderer from './BlocksRenderer';
 import BlocksEditor from './BlocksEditor';
@@ -15,6 +16,8 @@ const HistoryManager = ({ artist_id }) => {
   const [insertionIndex, setInsertionIndex] = useState(null); 
   const [deleteIndex, setDeleteIndex] = useState(null);
   const [filterQuery, setFilterQuery] = useState('');
+
+  const reportData = useReport();
 
   const fetchHistory = async () => {
     try {
@@ -125,27 +128,40 @@ const HistoryManager = ({ artist_id }) => {
   };
 
   if (loading) {
-    return <div className="p-6 text-gray-700 animate-pulse">Loading analysis...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="p-6 text-[rgba(180,150,255,1)] animate-pulse text-center text-xl font-semibold">
+          Loading analysis...
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="p-6 space-y-4">
-      <h1 className="text-3xl font-bold">Analysis Manager</h1>
+    <div className="min-h-screen bg-gradient-to-br from-[rgba(25,20,30,1)] to-[rgba(5,5,10,1)] p-6">
+      <div className="max-w-4xl mx-auto bg-[rgba(255,255,255,0.03)] backdrop-blur-md rounded-lg shadow-xl p-6 space-y-4 text-[rgba(255,255,255,0.9)]">
+      {/* 헤더 부분 */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold tracking-wide drop-shadow-lg">
+          Analysis Manager
+        </h1>
+      </div>
 
+      {/* 검색창 */}
       <div className="flex items-center space-x-2">
         <div className="relative flex-1">
-          <FaSearch className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <FaSearch className="absolute left-2 top-1/2 transform -translate-y-1/2 text-[rgba(156,163,175,0.8)]" />
           <input
             type="text"
             placeholder="Search blocks..."
-            className="w-full border pl-8 pr-8 py-2 rounded"
+            className="w-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.06)] pl-8 pr-8 py-2 rounded focus:outline-none focus:ring-1 focus:ring-[rgba(255,255,255,0.3)] transition"
             value={filterQuery}
             onChange={(e) => setFilterQuery(e.target.value)}
           />
           {filterQuery && (
             <button
               onClick={() => setFilterQuery('')}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-[rgba(156,163,175,1)] hover:text-[rgba(255,255,255,0.8)]"
               title="Clear Filter"
             >
               <FaTimes />
@@ -155,168 +171,222 @@ const HistoryManager = ({ artist_id }) => {
       </div>
 
       {filterQuery && (
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-[rgba(255,255,255,0.6)]">
           Showing filtered results for <strong>"{filterQuery}"</strong>
         </p>
       )}
 
+      <h1 className="pt-12 text-6xl">
+        {reportData.artist_eng}
+      </h1>
+
       {/* 블록이 하나도 없을 때만 상단에 add 버튼 표시 */}
-      {filteredData.length === 0 && editingBlockIndex === null && insertionIndex === null && (
-        <div className="text-center text-gray-500 mt-4">
-          No blocks to display.
-          <div className="mt-4">
-            <button
-              onClick={addInitialBlock}
-              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 flex items-center space-x-1 mx-auto"
-            >
-              <FaPlus />
-              <span>Add Block</span>
-            </button>
+      {filteredData.length === 0 &&
+          editingBlockIndex === null &&
+          insertionIndex === null && (
+            <div className="text-center text-[rgba(255,255,255,0.6)] mt-4">
+              No blocks to display.
+              <div className="mt-4">
+                <button
+                  onClick={addInitialBlock}
+                  className="px-4 py-2 bg-[rgba(34,197,94,1)] text-[rgba(255,255,255,1)] rounded hover:bg-[rgba(22,163,74,1)] flex items-center space-x-1 mx-auto shadow-md hover:shadow-lg transition"
+                >
+                  <FaPlus />
+                  <span>Add Block</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+        {/* 블록이 없고 insertionIndex가 설정되었을 때(즉, 초기 블록 추가 상황) */}
+        {filteredData.length === 0 &&
+          insertionIndex !== null &&
+          editingBlockIndex === null && (
+            <div className="mt-4 border border-[rgba(255,255,255,0.2)] p-4 rounded bg-[rgba(255,255,255,0.05)]">
+              <p className="text-sm text-[rgba(255,255,255,0.6)] mb-2">
+                Inserting block at position {insertionIndex + 1}
+              </p>
+              <BlocksEditor
+                onSave={handleAddBlock}
+                onCancel={() => setInsertionIndex(null)}
+              />
+            </div>
+          )}
+
+        {/* 가장 상단에 블록이 있을 경우 맨 위 삽입 지원 */}
+        {filteredData.length > 0 && (
+          <div className="relative mt-4 group transition-all duration-300 ease-in-out">
+            {editingBlockIndex === null && insertionIndex === null && (
+              <div className="text-center mb-1 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out transform group-hover:translate-y-2">
+                <button
+                  onClick={() => setInsertionIndex(0)}
+                  className="px-2 py-1 bg-[rgba(209,250,229,1)] text-[rgba(21,128,61,1)] rounded hover:bg-[rgba(187,247,208,1)] text-sm shadow hover:shadow-md transition"
+                >
+                  <FaPlus className="inline mr-1" />
+                  Add Block at top
+                </button>
+              </div>
+            )}
+            {editingBlockIndex === null &&
+              insertionIndex !== null &&
+              insertionIndex === 0 && (
+                <div className="mt-4 border border-[rgba(255,255,255,0.2)] p-4 rounded bg-[rgba(255,255,255,0.05)]">
+                  <p className="text-sm text-[rgba(255,255,255,0.6)] mb-2">
+                    Inserting block at position {insertionIndex + 1}
+                  </p>
+                  <BlocksEditor
+                    onSave={handleAddBlock}
+                    onCancel={() => setInsertionIndex(null)}
+                  />
+                </div>
+              )}
           </div>
-        </div>
       )}
 
-      {/* 블록이 없고 insertionIndex가 설정되었을 때(즉, 초기 블록 추가 상황) */}
-      {filteredData.length === 0 && insertionIndex !== null && editingBlockIndex === null && (
-        <div className="mt-4 border p-4 rounded bg-gray-50">
-          <p className="text-sm text-gray-500 mb-2">Inserting block at position {insertionIndex + 1}</p>
-          <BlocksEditor onSave={handleAddBlock} onCancel={() => setInsertionIndex(null)} />
-        </div>
-      )}
+      {/* 메인 블록 목록 */}
+      <div className="space-y-4 mt-1">
+          {filteredData.map((block, index) => {
+            const actualIndex = historyData.indexOf(block);
+            return (
+              <div key={actualIndex} className="group relative transition-all">
+                <div
+                  className={`relative mb-1 border border-[rgba(255,255,255,0.15)] p-4 rounded-lg shadow-sm transition-all duration-300 ease-in-out ${
+                    editingBlockIndex === actualIndex
+                      ? 'bg-[rgba(239,246,255,0.1)] border-[rgba(255,255,255,0.3)]'
+                      : 'bg-[rgba(255,255,255,0.02)]'
+                  }`}
+                >
+                  <div className="max-w-[480px] content-center">
+                    {editingBlockIndex === actualIndex ? (
+                      <div>
+                        <p className="text-xs text-[rgba(37,99,235,0.8)] mb-2 font-medium">
+                          Editing Block #{actualIndex + 1}
+                        </p>
+                        <BlocksEditor
+                          block={block}
+                          onSave={(updatedBlock) =>
+                            handleUpdateBlock(actualIndex, updatedBlock)
+                          }
+                          onCancel={() => setEditingBlockIndex(null)}
+                        />
+                      </div>
+                    ) : (
+                      <BlocksRenderer block={block} locale='ko' />
+                    )}
+                  </div>
 
-      {/* 가장 상단에 블록이 있을 경우 맨 위 삽입 지원 */}
-      {filteredData.length > 0 && (
-        <div className="relative mt-4 group transition-all duration-300 ease-in-out">
-          {editingBlockIndex === null && insertionIndex === null && (
-            <div className="text-center mb-1 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out transform group-hover:translate-y-2">
-              <button
-                onClick={() => setInsertionIndex(0)}
-                className="px-2 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 text-sm"
-              >
-                <FaPlus className="inline mr-1" />
-                Add Block at top
-              </button>
-            </div>
-          )}
-          {editingBlockIndex === null && insertionIndex !== null && insertionIndex === 0 && (
-            <div className="mt-4 border p-4 rounded bg-gray-50">
-              <p className="text-sm text-gray-500 mb-2">Inserting block at position {insertionIndex + 1}</p>
-              <BlocksEditor onSave={handleAddBlock} onCancel={() => setInsertionIndex(null)} />
-            </div>
-          )}
-        </div>
-      )}
-
-      {filteredData.map((block, index) => {
-        const actualIndex = historyData.indexOf(block);
-        return (
-          <React.Fragment key={actualIndex}>
-            <div className="group relative transition-all duration-300 ease-in-out">
-              <div className={`relative mb-1 border p-2 rounded ${editingBlockIndex === actualIndex ? 'bg-blue-50' : ''} transition-all duration-300 ease-in-out`}>
-                <div className="max-w-[480px] content-center">
-                  {editingBlockIndex === actualIndex ? (
-                    <div>
-                      <p className="text-xs text-blue-600 mb-2">Editing Block #{actualIndex + 1}</p>
-                      <BlocksEditor
-                        block={block}
-                        onSave={(updatedBlock) => handleUpdateBlock(actualIndex, updatedBlock)}
-                        onCancel={() => setEditingBlockIndex(null)}
-                      />
+                  {/* 우측 상단 버튼들 */}
+                  {editingBlockIndex !== actualIndex && (
+                    <div className="absolute top-2 right-2 space-x-2 flex">
+                      <button
+                        onClick={() => moveBlockUp(actualIndex)}
+                        className="text-[rgba(107,114,128,1)] hover:text-[rgba(255,255,255,0.8)] disabled:opacity-50 disabled:cursor-not-allowed transition"
+                        disabled={actualIndex === 0}
+                        title="Move Up"
+                      >
+                        <FaArrowUp size={16} />
+                      </button>
+                      <button
+                        onClick={() => moveBlockDown(actualIndex)}
+                        className="text-[rgba(107,114,128,1)] hover:text-[rgba(255,255,255,0.8)] disabled:opacity-50 disabled:cursor-not-allowed transition"
+                        disabled={actualIndex === historyData.length - 1}
+                        title="Move Down"
+                      >
+                        <FaArrowDown size={16} />
+                      </button>
+                      <button
+                        onClick={() => setEditingBlockIndex(actualIndex)}
+                        className="text-[rgba(59,130,246,1)] hover:text-[rgba(29,78,216,1)] transition"
+                        title="Edit Block"
+                      >
+                        <FaEdit size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteBlockRequest(actualIndex)}
+                        className="text-[rgba(239,68,68,1)] hover:text-[rgba(185,28,28,1)] transition"
+                        title="Delete Block"
+                      >
+                        <FaTrash size={16} />
+                      </button>
                     </div>
-                  ) : (
-                    <BlocksRenderer block={block} />
                   )}
                 </div>
-                {editingBlockIndex !== actualIndex && (
-                  <div className="absolute top-2 right-2 space-x-2 flex">
+
+                {/* 블록 아래 Add Block 버튼 */}
+                {editingBlockIndex === null && insertionIndex === null && (
+                  <div className="text-center h-0 overflow-hidden opacity-0 transition-all duration-300 ease-in-out transform group-hover:opacity-100 group-hover:h-auto group-hover:translate-y-2">
                     <button
-                      onClick={() => moveBlockUp(actualIndex)}
-                      className="text-gray-500 hover:text-black"
-                      disabled={actualIndex === 0}
-                      title="Move Up"
+                      onClick={() => setInsertionIndex(actualIndex)}
+                      className="px-2 py-1 bg-[rgba(209,250,229,1)] text-[rgba(21,128,61,1)] rounded hover:bg-[rgba(187,247,208,1)] text-sm shadow hover:shadow-md transition"
                     >
-                      <FaArrowUp size={16} />
-                    </button>
-                    <button
-                      onClick={() => moveBlockDown(actualIndex)}
-                      className="text-gray-500 hover:text-black"
-                      disabled={actualIndex === historyData.length - 1}
-                      title="Move Down"
-                    >
-                      <FaArrowDown size={16} />
-                    </button>
-                    <button
-                      onClick={() => setEditingBlockIndex(actualIndex)}
-                      className="text-blue-500 hover:text-blue-700"
-                      title="Edit Block"
-                    >
-                      <FaEdit size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteBlockRequest(actualIndex)}
-                      className="text-red-500 hover:text-red-700"
-                      title="Delete Block"
-                    >
-                      <FaTrash size={16} />
+                      <FaPlus className="inline mr-1" />
+                      Add Block Here
                     </button>
                   </div>
                 )}
+
+                {/* 인서션 인덱스가 실제 인덱스일 때 에디터 표시 */}
+                {editingBlockIndex === null && insertionIndex === actualIndex && (
+                  <div className="mt-4 border border-[rgba(255,255,255,0.2)] p-4 rounded bg-[rgba(255,255,255,0.05)]">
+                    <p className="text-sm text-[rgba(255,255,255,0.6)] mb-2">
+                      Inserting block at position {insertionIndex + 1}
+                    </p>
+                    <BlocksEditor
+                      onSave={handleAddBlock}
+                      onCancel={() => setInsertionIndex(null)}
+                    />
+                  </div>
+                )}
               </div>
-
-              {/* 블록 아래 Add Block 버튼 */}
-              {editingBlockIndex === null && insertionIndex === null && (
-                <div 
-                  className="text-center h-0 overflow-hidden opacity-0 transition-all duration-300 ease-in-out transform group-hover:opacity-100 group-hover:h-auto group-hover:translate-y-2"
-                >
-                  <button
-                    onClick={() => setInsertionIndex(actualIndex)}
-                    className="px-2 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 text-sm"
-                  >
-                    <FaPlus className="inline mr-1" />
-                    Add Block Here
-                  </button>
-                </div>
-              )}
-
-              {/* 인서션 인덱스가 실제 인덱스일 때 에디터 표시 */}
-              {editingBlockIndex === null && insertionIndex === actualIndex && (
-                <div className="mt-4 border p-4 rounded bg-gray-50">
-                  <p className="text-sm text-gray-500 mb-2">Inserting block at position {insertionIndex + 1}</p>
-                  <BlocksEditor onSave={handleAddBlock} onCancel={() => setInsertionIndex(null)} />
-                </div>
-              )}
-            </div>
-          </React.Fragment>
-        );
-      })}
+            );
+          })}
+      </div>
 
       {/* 마지막에 삽입하는 경우 */}
-      {filteredData.length > 0 && insertionIndex === historyData.length && editingBlockIndex === null && (
-        <div className="mt-4 border p-4 rounded bg-gray-50">
-          <p className="text-sm text-gray-500 mb-2">Inserting block at position {insertionIndex + 1}</p>
-          <BlocksEditor onSave={handleAddBlock} onCancel={() => setInsertionIndex(null)} />
-        </div>
+      {filteredData.length > 0 &&
+        insertionIndex === historyData.length &&
+        editingBlockIndex === null && (
+          <div className="mt-4 border border-[rgba(255,255,255,0.2)] p-4 rounded bg-[rgba(255,255,255,0.05)]">
+            <p className="text-sm text-[rgba(255,255,255,0.6)] mb-2">
+              Inserting block at position {insertionIndex + 1}
+            </p>
+            <BlocksEditor
+              onSave={handleAddBlock}
+              onCancel={() => setInsertionIndex(null)}
+            />
+          </div>
       )}
+
 
       {/* 삭제 확인 모달 */}
       <Modal
-        isOpen={deleteIndex !== null}
-        onRequestClose={handleDeleteBlockCancel}
-        ariaHideApp={false}
-        className="bg-white p-6 rounded shadow-xl max-w-md mx-auto my-40 relative"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
-      >
-        <h2 className="text-xl font-semibold mb-4">Delete Confirmation</h2>
-        <p className="mb-6">Are you sure you want to delete block #{deleteIndex !== null ? deleteIndex + 1 : ''}?</p>
-        <div className="flex justify-end space-x-2">
-          <button onClick={handleDeleteBlockCancel} className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
-            Cancel
-          </button>
-          <button onClick={handleDeleteBlockConfirm} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
-            Delete
-          </button>
-        </div>
-      </Modal>
+          isOpen={deleteIndex !== null}
+          onRequestClose={handleDeleteBlockCancel}
+          ariaHideApp={false}
+          className="bg-[rgba(35,35,40,1)] p-6 rounded-2xl shadow-xl max-w-md mx-auto my-40 relative focus:outline-none"
+          overlayClassName="fixed inset-0 bg-[rgba(0,0,0,0.5)] flex items-center justify-center"
+        >
+          <h2 className="text-xl font-semibold mb-4">Delete Confirmation</h2>
+          <p className="mb-6">
+            Are you sure you want to delete block #
+            {deleteIndex !== null ? deleteIndex + 1 : ''}?
+          </p>
+          <div className="flex justify-end space-x-2">
+            <button
+              onClick={handleDeleteBlockCancel}
+              className="px-4 py-2 bg-[rgba(109,113,119,1)] rounded hover:bg-[rgba(156,163,175,1)] transition"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDeleteBlockConfirm}
+              className="px-4 py-2 bg-[rgba(239,68,68,1)] text-[rgba(255,255,255,1)] rounded hover:bg-[rgba(220,38,38,1)] transition"
+            >
+              Delete
+            </button>
+          </div>
+        </Modal>
+    </div>
     </div>
   );
 };

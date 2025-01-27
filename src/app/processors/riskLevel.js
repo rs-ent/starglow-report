@@ -40,7 +40,7 @@ export const calculateRiskLevelPercentage = (goalFund, shareRatio, minRevenue, s
           bgColor: 'bg-yellow-600',
           riskText: {
             en: 'Moderate Risk',
-            ko: '중간 위험',
+            ko: '중위험',
           },
           description: {
             en: 'An investment with the potential for both profits and losses.',
