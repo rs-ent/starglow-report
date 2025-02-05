@@ -1,14 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { useParams } from "next/navigation";
 import { useIntroduction, useValuation } from "../../../context/GlobalData";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { safeLangValue } from "../../../script/convertLang";
 
-const Introduction = () => {
-  const { locale } = useParams(); 
+const Introduction = ({locale}) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const valuationData = useValuation();

@@ -2,8 +2,6 @@
 
 import React, {useState} from 'react';
 import { useReport } from '../../../context/GlobalData';
-
-import { useParams } from "next/navigation";
 import { translations } from '../../../lib/translations';
 
 import dayjs from 'dayjs';
@@ -19,8 +17,7 @@ function getMonthDayDiff(startDate, endDate) {
     return { en, ko };
 }
 
-const Summary = () => {
-    const { locale } = useParams(); 
+const Summary = ({locale}) => {
     const t = translations[locale] || translations.en;
 
     const [isExpanded, setIsExpanded] = useState(false);

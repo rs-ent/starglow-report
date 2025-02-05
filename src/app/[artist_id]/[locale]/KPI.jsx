@@ -16,8 +16,6 @@ import {
     ReferenceDot,
     ResponsiveContainer,
 } from 'recharts';
-
-import { useParams } from "next/navigation";
 import { translations } from '../../../lib/translations';
 
 function formatYearMonth(yyyyMM, localeRaw = 'en') {
@@ -41,7 +39,7 @@ function formatYearMonth(yyyyMM, localeRaw = 'en') {
     }
 }  
 
-export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenue, minRevenue, maxRevenue) => {
+export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenue, minRevenue, maxRevenue, locale) => {
     // 데이터 계산
     const avgPoint1 = totalValueMultiple;
     const avgPoint3 = currentRevenue;
@@ -76,7 +74,7 @@ export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenu
                             domain={[0, 10]}
                     />
                     <YAxis stroke="#A0A0A0"
-                            tickFormatter={(tick) => formatNumber(tick,'',0)}
+                            tickFormatter={(tick) => formatNumber(tick,'',0, locale)}
                             style={{ fontWeight: 100, fontSize: '8px' }}
                             domain={[lowerBoundPoint2 * 0.9, upperBoundPoint2 * 1.03]}
                     />
@@ -116,7 +114,7 @@ export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenu
                         y={avgPoint3}
                         r={0} // 점 숨김
                         label={{
-                            value: `₩${formatNumber(avgPoint3)}`,
+                            value: `${locale === 'ko' ? '₩' : '$'}${formatNumber(avgPoint3,'',2,locale)}`,
                             position: 'right',
                             fontSize: 10,
                             fill: '#ffffff',
@@ -129,7 +127,7 @@ export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenu
                         y={lowerBoundPoint2}
                         r={0} // 점 숨김
                         label={{
-                            value: `₩${formatNumber(lowerBoundPoint2)}`,
+                            value: `${locale === 'ko' ? '₩' : '$'}${formatNumber(lowerBoundPoint2,'',2,locale)}`,
                             position: 'right',
                             fontSize: 10,
                             fill: '#999999',
@@ -142,7 +140,7 @@ export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenu
                         y={upperBoundPoint2}
                         r={0} // 점 숨김
                         label={{
-                            value: `₩${formatNumber(upperBoundPoint2)}`,
+                            value: `${locale === 'ko' ? '₩' : '$'}${formatNumber(upperBoundPoint2,'',2,locale)}`,
                             position: 'right',
                             fontSize: 10,
                             fill: '#999999',
@@ -154,8 +152,7 @@ export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenu
     );
 };
 
-const KPI = () => {
-    const { locale } = useParams(); 
+const KPI = ({locale}) => {
     const t = translations[locale] || translations.en;
 
     const [isExpanded, setIsExpanded] = useState(false);
@@ -220,12 +217,12 @@ const KPI = () => {
                             </h4>
                             <p className="text-xs font-semibold text-right purple-text-glow-5">
                                 {kpi.suffix === '₩'
-                                    ? `₩${formatNumber(kpi.value)}`
+                                    ? `${locale === 'ko' ? '₩' : '$'}${formatNumber(kpi.value, '', 2, locale)}`
                                     : `${formatNumber(kpi.value)}${kpi.suffix}`}
                             </p>
                         </div>
                         {isExpanded && kpi.label === t.revenueSpectrum && (
-                            revenueSpectrumChart(totalValueMultiple, spectrum, avgRevenue, minRevenue, maxRevenue)
+                            revenueSpectrumChart(totalValueMultiple, spectrum, avgRevenue, minRevenue, maxRevenue, locale)
                         )}
                     </div>
                 ))}

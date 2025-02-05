@@ -26,7 +26,7 @@ export default async function RootLayout({ children }) {
   const reports = await res.json();
   
   return (
-    <html lang="en">
+    <html>
       <body>
         <Analytics />
         <ReportsProvider reports={reports}>

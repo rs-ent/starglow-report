@@ -4,7 +4,7 @@
 
 import React from 'react';
 
-const MediaDisplay = ({ media, mediaTitles }) => {
+const MediaDisplay = ({ media, mediaTitles, locale }) => {
   const gridColumns = media.length === 1 ? "grid-cols-1" : media.length === 2 ? "grid-cols-2" : "grid-cols-3";
 
   const extractYouTubeEmbedUrl = (url) => {
@@ -42,7 +42,7 @@ const MediaDisplay = ({ media, mediaTitles }) => {
 
   return (
     <div
-      className={`grid ${gridColumns} gap-8`}
+      className={`grid ${gridColumns} gap-2`}
     >
       {media.map((item, index) => (
         <figure
@@ -54,7 +54,7 @@ const MediaDisplay = ({ media, mediaTitles }) => {
               <img
                 src={item.url}
                 alt={mediaTitles[index] || `Media ${index + 1}`}
-                className="w-full h-full object-cover rounded-lg"
+                className="w-full h-full object-cover rounded-md"
               />
             </div>
           ) : (

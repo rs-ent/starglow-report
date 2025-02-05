@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useMemo, useRef, useEffect } from 'react';
-import BlocksRenderer from '../analysis-manager/BlocksRenderer'; // BlocksRenderer 가져오기
+import BlocksRenderer from '../analysis-manager/BlocksRenderer';
+import { AnimatedBlock } from '../../components/client/AnimationHook';
 
 const HistoryModal = ({ onClose, contents, locale }) => {
     if (!contents || contents.length === 0) return null;
@@ -37,6 +38,7 @@ const HistoryModal = ({ onClose, contents, locale }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex justify-center items-center">
+            <div className="p-[1px] bg-gradient-to-br from-[rgba(255,255,255,0.4)] to-[rgba(255,255,255,0.2)] shadow-inner">
             <div className="relative w-full max-w-[480px] max-h-dvh bg-animated-glow shadow-lg flex flex-col">
                 {/* 패럴랙스 백그라운드 div */}
                 <div
@@ -44,7 +46,7 @@ const HistoryModal = ({ onClose, contents, locale }) => {
                     className="bg-cover bg-center bg-no-repeat absolute inset-0 z-0 backdrop-blur-sm"
                     style={{
                         backgroundImage: `url(${randomImage})`,
-                        backgroundColor: "rgba(0, 0, 0, 0.1)",
+                        backgroundColor: "rgba(0, 0, 0, 0.55)",
                         backgroundBlendMode: "multiply",
                         backgroundPosition: "center 0",
                     }}
@@ -70,10 +72,13 @@ const HistoryModal = ({ onClose, contents, locale }) => {
                     
                     <div className="p-9">
                         {contents.map((block, index) => (
-                            <BlocksRenderer key={index} block={block} locale={locale} />
+                            <AnimatedBlock>
+                                <BlocksRenderer key={index} block={block} locale={locale} />
+                            </AnimatedBlock>
                         ))}
                     </div>
                 </div>
+            </div>
             </div>
         </div>
     );

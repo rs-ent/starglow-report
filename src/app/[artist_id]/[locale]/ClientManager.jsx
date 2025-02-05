@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './Header';
 import KPI from './KPI';
 import InvestmentPoints from './InvestmentPoints';
@@ -17,7 +17,12 @@ import Estimation from './Estimation';
 
 const ClientManager = ({artist_id, locale}) => {
   const [isHistoryModalOpen, setHistoryModalOpen] = useState(false);
-  const [modalContents, setModalContents] = useState([]); // Modal에 전달할 데이터
+  const [modalContents, setModalContents] = useState([]);
+
+  useEffect(() => {
+    // 클라이언트 사이드에서 최상위 <html> 태그의 lang 속성 업데이트
+    document.documentElement.lang = locale;
+  }, [locale]);
 
   const openHistoryModal = (contents) => {
     setModalContents(contents); // 선택된 contents를 저장
@@ -37,31 +42,31 @@ const ClientManager = ({artist_id, locale}) => {
       <div className="relative flex flex-col gap-4 pb-3">
         {/* 개요 */}
         <section>
-          <Outline />
+          <Outline locale={locale}/>
         </section>
 
         {/* 소개 */}
         <section className="section-base">
-          <Introduction />
+          <Introduction locale={locale} />
         </section>
         
         {/* KPI 섹션 */}
         <section className="section-base">
           <h2 className="section-title">Key Performance Indicators</h2>
-          <KPI />
+          <KPI locale={locale} />
         </section>
 
         {/* 투자요약 섹션 */}
         <section className="section-base">
           <h2 className="section-title">Investment Details</h2>
-          <Summary />
+          <Summary locale={locale} />
         </section>
 
         {/* 리워드 섹션 */}
-        <Rewards />
+        <Rewards locale={locale} />
         
         {/* 투자 포인트 */}
-        <InvestmentPoints type="Investment Point" />
+        <InvestmentPoints type="Investment Point" locale={locale} />
 
         {/* 히스토리 */}
         <section className="section-base">
@@ -75,12 +80,12 @@ const ClientManager = ({artist_id, locale}) => {
         )}
         
         {/* 리스크 */}
-        <InvestmentPoints type="Risk" />
+        <InvestmentPoints type="Risk" locale={locale} />
 
         {/* Estimation */}
         <section className="section-base">
           <h2 className="section-title">Estimation</h2>
-          <Estimation />
+          <Estimation locale={locale} />
         </section>
 
         {/* 위험도 */}

@@ -19,3 +19,17 @@ export function convertKor(val) {
     if (typeof val === 'object') return val;
     return { ko: val, en: ''};
 }
+
+export function safeLangMapper(val, locale = 'ko') {
+  if (Array.isArray(val)) {
+    return val;
+  }
+  
+  if (typeof val === 'object') {
+    if (Object.prototype.hasOwnProperty.call(val, locale) && Array.isArray(val[locale])) {
+      return val[locale];
+    }
+  }
+
+  return [];
+}

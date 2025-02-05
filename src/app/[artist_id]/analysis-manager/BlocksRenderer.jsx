@@ -1,4 +1,4 @@
-// src/app/[artist_id]/history-manager/BlocksRenderer.jsx
+// src/app/[artist_id]/analysis-manager/BlocksRenderer.jsx
 import React from 'react';
 import {
   BarChart,
@@ -26,23 +26,20 @@ import {
   FaTimes,
 } from 'react-icons/fa';
 
-function safeLangValue(val, locale = 'ko') {
-  if (!val) return '';
-  if (typeof val === 'string') {
-    return val; // 예전 (단일 string) 데이터
-  }
-  if (typeof val === 'object') {
-    // 새 구조: { ko:'...', en:'...' }
-    return val[locale] || '';
-  }
-  return '';
-}
+import { safeLangMapper, safeLangValue } from '../../../script/convertLang';
 
+// 간단한 undefined 방지용 함수
+const safeText = (text) => text || '';
+
+// 배열 안전 처리 함수
 function safeArray(arr) {
   return Array.isArray(arr) ? arr : [];
 }
 
-// 섹션, 타이틀 헬퍼 컴포넌트
+/* --------------------------------------------------------------------------
+   헬퍼 컴포넌트: Section & Title
+   globals.css의 .section-base, .border-gradient-b, .text-gradient 등 적용
+-------------------------------------------------------------------------- */
 const Section = ({ children, className = '' }) => (
   <section
     className={`section-base ${className}`}
@@ -53,69 +50,54 @@ const Section = ({ children, className = '' }) => (
   </section>
 );
 
-const Title = ({ level, children }) => {
+const Title = ({ level, children, gradient = false, Icon }) => {
   const Tag = `h${level}`;
-  // 기존 classNames -> RGBA 변환
-  const classNames = {
-    1: `
-      text-4xl font-bold mt-4 mb-2 flex items-center border-b-2 pb-2 
-      border-[rgba(255,255,255,0.2)] 
-      text-[rgba(59,130,246,1)]
-    `,
-    2: `
-      text-2xl font-bold mt-10 mb-2 flex items-center pb-1 
-      text-[rgba(59,130,246,1)]
-    `,
-    3: `
-      text-xl font-semibold mt-6 mb-1 flex items-center pb-1
-      text-[rgba(139,92,246,1)]
-    `,
+  // 각 레벨에 따른 기본 스타일과 전환 효과
+  const baseClasses = 'font-bold flex items-center pb-1 transition-all duration-300';
+  const levelClasses = {
+    1: 'text-6xl mt-8 mb-2 pb-4 border-b-2 border-gradient-b text-[var(--primary)] text-glow',
+    2: 'text-4xl mt-16 mb-2 text-[var(--primary)] text-outline purple-text-glow-5',
+    3: 'text-xl mt-6 mb-1 text-[rgba(139,92,246,1)]',
   };
-
+  // gradient 옵션 활성 시 globals.css의 텍스트 그라데이션 적용
+  const gradientClass = gradient ? 'text-gradient' : '';
   return (
-    <Tag className={classNames[level]} tabIndex="0">
+    <Tag className={`${baseClasses} ${levelClasses[level] || ''} ${gradientClass}`} tabIndex="0">
+      {Icon && <Icon className="mr-2 inline-block" />}
       {children}
     </Tag>
   );
 };
 
-// 갤러리 컴포넌트
+/* --------------------------------------------------------------------------
+   Gallery 컴포넌트 (이미지 갤러리 + 전체 화면 라이트박스)
+   globals.css의 애니메이션, 전환, 그림자 효과 활용
+-------------------------------------------------------------------------- */
 const Gallery = ({ images }) => {
   const [lightboxIndex, setLightboxIndex] = React.useState(null);
   const lightboxRef = React.useRef(null);
 
-  const openLightbox = (index) => {
-    setLightboxIndex(index);
-  };
-
-  const closeLightbox = () => {
-    setLightboxIndex(null);
-  };
+  const openLightbox = (index) => setLightboxIndex(index);
+  const closeLightbox = () => setLightboxIndex(null);
 
   const showNext = React.useCallback(() => {
-    if (images.length > 0 && lightboxIndex !== null) {
-      setLightboxIndex((prevIndex) => (prevIndex + 1) % images.length);
+    if (images.length && lightboxIndex !== null) {
+      setLightboxIndex((prev) => (prev + 1) % images.length);
     }
   }, [images, lightboxIndex]);
 
   const showPrev = React.useCallback(() => {
-    if (images.length > 0 && lightboxIndex !== null) {
-      setLightboxIndex((prevIndex) =>
-        prevIndex === 0 ? images.length - 1 : prevIndex - 1
-      );
+    if (images.length && lightboxIndex !== null) {
+      setLightboxIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
     }
   }, [images, lightboxIndex]);
 
   React.useEffect(() => {
     const handleKeyDown = (e) => {
       if (lightboxIndex !== null) {
-        if (e.key === 'Escape') {
-          closeLightbox();
-        } else if (e.key === 'ArrowRight') {
-          showNext();
-        } else if (e.key === 'ArrowLeft') {
-          showPrev();
-        }
+        if (e.key === 'Escape') closeLightbox();
+        else if (e.key === 'ArrowRight') showNext();
+        else if (e.key === 'ArrowLeft') showPrev();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -125,70 +107,50 @@ const Gallery = ({ images }) => {
   const currentImage = lightboxIndex !== null ? images[lightboxIndex] : null;
 
   return (
-    <div
-      className="my-8 items-center transition-all duration-300"
-      role="region"
-      aria-label="Advanced Image Gallery"
-    >
-      {images && images.length > 0 ? (
-        <div
-          className="px-8 grid gap-2 items-center justify-items-center w-full"
-          style={{ gridTemplateColumns: `repeat(${images.length}, minmax(0, 1fr))` }}
-        >
-          {images.map((img, index) => (
-            <button
-              key={index}
-              className="
-                group relative w-full overflow-hidden rounded-md
-                focus:outline-none
-                focus:ring-2
-                focus:ring-[rgba(59,130,246,1)]
-                transition
-              "
-              onClick={() => openLightbox(index)}
-              aria-label={`Open image ${index + 1}`}
-            >
-              <div
-                className="
-                  w-full h-40 bg-[rgba(229,231,235,1)]
-                  flex items-center justify-center overflow-hidden
-                  transition-transform duration-300
-                  group-hover:scale-105
-                  shadow-md
-                "
+    <>
+      <div
+        className="my-8 transition-all duration-300"
+        role="region"
+        aria-label="Advanced Image Gallery"
+      >
+        {images && images.length > 0 ? (
+          <div
+            className="px-4 grid gap-2 items-center justify-items-center w-full"
+            style={{ gridTemplateColumns: `repeat(${Math.min(images.length, 3)}, minmax(0, 1fr))` }}
+          >
+            {images.map((img, index) => (
+              <button
+                key={index}
+                className="group relative w-full overflow-hidden rounded-md focus:outline-none focus:ring-2 focus:ring-[rgba(59,130,246,1)] transition transform hover:scale-105"
+                onClick={() => openLightbox(index)}
+                aria-label={`Open image ${index + 1}`}
               >
-                {img.src ? (
-                  <img
-                    src={img.src}
-                    alt={img.alt || `Image ${index + 1}`}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="text-[rgba(107,114,128,1)] text-sm">
-                    No Image Available
-                  </div>
-                )}
-              </div>
-            </button>
-          ))}
-        </div>
-      ) : (
-        <div className="flex items-center justify-center w-full h-60 bg-[rgba(229,231,235,1)] text-[rgba(55,65,81,1)]">
-          No Images to Display
-        </div>
-      )}
+                <div className="w-full h-40 bg-[rgba(229,231,235,1)] flex items-center justify-center overflow-hidden shadow-md transition-transform duration-300">
+                  {img.src ? (
+                    <img
+                      src={img.src}
+                      alt={img.alt || `Image ${index + 1}`}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="text-sm text-[var(--foreground-muted)]">No Image Available</div>
+                  )}
+                </div>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="flex items-center justify-center w-full h-60 bg-[rgba(229,231,235,1)] text-[var(--text-secondary)]">
+            No Images to Display
+          </div>
+        )}
+      </div>
 
       {lightboxIndex !== null && (
         <div
           ref={lightboxRef}
-          className="
-            fixed inset-0 z-50 
-            bg-[rgba(0,0,0,0.8)] 
-            flex items-center justify-center 
-            p-4
-            transition-colors duration-300
-          "
+          className="fixed inset-0 z-50 bg-[rgba(0,0,0,0.9)] flex items-center justify-center p-4 animate-fadeIn"
           role="dialog"
           aria-modal="true"
           aria-label="Lightbox Image View"
@@ -197,17 +159,7 @@ const Gallery = ({ images }) => {
             {/* 닫기 버튼 */}
             <button
               onClick={closeLightbox}
-              className="
-                absolute top-4 right-4 
-                text-[rgba(255,255,255,1)] text-2xl
-                bg-[rgba(0,0,0,0.5)]
-                rounded-full p-2
-                hover:bg-[rgba(0,0,0,0.7)]
-                focus:outline-none
-                focus:ring-2
-                focus:ring-[rgba(59,130,246,1)]
-                transition
-              "
+              className="absolute top-4 right-4 text-3xl bg-[rgba(0,0,0,0.6)] rounded-full p-2 hover:bg-[rgba(0,0,0,0.8)] focus:outline-none focus:ring-2 focus:ring-[rgba(59,130,246,1)] transition"
               aria-label="Close Lightbox"
             >
               <FaTimes />
@@ -217,41 +169,20 @@ const Gallery = ({ images }) => {
               <>
                 <button
                   onClick={showPrev}
-                  className="
-                    absolute top-1/2 left-2 transform -translate-y-1/2
-                    text-[rgba(255,255,255,1)] text-2xl
-                    bg-[rgba(0,0,0,0.5)]
-                    rounded-full p-2
-                    hover:bg-[rgba(0,0,0,0.7)]
-                    focus:outline-none
-                    focus:ring-2
-                    focus:ring-[rgba(59,130,246,1)]
-                    transition
-                  "
+                  className="absolute top-1/2 left-4 transform -translate-y-1/2 text-3xl bg-[rgba(0,0,0,0.6)] rounded-full p-2 hover:bg-[rgba(0,0,0,0.8)] focus:outline-none focus:ring-2 focus:ring-[rgba(59,130,246,1)] transition"
                   aria-label="Show Previous Image"
                 >
                   <FaArrowLeft />
                 </button>
                 <button
                   onClick={showNext}
-                  className="
-                    absolute top-1/2 right-2 transform -translate-y-1/2
-                    text-[rgba(255,255,255,1)] text-2xl
-                    bg-[rgba(0,0,0,0.5)]
-                    rounded-full p-2
-                    hover:bg-[rgba(0,0,0,0.7)]
-                    focus:outline-none
-                    focus:ring-2
-                    focus:ring-[rgba(59,130,246,1)]
-                    transition
-                  "
+                  className="absolute top-1/2 right-4 transform -translate-y-1/2 text-3xl bg-[rgba(0,0,0,0.6)] rounded-full p-2 hover:bg-[rgba(0,0,0,0.8)] focus:outline-none focus:ring-2 focus:ring-[rgba(59,130,246,1)] transition"
                   aria-label="Show Next Image"
                 >
                   <FaArrowRight />
                 </button>
               </>
             )}
-
             <div className="flex items-center justify-center">
               {currentImage && currentImage.src ? (
                 <img
@@ -260,45 +191,36 @@ const Gallery = ({ images }) => {
                   className="max-h-[90vh] object-contain transition-transform duration-300 shadow-2xl"
                 />
               ) : (
-                <div className="text-[rgba(255,255,255,1)]">
-                  No Image Available
-                </div>
+                <div className="text-[var(--foreground)]">No Image Available</div>
               )}
             </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
-// 메인 BlocksRenderer 컴포넌트
+/* --------------------------------------------------------------------------
+   메인 BlocksRenderer 컴포넌트
+   각 블록 타입마다 globals.css의 동적 효과, 그라데이션, 애니메이션 적용
+-------------------------------------------------------------------------- */
 const BlocksRenderer = ({ block, locale = 'ko' }) => {
   const { type, ...props } = block;
 
   switch (type) {
     case 'SectionTitle':
       return (
-        <div
-          className="my-4 transition-all"
-          role="region"
-          aria-label="Section Title Block"
-        >
+        <div className="my-4 transition-all" role="region" aria-label="Section Title Block">
           {props.src && (
             <img
               src={props.src}
               alt={safeLangValue(props.alt, locale) || 'Section image'}
-              className="
-                w-full object-cover rounded-lg 
-                shadow-[0_4px_12px_rgba(0,0,0,0.3)]
-                mb-4
-                hover:opacity-95 
-                transition
-              "
+              className="w-full object-cover rounded-lg shadow-[0_8px_16px_rgba(0,0,0,0.4)] mb-4 hover:opacity-90 transition-all bg-animated-glow"
               loading="lazy"
             />
           )}
-          <Title level={1}>{safeLangValue(props.text, locale)}</Title>
+          <Title level={1} gradient>{safeLangValue(props.text, locale)}</Title>
         </div>
       );
 
@@ -312,14 +234,14 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
     case 'Subtitle':
       return (
         <div role="heading" aria-level="3" aria-label="Subtitle Block">
-          <Title level={3}>{safeLangValue(props.text, locale)}</Title>
+          <Title level={3} gradient>❐ {safeLangValue(props.text, locale)}</Title>
         </div>
       );
 
     case 'Text':
       return (
         <p
-          className="text-sm font-normal mt-1 mb-4 text-[rgba(255,255,255,0.85)]"
+          className="text-sm font-normal mt-1 mb-4 text-[var(--text-primary)] transition-all tracking-wide leading-relaxed"
           role="text"
           aria-label="Text Block"
         >
@@ -329,88 +251,66 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
 
     case 'Image':
       return (
-        <div
-          className="my-8 flex justify-center transition-all"
-          role="img"
-          aria-label="Image Block"
-        >
+        <div className="my-8 flex justify-center transition-all" role="img" aria-label="Image Block">
           <img
             src={props.src || ''}
             alt={safeLangValue(props.alt, locale) || 'Image'}
-            className="
-              w-3/4 object-cover rounded-lg 
-              shadow-[0_4px_12px_rgba(0,0,0,0.3)] 
-              hover:opacity-95
-              transition
-            "
+            className="w-11/12 sm:w-3/4 object-cover rounded-lg shadow-[0_8px_16px_rgba(0,0,0,0.4)] hover:opacity-90 transition-all"
             loading="lazy"
           />
         </div>
       );
 
-    case 'Video':
+    case 'Video': {
       const extractYouTubeId = (url) => {
         if (!url) return null;
         const match = url.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/.*[?&]v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
         return match ? match[1] : null;
       };
       const videoId = extractYouTubeId(props.src);
-
       return (
-        <div className="video-container my-9" role="region" aria-label="Video Block">
+        <div className="video-container my-9 transition-all" role="region" aria-label="Video Block">
           {videoId ? (
             <iframe
-              className="w-5/6 h-60 mx-auto rounded-lg shadow-soft transition-transform transform focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-11/12 h-60 mx-auto rounded-lg shadow-soft transition-transform transform focus:outline-none focus:ring-2 focus:ring-blue-500"
               src={`https://www.youtube.com/embed/${videoId}`}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               title="Embedded YouTube Video"
             ></iframe>
           ) : (
-            <div className="w-5/6 mx-auto text-center text-gray-500 p-4 bg-gray-100 rounded">
+            <div className="w-11/12 mx-auto text-center text-gray-500 p-4 bg-gray-100 rounded">
               Invalid or Missing Video URL
             </div>
           )}
         </div>
       );
+    }
 
     case 'List': {
       const ListIcon = props.ordered ? FaList : FaCheckCircle;
-      // items가 { ko:[], en:[] }거나 단일 array일 수 있음
-      // => safeArray + safeLangValue 필요
       let items = props.items;
       if (typeof items === 'object' && items !== null && !Array.isArray(items)) {
-        // 새 구조: items = { ko: [...], en: [...] }
         items = items[locale] || [];
       } else if (!Array.isArray(items)) {
         items = [];
       }
-
       return (
         <div className="my-4 transition-all" role="list" aria-label="List Block">
           <div className="flex items-center mb-2">
-            <ListIcon
-              className="inline-block mr-2 text-[rgba(139,92,246,1)]"
-              aria-hidden="true"
-            />
-            <span className="sr-only">
-              {props.ordered ? 'Ordered List' : 'Unordered List'}
-            </span>
+            <ListIcon className="inline-block mr-2 text-[rgba(139,92,246,1)] animate-pulse-soft" aria-hidden="true" />
+            <span className="sr-only">{props.ordered ? 'Ordered List' : 'Unordered List'}</span>
           </div>
           {props.ordered ? (
-            <ol className="list-decimal list-inside my-2 text-[rgba(255,255,255,0.85)]">
+            <ol className="list-decimal list-inside my-2 text-[var(--text-primary)]">
               {items.map((item, index) => (
-                <li key={index} className="mb-1" role="listitem">
-                  {item}
-                </li>
+                <li key={index} className="mb-1" role="listitem">{item}</li>
               ))}
             </ol>
           ) : (
-            <ul className="list-disc list-inside my-2 text-[rgba(255,255,255,0.85)]">
+            <ul className="list-disc list-inside my-2 text-[var(--text-primary)]">
               {items.map((item, index) => (
-                <li key={index} className="mb-1" role="listitem">
-                  {item}
-                </li>
+                <li key={index} className="mb-1" role="listitem">{item}</li>
               ))}
             </ul>
           )}
@@ -419,29 +319,18 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
     }
 
     case 'Blockquote': {
-      // text / cite => 각각 safeLangValue
       const quoteText = safeLangValue(props.text, locale);
       const quoteCite = safeLangValue(props.cite, locale);
-
       return (
         <blockquote
-          className="
-            border-l-4 border-[rgba(139,92,246,1)] pl-4 italic 
-            my-6 text-[rgba(255,255,255,0.7)] 
-            transition-all
-          "
+          className="border-l-4 border-[rgba(139,92,246,1)] pl-4 italic my-6 text-[var(--text-secondary)] transition-all"
           role="quote"
           aria-label="Blockquote"
         >
-          <FaQuoteLeft
-            className="inline-block mr-2 text-[rgba(139,92,246,1)]"
-            aria-hidden="true"
-          />
+          <FaQuoteLeft className="inline-block mr-2 text-[rgba(139,92,246,1)]" aria-hidden="true" />
           “{quoteText}”
           {quoteCite && (
-            <cite className="block text-right text-sm text-[rgba(255,255,255,0.6)] mt-2">
-              - {quoteCite}
-            </cite>
+            <cite className="block text-right text-sm text-[var(--foreground-muted)] mt-2">- {quoteCite}</cite>
           )}
         </blockquote>
       );
@@ -449,34 +338,34 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
 
     case 'Code':
       return (
-        <div className="my-4" role="region" aria-label="Code Block">
+        <div className="my-4 transition-all" role="region" aria-label="Code Block">
           <pre
-            className="bg-[var(--background-muted)] text-[var(--foreground)] p-4 rounded-lg overflow-auto shadow-soft"
+            className="bg-[var(--background-muted)] text-[var(--foreground)] p-4 rounded-lg overflow-auto shadow-[0_8px_16px_rgba(0,0,0,0.4)] transition-all"
             tabIndex="0"
           >
-            <code className={`language-${safeText(props.language)}`}>{safeText(props.code)}</code>
+            <code className={`language-${safeText(props.language)}`}>
+              {safeText(props.code)}
+            </code>
           </pre>
         </div>
       );
 
-    case 'Table':
-      const tableData = safeArray(props.tableData);
+    case 'Table': {
+      const tableData = safeLangMapper(props.tableData, locale);
       if (tableData.length === 0) {
         return <div className="my-8 text-center text-gray-500">No Table Data</div>;
       }
-
       const headers = tableData[0] ? tableData[0].split('@@') : [];
       const rows = tableData.slice(1);
-
       return (
-        <div className="overflow-x-auto my-8" role="region" aria-label="Table Block">
-          <table className="min-w-full border-collapse border border-[var(--background-second)]" role="table">
+        <div className="overflow-x-auto my-8 transition-all" role="region" aria-label="Table Block">
+          <table className="min-w-full border-collapse border border-[var(--background-second)]">
             <thead>
               <tr>
                 {headers.map((header, index) => (
                   <th
                     key={index}
-                    className="border border-[var(--background-second)] px-4 py-2 bg-[var(--background-brushed)] text-center text-[var(--text-primary)] text-base"
+                    className="border border-[var(--background-second)] px-4 py-2 bg-[var(--background-brushed)] text-center text-[var(--text-primary)] text-base border-gradient-b"
                     role="columnheader"
                   >
                     {header}
@@ -505,11 +394,11 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
           </table>
         </div>
       );
+    }
 
-    case 'Chart':
+    case 'Chart': {
       const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#8dd1e1'];
       const chartData = safeArray(props.data);
-
       const renderChart = () => {
         if (!chartData || chartData.length === 0) {
           return <div className="text-center text-gray-500 p-4">No chart data available</div>;
@@ -524,7 +413,7 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
                   <YAxis stroke="var(--text-primary)" />
                   <Tooltip />
                   <Legend />
-                  <Line type="monotone" dataKey={props.dataKey} stroke="var(--accent)" />
+                  <Line type="monotone" dataKey={props.dataKey} stroke="var(--accent)" strokeWidth={3} />
                 </LineChart>
               </ResponsiveContainer>
             );
@@ -561,23 +450,25 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
                   <YAxis stroke="var(--text-primary)" />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey={props.dataKey} fill="var(--accent)" />
+                  <Bar dataKey={props.dataKey} fill="var(--accent)" barSize={30} />
                 </BarChart>
               </ResponsiveContainer>
             );
         }
       };
-
       return (
-        <div className="my-4" role="region" aria-label="Chart Block">
-          {props.title && <Title level={3}>{safeText(props.title)}</Title>}
-          {renderChart()}
+        <div className="my-4 transition-all" role="region" aria-label="Chart Block">
+          {props.title && <Title level={3} gradient>{safeText(props.title)}</Title>}
+          <div className="bg-animated-glow p-4 rounded-lg shadow-[0_8px_16px_rgba(0,0,0,0.4)] transition-all">
+            {renderChart()}
+          </div>
         </div>
       );
+    }
 
     case 'Link':
       return (
-        <div className="my-4" role="link" aria-label="Link Block">
+        <div className="my-4 transition-all" role="link" aria-label="Link Block">
           <a
             href={props.href || '#'}
             target="_blank"
@@ -592,7 +483,7 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
 
     case 'File':
       return (
-        <div className="my-4" role="link" aria-label="File Download Block">
+        <div className="my-4 transition-all" role="link" aria-label="File Download Block">
           <a
             href={props.href || '#'}
             download
@@ -604,57 +495,45 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
         </div>
       );
 
-    case 'Countdown':
+    case 'Countdown': {
       const calculateTimeLeft = () => {
-        const difference = props.targetDate ? +new Date(props.targetDate) - +new Date() : -1;
+        const diff = props.targetDate ? +new Date(props.targetDate) - +new Date() : -1;
         let timeLeft = {};
-
-        if (difference > 0) {
+        if (diff > 0) {
           timeLeft = {
-            days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-            hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-            minutes: Math.floor((difference / (1000 * 60)) % 60),
-            seconds: Math.floor((difference / 1000) % 60),
+            days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+            hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+            minutes: Math.floor((diff / (1000 * 60)) % 60),
+            seconds: Math.floor((diff / 1000) % 60),
           };
         }
-
         return timeLeft;
       };
-
       const [timeLeft, setTimeLeft] = React.useState(calculateTimeLeft());
-
       React.useEffect(() => {
-        const timer = setInterval(() => {
-          setTimeLeft(calculateTimeLeft());
-        }, 1000);
+        const timer = setInterval(() => setTimeLeft(calculateTimeLeft()), 1000);
         return () => clearInterval(timer);
       }, [props.targetDate]);
-
-      const timerKeys = Object.keys(timeLeft);
-      const timerComponents = timerKeys.length
-        ? timerKeys.map((interval) => (
-            <span key={interval} className="mx-1">
+      const timerComponents = Object.keys(timeLeft).length
+        ? Object.keys(timeLeft).map((interval) => (
+            <span key={interval} className="mx-1 text-xl font-semibold">
               {timeLeft[interval]} {interval}
             </span>
           ))
         : null;
-
       return (
         <div
-          className="my-4 p-4 border border-[var(--background-second)] rounded-lg shadow-soft bg-[var(--background-brushed)]"
+          className="my-4 p-4 border border-[var(--background-second)] rounded-lg shadow-soft bg-[var(--background-brushed)] transition-all"
           role="region"
           aria-label="Countdown Block"
         >
-          {props.title && <Title level={3}>{safeText(props.title)}</Title>}
+          {props.title && <Title level={3} gradient>{safeText(props.title)}</Title>}
           <div className="flex justify-center items-center text-lg">
-            {timerComponents ? (
-              timerComponents
-            ) : (
-              <span className="text-green-600">이벤트가 시작되었습니다!</span>
-            )}
+            {timerComponents || <span className="text-green-600 font-bold">이벤트가 시작되었습니다!</span>}
           </div>
         </div>
       );
+    }
 
     case 'Gallery':
       return (
@@ -665,7 +544,7 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
 
     default:
       return (
-        <div className="my-4 text-center text-gray-500" role="region" aria-label="Unknown Block">
+        <div className="my-4 text-center text-gray-500 transition-all" role="region" aria-label="Unknown Block">
           Unsupported block type: {type}
         </div>
       );

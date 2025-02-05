@@ -17,6 +17,7 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { formatNumber } from '../../utils/formatNumber';
+import { safeLangValue } from '../../../script/convertLang';
 
 const calculateYAxisDomain = (data, chartConfig) => {
   if (!data || !chartConfig) {
@@ -42,19 +43,19 @@ const calculateYAxisDomain = (data, chartConfig) => {
   return [0, paddedMaxY]; // Y축 도메인 반환
 };
 
-const ChartDisplay = ({ chartConfig, chartTitle, timeline }) => { // sortedData 추가
-  const data = processChartData(chartConfig, timeline); // sortedData 전달
+const ChartDisplay = ({ chartConfig, chartTitle, timeline, locale }) => { // sortedData 추가
+  const data = processChartData(chartConfig, timeline, locale);
 
   return (
     <div className="chart-display">
       {/* 차트 제목 */}
-      {chartTitle && <h2 className="pb-4 text-xs font-light text-center text-[var(--foreground-muted)]">{chartTitle}</h2>}
+      {chartTitle && <h2 className="pb-4 text-xs font-light text-center text-[var(--foreground-muted)]">{safeLangValue(chartTitle, locale)}</h2>}
 
   
       <ResponsiveContainer width="100%" height={250}>
         <LineChart 
           data={data}
-          margin={{ top: 0, right: 20, left: -15, bottom: 0 }}
+          margin={{ top: 0, right: 25, left: -15, bottom: 0 }}
         >
           {/* 격자 배경 */}
           <CartesianGrid strokeDasharray="8 8" stroke="var(--secondary)" opacity={0.15} />
@@ -67,7 +68,7 @@ const ChartDisplay = ({ chartConfig, chartTitle, timeline }) => { // sortedData 
           <YAxis
             domain={calculateYAxisDomain(data, chartConfig)}
             tick={{ fontSize: 8, fill: 'var(--foreground-muted)' }}
-            tickFormatter={(value) => formatNumber(value, '', 1)}
+            tickFormatter={(value) => formatNumber(value, '', 1, locale)}
             label={{
               angle: -90,
               position: 'insideLeft',
@@ -76,43 +77,32 @@ const ChartDisplay = ({ chartConfig, chartTitle, timeline }) => { // sortedData 
             }}
           />
   
-          {/* 툴팁 
-          <Tooltip
-            formatter={(value, name) => [formatNumber(value, '', 2), name]}
-            contentStyle={{
-              backgroundColor: 'var(--background)',
-              borderColor: 'var(--secondary)',
-              borderRadius: '8px',
-              color: 'var(--foreground)',
-              fontSize: 10,
-            }}
-            itemStyle={{ color: 'var(--foreground)' }}
-            wrapperStyle={{
-              padding: '2px', // 필요하면 내부 여백 조정
-            }}
-          />*/}
-  
           {/* 범례 */}
-          <Legend wrapperStyle={{ position: 'relative', top: -30, fontSize: 12, color: 'var(--foreground-muted)' }} />
+          <Legend wrapperStyle={{ position: 'relative', top: -30, left: 10, fontSize: 12, color: 'var(--foreground-muted)' }} />
 
   
           {/* 선택된 필드의 선 그리기 */}
-          {chartConfig.selectedFields.map((field, index) => (
-            <Line
-              key={index}
-              type="monotone"
-              dataKey={field.label || field.field}
-              stroke={getLineColor(index)}
-              strokeWidth={2}
-              dot={false}
-              activeDot={{ r: 5 }}
-            />
-          ))}
+          {chartConfig.selectedFields.map((field, index) => {
+            const localizedName = safeLangValue(field.label, locale) || field.field;
+
+            return (
+              <Line
+                key={index}
+                type="monotone"
+                dataKey={localizedName}
+                name={localizedName}
+                stroke={getLineColor(index)}
+                strokeWidth={2}
+                dot={false}
+                activeDot={{ r: 5 }}
+              />
+            );
+          })}
   
           {/* 마커 렌더링 */}
           {chartConfig.markers &&
             chartConfig.markers.map((marker, index) =>
-              renderMarker(marker, index, timeline)
+              renderMarker(marker, index, timeline, locale)
             )}
         </LineChart>
       </ResponsiveContainer>
@@ -126,7 +116,7 @@ const getMarkerMaxY = (markers) => {
   return markers.map(marker => marker.yMax || 0);
 };
 
-const processChartData = (chartConfig, sortedData) => {
+const processChartData = (chartConfig, sortedData, locale) => {
   if (!chartConfig || !chartConfig.dateRange) {
     console.error('Invalid chartConfig or missing dateRange');
     return [];
@@ -150,7 +140,8 @@ const processChartData = (chartConfig, sortedData) => {
   return filteredData.map((item) => {
     const dataPoint = { date: formatDate(item.date) };
     chartConfig.selectedFields.forEach((field) => {
-      dataPoint[field.label || field.field] = item[field.field];
+      const label = safeLangValue(field.label, locale) || field.field;
+      dataPoint[label] = item[field.field];
     });
     return dataPoint;
   });
@@ -167,12 +158,14 @@ const getLineColor = (index) => {
   return colors[index % colors.length];
 };
 
-const renderMarker = (marker, index, sortedData) => {
+const renderMarker = (marker, index, sortedData, locale) => {
   if(marker.type === 'box' && marker.xMax - marker.xMin <= 2) {
     marker.type = 'line';
     const xValue = Math.ceil((parseInt(marker.xMax, 10) + parseInt(marker.xMin, 10)) / 2);
     marker.xValue = xValue;
   }
+
+  const labelText = safeLangValue(marker.description, locale) || `Point ${index + 1}`;
     
   switch (marker.type) {
     case 'box':
@@ -198,7 +191,7 @@ const renderMarker = (marker, index, sortedData) => {
           x2={formatDate(x2)}
           y1={marker.yMin}
           y2={marker.yMax}
-          label={marker.description}
+          label={labelText}
           fill={marker.color}
           fillOpacity={marker.alpha}
         />
@@ -215,7 +208,7 @@ const renderMarker = (marker, index, sortedData) => {
             strokeWidth={2}
             label={{
               position: 'top',
-              value: marker.description,
+              value: labelText,
               fill: 'var(--accent)',
               fontSize: 9,
             }}
@@ -231,7 +224,7 @@ const renderMarker = (marker, index, sortedData) => {
           strokeDasharray="4 4"
           label={{
             position: 'right',
-            value: marker.description,
+            value: labelText,
             fill: marker.color,
             fontSize: 12,
             fontWeight: 'bold',

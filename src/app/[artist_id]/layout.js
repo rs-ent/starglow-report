@@ -14,7 +14,7 @@ export default async function ArtistLayout({ children, params }) {
     const data = await res.json();
 
     return (
-        <div>
+        <main>
             <DataProvider 
                 valuation={data.valuation}
                 timeline={data.timeline} 
@@ -28,6 +28,6 @@ export default async function ArtistLayout({ children, params }) {
             >
                 {children}
             </DataProvider>
-        </div>
+        </main>
     );
 }

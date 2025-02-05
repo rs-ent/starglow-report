@@ -47,12 +47,12 @@ function convertLegacyFields(data) {
   return newData;
 }
 
-const BlocksEditor = ({ block = null, onSave, onCancel }) => {
+const BlocksEditor = ({ block = null, onSave, onCancel, locale = 'ko' }) => {
   const defaultType = block ? block.type : BLOCK_TYPES[0].value;
   const [type, setType] = useState(defaultType);
   const [formData, setFormData] = useState(block || { type: defaultType });
   const [activeTab, setActiveTab] = useState('edit');
-  const [activeLanguage, setActiveLanguage] = useState('ko');
+  const [activeLanguage, setActiveLanguage] = useState(locale);
 
   const currentType = BLOCK_TYPES.find(bt => bt.value === type);
 
@@ -135,40 +135,6 @@ const BlocksEditor = ({ block = null, onSave, onCancel }) => {
           </div>
         </div>
 
-        {/* Language Tab (Only in Edit Mode) */}
-        {activeTab === 'edit' && (
-          <div className="border-b border-[rgba(255,255,255,0.2)] flex space-x-2">
-            <button
-              type="button"
-              className={`
-                px-4 py-2 transition 
-                ${
-                  activeLanguage === 'ko'
-                    ? 'border-b-2 border-[var(--primary)] text-[var(--primary)]'
-                    : 'text-[rgba(200,200,200,0.8)]'
-                }
-              `}
-              onClick={() => handleLanguageChange('ko')}
-            >
-              한국어
-            </button>
-            <button
-              type="button"
-              className={`
-                px-4 py-2 transition
-                ${
-                  activeLanguage === 'en'
-                    ? 'border-b-2 border-[var(--primary)] text-[var(--primary)]'
-                    : 'text-[rgba(200,200,200,0.8)]'
-                }
-              `}
-              onClick={() => handleLanguageChange('en')}
-            >
-              English
-            </button>
-          </div>
-        )}
-
         {/* Edit / Preview Tabs */}
         <div className="border-b border-[rgba(255,255,255,0.2)] flex space-x-2">
           <button
@@ -213,9 +179,41 @@ const BlocksEditor = ({ block = null, onSave, onCancel }) => {
           </div>
         ) : (
           <div className="mt-2 p-3 border border-[rgba(255,255,255,0.1)] rounded bg-[rgba(255,255,255,0.02)]">
-            <BlocksRenderer block={formData} />
+            <BlocksRenderer block={formData} locale={activeLanguage} />
           </div>
         )}
+
+        {/* Language Tab (Only in Edit Mode) */}
+        <div className="border-t border-[rgba(255,255,255,0.2)] flex space-x-2">
+          <button
+            type="button"
+            className={`
+              px-4 py-2 transition 
+              ${
+                activeLanguage === 'ko'
+                  ? 'border-t-2 border-[var(--primary)] text-[var(--primary)]'
+                  : 'text-[rgba(200,200,200,0.8)]'
+              }
+            `}
+            onClick={() => handleLanguageChange('ko')}
+          >
+            한국어
+          </button>
+          <button
+            type="button"
+            className={`
+              px-4 py-2 transition
+              ${
+                activeLanguage === 'en'
+                  ? 'border-t-2 border-[var(--primary)] text-[var(--primary)]'
+                  : 'text-[rgba(200,200,200,0.8)]'
+              }
+            `}
+            onClick={() => handleLanguageChange('en')}
+          >
+            English
+          </button>
+        </div>
 
         {/* Action Buttons */}
         <div className="mt-4 flex space-x-2 justify-end">

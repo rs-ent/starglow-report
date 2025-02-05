@@ -4,7 +4,7 @@
 
 import React from 'react';
 
-const KPISection = ({ selectedKPIs }) => {
+const KPISection = ({ selectedKPIs, locale }) => {
   return (
     <div className="kpi-section">
       {selectedKPIs.map((kpi, index) => (

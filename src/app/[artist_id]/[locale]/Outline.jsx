@@ -8,8 +8,6 @@ import { useReport, useIntroduction, useKPI } from '../../../context/GlobalData'
 import Image from 'next/image';
 import 'react-circular-progressbar/dist/styles.css';
 import ApplyButton from './Outline.ApplyButton';
-
-import { useParams } from "next/navigation";
 import { translations } from '../../../lib/translations';
 
 function getProjectStatus(launchDate, deadlineDate, currentDate) {
@@ -55,8 +53,7 @@ function easeOutCirc(t, b, c, d) {
     return c * Math.sqrt(1 - t * t) + b;
 }
 
-const Outline = () => {
-    const { locale } = useParams(); 
+const Outline = ({locale}) => {
     const t = translations[locale] || translations.en;
 
     const reportData = useReport();
@@ -174,7 +171,7 @@ const Outline = () => {
                             {artistName[locale]}
                         </h1>
                     </div>
-                    <h4 className='text-gradient text-sm text-left w-36 purple-text-glow-5'>
+                    <h4 className='text-gradient text-sm text-left w-36 purple-text-glow-3'>
                         {days + hours + minutes + seconds > 0
                             ? `D-${days}:${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
                             : 'Ended'

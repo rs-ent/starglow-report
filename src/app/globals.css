@@ -66,35 +66,35 @@ Mobile First + Simple is the Best + Professionalism*/
 /* --- 글로벌 변수 설정 --- */
 :root {
   /* 전체 배경/텍스트 */
-  --background: #0A0A0A;        /* 아주 짙은 블랙톤 */
-  --foreground: #f2f2f2;        /* 밝은 텍스트 (화이트 계열) */
+  --background: #0A0A0A;
+  --foreground: #f2f2f2;
 
   /* 부가 텍스트/배경 */
-  --foreground-muted: #9CA3AF;  /* 좀 더 흐린 텍스트 */
-  --foreground-unfocus: #666666;/* 비활성화/테두리 등 */
-  --background-second: #1A1A1A; /* 메인보다 약간 연한 어두운 배경 */
+  --foreground-muted: #9CA3AF;
+  --foreground-unfocus: #666666;
+  --background-second: #1A1A1A;
   --background-third: #1d1b1f;
-  --background-muted: #2A2A2A;  /* 버튼 등 묵직한 보조 배경 */
-  --background-brushed: #222222;/* 약간의 변화를 주고 싶을 때 */
+  --background-muted: #2A2A2A;
+  --background-brushed: #222222;
 
   --border-start: #f2f2f2;
   --border-mid: #858585;
   --border-end: #141414;
 
   /* 브랜드/포인트 컬러 */
-  --primary: rgba(245,207,57,0.9);   /* 기존 “딥 블루” 그대로 */
-  --secondary: #4A5568; /* 그레이톤 - 다크모드에서도 큰 무리 없음 */
-  --accent: rgba(217,195,255,0.9);    /* 고급스러운 골드 (네온 느낌에도 잘 어울림) */
-  --success: #2A4365;   /* 동일하게 딥 블루 */
-  --danger: #C53030;    /* 붉은 계열 경고 색상 */
-  --warning: #D4AF37;   /* 골드 포인트 */
-  --info: #3182CE;      /* 시원한 블루 */
+  --primary: rgba(132,97,234,0.95);
+  --secondary: #4A5568;
+  --accent: rgba(217,195,255,0.9);
+  --success: #2A4365;
+  --danger: #C53030;
+  --warning: #D4AF37;
+  --info: #3182CE;
 
   /* 텍스트 전용 */
-  --text-primary: #f2f2f2;    /* 본문 텍스트(기본) */
-  --text-secondary: #b0b2b5;  /* 부드러운 텍스트 */
-  --text-third: #888888;      /* 더 흐릿한 보조 텍스트 */
-  --text-reverse: #242424;    /* 역상 */
+  --text-primary: #f2f2f2;
+  --text-secondary: #b0b2b5;
+  --text-third: #888888;
+  --text-reverse: #242424;
   --text-muted: #999999;
 
   /* 유리(Glass) 느낌 투명도 */
@@ -238,7 +238,7 @@ h1, h2, h3, h4, h5, h6 {
   }
   
   .purple-text-glow-5 {
-    text-shadow: 0 0 12px rgba(157, 78, 221, 0.45);
+    text-shadow: 0 0 12px rgba(157, 78, 221, 0.65);
   }
   
   .purple-text-glow-7 {
@@ -255,6 +255,11 @@ h1, h2, h3, h4, h5, h6 {
 
   .text-glow {
     text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+  }
+
+  .text-outline {
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgba(132, 95, 236, 1.0);
   }
 
   /* 버튼 베이스 스타일 + 퍼플 Feather 라인 */

@@ -18,12 +18,10 @@ import {
     Legend,
 } from 'recharts';
 import { formatNumber } from '../../utils/formatNumber';
-
-import { useParams } from "next/navigation";
 import { translations } from '../../../lib/translations';
+import { safeLangValue } from '../../../script/convertLang';
 
-const Estimation = () => {
-    const { locale } = useParams(); 
+const Estimation = ({locale}) => {
     const t = translations[locale] || translations.en;
 
     const report = useReport();
@@ -91,15 +89,16 @@ const Estimation = () => {
     const totalAmount = data.reduce((sum, row) => sum + Number(row.spend.replace(/,/g,'')), 0);
 
     // PieChart에 사용할 데이터 변환
-    const pieChartData = data.map((row) => ({
-        label: row.label,
-        spend: Number(row.spend.replace(/,/g,'')),
-    }))
-    .sort((a, b) => {
-        if (a.label === "기타") return 1; // "기타"는 항상 마지막으로
-        if (b.label === "기타") return -1;
-        return b.spend - a.spend; // 나머지는 spend 기준으로 내림차순 정렬
-    });
+    const pieChartData = data
+        .map((row) => ({
+            label: safeLangValue(row.label, locale),
+            spend: Number(row.spend.replace(/,/g, '')),
+        }))
+        .sort((a, b) => {
+            if (a.label === "기타" || a.label === "Miscellaneous" || a.label === "etc" || a.label === "etc.") return 1;
+            if (b.label === "기타" || b.label === "Miscellaneous" || b.label === "etc" || b.label === "etc.") return -1;
+            return b.spend - a.spend;
+        });
 
     // 그라데이션 색상쌍 예시 (from -> to)
     const GRADIENT_COLORS = [
@@ -293,17 +292,17 @@ const Estimation = () => {
                     </thead>
                     <tbody>
                         {data.map((row, index) => (
-                            <tr key={index}>
-                                <td className="py-2 px-4 border border-gray-500 font-medium bg-[rgba(255,255,255,0.1)]">
-                                    {row.label}
-                                </td>
-                                <td className="py-2 px-4 border border-gray-500">
-                                    {row.value}
-                                </td>
-                                <td className="py-2 px-4 border border-gray-500">
-                                    {(Number(row.spend.replace(/,/g,'')) / totalAmount * 100).toFixed(0)}%
-                                </td>
-                            </tr>
+                        <tr key={index}>
+                            <td className="py-2 px-4 border border-gray-500 font-medium bg-[rgba(255,255,255,0.1)]">
+                            {safeLangValue(row.label, locale)}
+                            </td>
+                            <td className="py-2 px-4 border border-gray-500">
+                            {safeLangValue(row.value, locale)}
+                            </td>
+                            <td className="py-2 px-4 border border-gray-500">
+                            {((Number(row.spend.replace(/,/g, '')) / totalAmount) * 100).toFixed(0)}%
+                            </td>
+                        </tr>
                         ))}
                     </tbody>
                 </table>
@@ -341,10 +340,10 @@ const Estimation = () => {
                                     {row.name}
                                 </td>
                                 <td className="py-2 px-4 border border-gray-500">
-                                    ₩{formatNumber(row.Revenue,'',2)}
+                                    {locale === 'ko' ? '₩' : '$'}{formatNumber(row.Revenue,'',2,locale)}
                                 </td>
                                 <td className="py-2 px-4 border border-gray-500">
-                                    ₩{formatNumber(row.Investors,'',2)}
+                                    {locale === 'ko' ? '₩' : '$'}{formatNumber(row.Investors,'',2,locale)}
                                 </td>
                                 <td className="py-2 px-4 border border-gray-500">
                                     {(((row.Revenue - bep) / bep) * 100).toFixed(0)}%

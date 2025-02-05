@@ -4,9 +4,8 @@ import React from 'react';
 import { useHistory } from '../../../context/GlobalData';
 import { safeLangValue } from '../../../script/convertLang';
 
-const History = ({ openModal, locale = 'ko' }) => {
+const History = ({ openModal, locale = 'en' }) => {
     const history = useHistory();
-    console.log(history);
 
     // SectionTitle 타입만 필터링
     const sectionTitles = history?.history.filter(item => item.type === 'SectionTitle') || [];

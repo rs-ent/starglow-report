@@ -4,8 +4,10 @@
 import React, { useState } from 'react';
 import InvestmentPointItem from '../InvestmentPointsAndRisks/InvestmentPointItem';
 import { useKPI, useInvestmentPoints } from '../../../context/GlobalData';
+import { safeLangValue } from '../../../script/convertLang';
+import { AnimatedBlock } from '../../components/client/AnimationHook';
 
-const InvestmentPoints = ({type = "Investment Point"}) => { // async 제거
+const InvestmentPoints = ({type = "Investment Point", locale = "en"}) => { // async 제거
     const pointsData = useInvestmentPoints();
     const investmentData = pointsData.filter(a => a.type === type);
     const kpiData = useKPI();
@@ -25,19 +27,18 @@ const InvestmentPoints = ({type = "Investment Point"}) => { // async 제거
                 <h2 className="section-title">{type}s</h2>
                 <div className="space-y-4">
                     {investmentData.map((item, index) => (
+                        <AnimatedBlock key={index}>
                         <div
-                            key={index}
                             className="rounded-lg overflow-hidden bg-[rgba(255,255,255,0.05)] shadow-md border border-[var(--border-mid)]"
                         >
                             {/* 제목 라벨 */}
                             <button
-                                style={{
-                                    fontFamily: 'Conthrax',
-                                }}
                                 className="w-full text-left p-4 text-gradient text-base hover:bg-opacity-90 transition-all min-h-28"
                                 onClick={() => toggleItem(index)}
                             >
-                                {item.title}
+                                <h1>
+                                    {safeLangValue(item.title, locale)}
+                                </h1>
                             </button>
 
                             {/* 내용 */}
@@ -56,10 +57,12 @@ const InvestmentPoints = ({type = "Investment Point"}) => { // async 제거
                                     <InvestmentPointItem
                                         data={item}
                                         timeline={kpiData.timeline}
+                                        locale={locale}
                                     />
                                 </div>
                             </div>
                         </div>
+                        </AnimatedBlock>
                     ))}
                 </div>
             </section>

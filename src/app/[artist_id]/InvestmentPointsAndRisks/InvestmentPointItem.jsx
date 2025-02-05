@@ -5,8 +5,9 @@ import React from 'react';
 import MediaDisplay from './MediaDisplay';
 import ChartDisplay from './ChartDisplay';
 import KPISection from './KPISection';
+import { safeLangValue, convertKor } from '../../../script/convertLang';
 
-const InvestmentPointItem = ({ data, timeline }) => {
+const InvestmentPointItem = ({ data, timeline, locale = 'ko' }) => {
   const {
     title,
     type,
@@ -18,18 +19,21 @@ const InvestmentPointItem = ({ data, timeline }) => {
     selectedKPIs,
   } = data;
 
+  const localizedTitle = safeLangValue(title, locale); 
+  const localizedContext = safeLangValue(context, locale); 
+
   return (
     <section
     className="investment-point-item rounded-lg p-4 space-y-4 transition-transform duration-300 max-h-[60dvh] overflow-y-scroll"
-    aria-label={`Investment Point: ${title}`}
+    aria-label={`Investment Point: ${localizedTitle}`}
     >
       {/* Media Display */}
       {media && media.length > 0 && (
         <>
-        <MediaDisplay media={media} mediaTitles={mediaTitles} />
+        <MediaDisplay media={media} mediaTitles={mediaTitles} locale={locale} />
 
         {/* Line Breaker */}
-        <hr className="border-t border-[var(--background-second)] mb-6" />
+        <hr className="border-t border-[rgba(255,255,255,0.1)] mb-6" />
         </>
       )}
   
@@ -40,19 +44,20 @@ const InvestmentPointItem = ({ data, timeline }) => {
           chartConfig={chartConfig}
           chartTitle={chartTitle}
           timeline={timeline}
+          locale={locale}
         />
 
         {/* Line Breaker */}
-        <hr className="border-t border-[var(--background-second)] mb-6" />
+        <hr className="border-t border-[rgba(255,255,255,0.1)] mb-6" />
         </>
       )}
 
       {/* KPI Section */}
       {selectedKPIs.length > 0 && (
         <>
-        <KPISection selectedKPIs={selectedKPIs} />
+        <KPISection selectedKPIs={selectedKPIs} locale={locale} />
         {/* Line Breaker */}
-        <hr className="border-t border-[var(--background-second)] mb-6" />
+        <hr className="border-t border-[rgba(255,255,255,0.1)] mb-6" />
         </>
       )}
   
@@ -64,8 +69,17 @@ const InvestmentPointItem = ({ data, timeline }) => {
             role="region"
             aria-label="Context Section"
           >
-            {context.split('\n').map((paragraph, index) => (
-              <p key={index} className='px-4 py-2 break-all whitespace-normal'>{paragraph}</p>
+            {localizedContext.split('\n').map((paragraph, index) => (
+              <p 
+                key={index} 
+                className="
+                  px-4 py-2 
+                  break-all 
+                  whitespace-normal
+                "
+              >
+                {paragraph}
+              </p>
             ))}
           </div>
         )}

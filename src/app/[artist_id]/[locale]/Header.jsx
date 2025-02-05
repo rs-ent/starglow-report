@@ -56,7 +56,7 @@ export default function Header() {
                 locale === "KO" ? "font-bold" : "font-normal"
               } py-2 px-4 hover:bg-gray-700 text-left font-heading`}
             >
-              KR
+              KO
             </Link>
           </div>
         )}

@@ -1,15 +1,7 @@
 // src/app/[artist_id]/history-manager/BlocksInputs.jsx
 import React from 'react';
 import { uploadFiles } from '../../firebase/fetch';
-
-// oldVal이 객체가 아니면 { ko:'', en:'' }로 초기화해 언어별 텍스트 관리
-const updateLangField = (oldVal, lang, newVal) => {
-  let result = typeof oldVal === 'object' && oldVal !== null
-    ? { ...oldVal }
-    : { ko: '', en: '' };
-  result[lang] = newVal;
-  return result;
-};
+import { safeLangValue, updateLangField, safeLangMapper } from '../../../script/convertLang';
 
 const BlocksInputs = ({ type, data, onChange, currentLang = 'ko' }) => {
   /**
@@ -504,7 +496,48 @@ const BlocksInputs = ({ type, data, onChange, currentLang = 'ko' }) => {
      * tableData → { ko:[], en:[] }, rows, columns → 단일
      * row 내용은 @@로 구분
      */
-    case 'Table':
+    case 'Table': {
+      let normalizedRows = safeLangMapper(data.tableData, currentLang).map((row) => {
+        if (Array.isArray(row)) return row;
+        if (typeof row === 'string') return row.split('@@');
+        return [];
+      });
+    
+      // 데이터가 없으면 기본 Rows/Columns 값으로 초기화
+      if (normalizedRows.length === 0) {
+        const defaultRows = data.rows || 1;
+        const defaultColumns = data.columns || 1;
+        normalizedRows = Array.from({ length: defaultRows }, () =>
+          Array.from({ length: defaultColumns }, () => '')
+        );
+      }
+    
+      // 열에 맞게 행 조정
+      const adjustRowColumns = (row, targetCols) => {
+        const currentCols = row.length;
+        if (currentCols < targetCols) {
+          // 부족한 열은 빈 문자열로
+          return [...row, ...Array.from({ length: targetCols - currentCols }, () => '')];
+        } else if (currentCols > targetCols) {
+          // 초과하는 열은 잘라냄
+          return row.slice(0, targetCols);
+        }
+        return row;
+      };
+    
+      // 각 행을 '@@'로 join한 문자열 배열로 변환하는 함수
+      const serializeRows = (rows) => rows.map((row) => row.join('@@'));
+    
+      // 업데이트된 normalizedRows를 저장하기 위해 tableData 객체 갱신
+      const updateTableData = (updatedRows) => {
+        const serialized = serializeRows(updatedRows);
+        const updatedTableData = {
+          ...(data.tableData || {}),
+          [currentLang]: serialized,
+        };
+        onChange({ tableData: updatedTableData });
+      };
+    
       return (
         <div className="space-y-4">
           {/* 테이블 크기 설정 */}
@@ -513,147 +546,99 @@ const BlocksInputs = ({ type, data, onChange, currentLang = 'ko' }) => {
               Table Dimensions
             </label>
             <div className="flex space-x-4 mt-2">
+              {/* 행 입력 */}
               <div className="flex-1">
-                <label className="block text-sm text-[rgba(255,255,255,0.6)]">
-                  Rows
-                </label>
+                <label className="block text-sm text-[rgba(255,255,255,0.6)]">Rows</label>
                 <input
                   type="number"
                   name="rows"
                   min="1"
                   value={data.rows || 1}
                   onChange={(e) => {
-                    const rows = parseInt(e.target.value, 10) || 1;
-                    const langRows = (data.tableData?.[currentLang] || []).slice();
-
-                    // 행 증가/감소 처리
-                    if (rows > langRows.length) {
-                      const diff = rows - langRows.length;
-                      for (let i = 0; i < diff; i++) {
-                        langRows.push('');
-                      }
-                    } else if (rows < langRows.length) {
-                      langRows.length = rows;
+                    const newRowCount = parseInt(e.target.value, 10) || 1;
+                    let updatedRows = [...normalizedRows];
+                    if (newRowCount > updatedRows.length) {
+                      // 부족한 행을 기본값(각 행은 data.columns 길이의 빈 배열)으로 추가
+                      const cols = data.columns || 1;
+                      const rowsToAdd = Array.from({ length: newRowCount - updatedRows.length }, () =>
+                        Array.from({ length: cols }, () => '')
+                      );
+                      updatedRows = updatedRows.concat(rowsToAdd);
+                    } else if (newRowCount < updatedRows.length) {
+                      updatedRows = updatedRows.slice(0, newRowCount);
                     }
-
-                    const updatedTableData = {
-                      ...(data.tableData || {}),
-                      [currentLang]: langRows,
-                    };
-                    onChange({ rows, tableData: updatedTableData });
+                    onChange({
+                      rows: newRowCount,
+                      tableData: { ...(data.tableData || {}), [currentLang]: serializeRows(updatedRows) },
+                    });
+                    normalizedRows = updatedRows; // local 값 업데이트
                   }}
-                  className="
-                    w-full p-2 rounded
-                    border border-[rgba(255,255,255,0.2)]
-                    bg-[rgba(255,255,255,0.05)]
-                    text-[rgba(255,255,255,0.9)]
-                    focus:outline-none 
-                    focus:ring-2 
-                    focus:ring-[rgba(255,255,255,0.4)]
-                    transition
-                  "
+                  className="w-full p-2 rounded border border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.9)] focus:outline-none focus:ring-2 focus:ring-[rgba(255,255,255,0.4)] transition"
                 />
               </div>
+              {/* 열 입력 */}
               <div className="flex-1">
-                <label className="block text-sm text-[rgba(255,255,255,0.6)]">
-                  Columns
-                </label>
+                <label className="block text-sm text-[rgba(255,255,255,0.6)]">Columns</label>
                 <input
                   type="number"
                   name="columns"
                   min="1"
                   value={data.columns || 1}
                   onChange={(e) => {
-                    const columns = parseInt(e.target.value, 10) || 1;
-                    const langRows = (data.tableData?.[currentLang] || []).map((row) => {
-                      const cells = row.split('@@');
-                      if (columns > cells.length) {
-                        const diff = columns - cells.length;
-                        for (let i = 0; i < diff; i++) cells.push('');
-                      } else if (columns < cells.length) {
-                        cells.length = columns;
-                      }
-                      return cells.join('@@');
+                    const newColCount = parseInt(e.target.value, 10) || 1;
+                    const updatedRows = normalizedRows.map((row) =>
+                      adjustRowColumns(row, newColCount)
+                    );
+                    onChange({
+                      columns: newColCount,
+                      tableData: { ...(data.tableData || {}), [currentLang]: serializeRows(updatedRows) },
                     });
-
-                    const updatedTableData = {
-                      ...(data.tableData || {}),
-                      [currentLang]: langRows,
-                    };
-                    onChange({ columns, tableData: updatedTableData });
+                    normalizedRows = updatedRows; // local 값 업데이트
                   }}
-                  className="
-                    w-full p-2 rounded
-                    border border-[rgba(255,255,255,0.2)]
-                    bg-[rgba(255,255,255,0.05)]
-                    text-[rgba(255,255,255,0.9)]
-                    focus:outline-none 
-                    focus:ring-2 
-                    focus:ring-[rgba(255,255,255,0.4)]
-                    transition
-                  "
+                  className="w-full p-2 rounded border border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.9)] focus:outline-none focus:ring-2 focus:ring-[rgba(255,255,255,0.4)] transition"
                 />
               </div>
             </div>
           </div>
-
+    
           {/* 테이블 데이터 편집 */}
           <div>
             <label className="block text-[rgba(255,255,255,0.8)] font-medium mb-2">
               Table Data ({currentLang})
             </label>
-            {data.tableData?.[currentLang] && (
-              <div className="overflow-auto max-h-64 border border-[rgba(255,255,255,0.2)] rounded p-2">
-                <table className="min-w-full border-collapse">
-                  <tbody>
-                    {data.tableData[currentLang].map((row, rowIndex) => {
-                      const cells = row.split('@@');
-                      return (
-                        <tr key={rowIndex}>
-                          {Array.from({ length: data.columns || 1 }).map((_, colIndex) => (
-                            <td
-                              key={colIndex}
-                              className="border border-[rgba(255,255,255,0.2)] p-2 align-top"
-                            >
-                              <input
-                                type="text"
-                                value={cells[colIndex] || ''}
-                                onChange={(e) => {
-                                  const newCells = [...cells];
-                                  newCells[colIndex] = e.target.value;
-                                  const newRow = newCells.join('@@');
-
-                                  const updatedLangRows = [...data.tableData[currentLang]];
-                                  updatedLangRows[rowIndex] = newRow;
-
-                                  const updatedTableData = {
-                                    ...(data.tableData || {}),
-                                    [currentLang]: updatedLangRows,
-                                  };
-                                  onChange({ tableData: updatedTableData });
-                                }}
-                                className="
-                                  w-full border-[rgba(255,255,255,0.2)] border p-1 rounded
-                                  bg-[rgba(255,255,255,0.05)]
-                                  text-[rgba(255,255,255,0.9)]
-                                  focus:outline-none
-                                  focus:ring-2
-                                  focus:ring-[rgba(255,255,255,0.4)]
-                                  transition
-                                "
-                              />
-                            </td>
-                          ))}
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
+            <div className="overflow-auto max-h-64 border border-[rgba(255,255,255,0.2)] rounded p-2">
+              <table className="min-w-full border-collapse">
+                <tbody>
+                  {normalizedRows.map((row, rowIndex) => (
+                    <tr key={rowIndex}>
+                      {row.map((cell, colIndex) => (
+                        <td key={colIndex} className="border border-[rgba(255,255,255,0.2)] p-2 align-top">
+                          <input
+                            type="text"
+                            value={safeLangValue(cell, currentLang)}
+                            onChange={(e) => {
+                              const newValue = e.target.value;
+                              const updatedRows = normalizedRows.map((r, rIdx) =>
+                                rIdx === rowIndex
+                                  ? r.map((c, cIdx) => (cIdx === colIndex ? newValue : c))
+                                  : r
+                              );
+                              updateTableData(updatedRows);
+                              normalizedRows = updatedRows; // local 값 업데이트
+                            }}
+                            className="w-full border-[rgba(255,255,255,0.2)] border p-1 rounded bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.9)] focus:outline-none focus:ring-2 focus:ring-[rgba(255,255,255,0.4)] transition"
+                          />
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       );
+    }
 
     /**
      * Chart

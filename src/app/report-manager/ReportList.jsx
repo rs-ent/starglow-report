@@ -73,9 +73,9 @@ export default function ReportList() {
                                             Rewards
                                         </button>
                                     </Link>
-                                    <Link href={`/${report.artist_id}/roadmap-manager`}>
+                                    <Link href={`/${report.artist_id}/estimation-manager`}>
                                         <button className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
-                                            Roadmap
+                                            Estimation
                                         </button>
                                     </Link>
                                     <button className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
