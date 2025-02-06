@@ -21,7 +21,7 @@ import { formatNumber } from '../../utils/formatNumber';
 import { translations } from '../../../lib/translations';
 import { safeLangValue } from '../../../script/convertLang';
 
-const Estimation = ({locale}) => {
+const Estimation = ({locale, exchangeRate = 1}) => {
     const t = translations[locale] || translations.en;
 
     const report = useReport();
@@ -208,7 +208,7 @@ const Estimation = ({locale}) => {
 
     revenueData.sort((a, b) => b.Investors - a.Investors);
 
-    const PerformanceChart = ({ revenueData }) => {
+    const PerformanceChart = ({ revenueData, exchangeRate }) => {
         // 손익분기점의 Revenue 값
         const breakEvenRevenue = revenueData.find(row => row.name === revenueDataName[locale]['bep'])?.Revenue || 1;
 
@@ -230,7 +230,7 @@ const Estimation = ({locale}) => {
                         {/* X축: row.Revenue */}
                         <XAxis
                             dataKey="Revenue"
-                            tickFormatter={(value) => `₩${formatNumber(value,'',2)}`}
+                            tickFormatter={(value) => `₩${formatNumber(value * exchangeRate,'',2)}`}
                             tick={{ fontSize: 9 }}
                         />
 
@@ -311,7 +311,7 @@ const Estimation = ({locale}) => {
             {/* 매출 스펙트럼 및 투자자 수익 표 */}
             <section className="mt-20 px-6">
                 <h3 className="text-base text-gradient mb-2">{t.revenueSpectrumAndExpectedRevenue}</h3>
-                <PerformanceChart revenueData={revenueData} />
+                <PerformanceChart revenueData={revenueData} exchangeRate={exchangeRate} />
                 <table className="min-w-full border-collapse border border-gray-500 text-center text-xs text-[var(--text-primary)]">
                     <thead>
                         <tr className="bg-[rgba(255,255,255,0.2)]">
@@ -340,10 +340,10 @@ const Estimation = ({locale}) => {
                                     {row.name}
                                 </td>
                                 <td className="py-2 px-4 border border-gray-500">
-                                    {locale === 'ko' ? '₩' : '$'}{formatNumber(row.Revenue,'',2,locale)}
+                                    {locale === 'ko' ? '₩' : '$'}{formatNumber(row.Revenue * exchangeRate,'',2,locale)}
                                 </td>
                                 <td className="py-2 px-4 border border-gray-500">
-                                    {locale === 'ko' ? '₩' : '$'}{formatNumber(row.Investors,'',2,locale)}
+                                    {locale === 'ko' ? '₩' : '$'}{formatNumber(row.Investors * exchangeRate,'',2,locale)}
                                 </td>
                                 <td className="py-2 px-4 border border-gray-500">
                                     {(((row.Revenue - bep) / bep) * 100).toFixed(0)}%

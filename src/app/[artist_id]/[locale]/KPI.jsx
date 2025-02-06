@@ -39,7 +39,7 @@ function formatYearMonth(yyyyMM, localeRaw = 'en') {
     }
 }  
 
-export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenue, minRevenue, maxRevenue, locale) => {
+export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenue, minRevenue, maxRevenue, locale, exchangeRate) => {
     // 데이터 계산
     const avgPoint1 = totalValueMultiple;
     const avgPoint3 = currentRevenue;
@@ -114,7 +114,7 @@ export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenu
                         y={avgPoint3}
                         r={0} // 점 숨김
                         label={{
-                            value: `${locale === 'ko' ? '₩' : '$'}${formatNumber(avgPoint3,'',2,locale)}`,
+                            value: `${locale === 'ko' ? '₩' : '$'}${formatNumber(avgPoint3 * exchangeRate,'',2,locale)}`,
                             position: 'right',
                             fontSize: 10,
                             fill: '#ffffff',
@@ -127,7 +127,7 @@ export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenu
                         y={lowerBoundPoint2}
                         r={0} // 점 숨김
                         label={{
-                            value: `${locale === 'ko' ? '₩' : '$'}${formatNumber(lowerBoundPoint2,'',2,locale)}`,
+                            value: `${locale === 'ko' ? '₩' : '$'}${formatNumber(lowerBoundPoint2 * exchangeRate,'',2,locale)}`,
                             position: 'right',
                             fontSize: 10,
                             fill: '#999999',
@@ -140,7 +140,7 @@ export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenu
                         y={upperBoundPoint2}
                         r={0} // 점 숨김
                         label={{
-                            value: `${locale === 'ko' ? '₩' : '$'}${formatNumber(upperBoundPoint2,'',2,locale)}`,
+                            value: `${locale === 'ko' ? '₩' : '$'}${formatNumber(upperBoundPoint2 * exchangeRate,'',2,locale)}`,
                             position: 'right',
                             fontSize: 10,
                             fill: '#999999',
@@ -152,8 +152,9 @@ export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenu
     );
 };
 
-const KPI = ({locale}) => {
+const KPI = ({locale, exchangeRate = 1}) => {
     const t = translations[locale] || translations.en;
+    console.log(exchangeRate);
 
     const [isExpanded, setIsExpanded] = useState(false);
     const containerRef = useRef(null);
@@ -180,10 +181,10 @@ const KPI = ({locale}) => {
 
     // 표시할 KPI 목록을 준비합니다.
     const allKPIs = useMemo(() => [
-        { label: t.currentMonthValue, value: totalValueMultiple, suffix: '₩', importance: 9, higherIsBetter: true },
+        { label: t.currentMonthValue, value: totalValueMultiple * exchangeRate, suffix: '₩', importance: 9, higherIsBetter: true },
         { label: t.riskRating, value: riskLevel.differencePercentage, suffix: '%', importance: 10, higherIsBetter: false},
         { label: t.riskLevel, value: riskLevel.riskText[locale], suffix: '', importance: 10, higherIsBetter: true},
-        { label: t.estimatedRevenue, value: calculatedKPIs.expectedAnnualRevenue, suffix: '₩', importance: 10, higherIsBetter: true},
+        { label: t.estimatedRevenue, value: calculatedKPIs.expectedAnnualRevenue * exchangeRate, suffix: '₩', importance: 10, higherIsBetter: true},
         { label: t.revenueSpectrum, value: revenueSpectrum, suffix: '', importance: 10, higherIsBetter: true},
         { label: t.peakDate, value: formatYearMonth(calculatedKPIs.peakDate, locale), suffix: '', importance: 8, higherIsBetter: false },
         { label: t.revenueDiversityRatio, value: (calculatedKPIs.normalizedDiversityIndex * 100).toFixed(2), suffix: '%', importance: 5, higherIsBetter: false },
@@ -222,7 +223,7 @@ const KPI = ({locale}) => {
                             </p>
                         </div>
                         {isExpanded && kpi.label === t.revenueSpectrum && (
-                            revenueSpectrumChart(totalValueMultiple, spectrum, avgRevenue, minRevenue, maxRevenue, locale)
+                            revenueSpectrumChart(totalValueMultiple, spectrum, avgRevenue, minRevenue, maxRevenue, locale, exchangeRate)
                         )}
                     </div>
                 ))}

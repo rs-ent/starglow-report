@@ -24,6 +24,7 @@ const Summary = ({locale}) => {
     const reportData = useReport();
 
     const nft_price = reportData.nft_price || 0;
+    console.log(reportData);
     const ratio = reportData.investors_share_ratio || 0.4;
 
     const nft_sales_start = reportData.nft_sales_start || "2025-01-31";

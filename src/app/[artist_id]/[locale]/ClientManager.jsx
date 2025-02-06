@@ -15,7 +15,7 @@ import Summary from './Summary';
 import Rewards from './Rewards';
 import Estimation from './Estimation';
 
-const ClientManager = ({artist_id, locale}) => {
+const ClientManager = ({artist_id, locale, exchangeRate = 1}) => {
   const [isHistoryModalOpen, setHistoryModalOpen] = useState(false);
   const [modalContents, setModalContents] = useState([]);
 
@@ -42,7 +42,7 @@ const ClientManager = ({artist_id, locale}) => {
       <div className="relative flex flex-col gap-4 pb-3">
         {/* 개요 */}
         <section>
-          <Outline locale={locale}/>
+          <Outline locale={locale} />
         </section>
 
         {/* 소개 */}
@@ -53,7 +53,7 @@ const ClientManager = ({artist_id, locale}) => {
         {/* KPI 섹션 */}
         <section className="section-base">
           <h2 className="section-title">Key Performance Indicators</h2>
-          <KPI locale={locale} />
+          <KPI locale={locale} exchangeRate={exchangeRate} />
         </section>
 
         {/* 투자요약 섹션 */}
@@ -85,7 +85,7 @@ const ClientManager = ({artist_id, locale}) => {
         {/* Estimation */}
         <section className="section-base">
           <h2 className="section-title">Estimation</h2>
-          <Estimation locale={locale} />
+          <Estimation locale={locale} exchangeRate={exchangeRate}/>
         </section>
 
         {/* 위험도 */}

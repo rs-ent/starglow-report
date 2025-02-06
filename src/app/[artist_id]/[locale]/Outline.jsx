@@ -161,11 +161,6 @@ const Outline = ({locale}) => {
                 
                 <div className='flex justify-between items-baseline border-gradient-b'>
                     <div className="pt-6 pb-3 px-3 flex gap-2 items-baseline">
-                        {/* 태그 */}
-                        <div className="inline-block bg-transparent border border-[var(--border-mid)] text-[var(--text-secondary)] text-xs font-extralight px-2 py-0.5 rounded-md self-center">
-                            {reportData.type}
-                        </div>
-                        
                         {/* Artist Korean Name */}
                         <h1 className="text-gradient text-4xl font-bold leading-none tracking-wide text-glow">
                             {artistName[locale]}
