@@ -109,6 +109,7 @@
     "three": "^0.171.0",
     "toast": "^0.5.4",
     "uuid": "^11.0.3",
+    "vercel": "^41.0.2",
     "vis-timeline": "^7.7.3"
   },
   "devDependencies": {
