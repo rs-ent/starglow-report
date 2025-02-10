@@ -178,10 +178,10 @@ export default function Background() {
         material = new THREE.SpriteMaterial({
           map: createParticleTexture(),
           transparent: true,
-          opacity: 0.4,
+          opacity: 0.8,
           depthTest: false,
         });
-        baseSize = 20;
+        baseSize = 15;
         obj.jitter = {
           freq: randomRange(1, 3),
           amp: randomRange(1, 5),
@@ -276,7 +276,7 @@ export default function Background() {
 
     const starMaterial = new THREE.PointsMaterial({
       color: 0xffffff,
-      size: randomRange(0.45, 1.45),
+      size: randomRange(0.55, 1.65),
       transparent: true,
       opacity: 0.7,
     });

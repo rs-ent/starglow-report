@@ -276,7 +276,7 @@ const Estimation = ({locale, exchangeRate = 1}) => {
 
             {/* 투자 배분 표 */}
             <section className="px-6">
-                <table className="min-w-full border-collapse border border-gray-500 text-center text-xs text-[var(--text-primary)]">
+                <table className="relative w-full border-collapse border border-gray-500 text-center text-xs text-[var(--text-primary)]">
                     <thead>
                         <tr className="bg-[rgba(255,255,255,0.2)]">
                             <th className="py-2 px-4 border border-gray-500 font-bold">
@@ -307,12 +307,13 @@ const Estimation = ({locale, exchangeRate = 1}) => {
                     </tbody>
                 </table>
             </section>
+            
 
             {/* 매출 스펙트럼 및 투자자 수익 표 */}
             <section className="mt-20 px-6">
                 <h3 className="text-base text-gradient mb-2">{t.revenueSpectrumAndExpectedRevenue}</h3>
                 <PerformanceChart revenueData={revenueData} exchangeRate={exchangeRate} />
-                <table className="min-w-full border-collapse border border-gray-500 text-center text-xs text-[var(--text-primary)]">
+                <table className="relative w-full border-collapse border border-gray-500 text-center text-xs text-[var(--text-primary)]">
                     <thead>
                         <tr className="bg-[rgba(255,255,255,0.2)]">
                             <th className="py-2 px-4 border border-gray-500 font-bold" style={{ width: '18%' }}>
