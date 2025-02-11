@@ -8,7 +8,7 @@ export const translations = {
       amount: "Amount",
       estimatedRoi: "Estimated ROI",
       preApplyButtonLabel: 'PRE APPLY',
-      applyButtonLabel: 'GLOW YOUR ARTIST',
+      applyButtonLabel: 'CLICK TO GLOW',
       currentMonthValue: 'Current Month Value',
       riskRating: 'Risk Rating',
       riskLevel: 'Risk Level',

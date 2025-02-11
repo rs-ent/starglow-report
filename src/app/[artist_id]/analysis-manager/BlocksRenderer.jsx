@@ -1,5 +1,5 @@
 // src/app/[artist_id]/analysis-manager/BlocksRenderer.jsx
-import React from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   BarChart,
   Bar,
@@ -32,9 +32,7 @@ import { safeLangMapper, safeLangValue } from '../../../script/convertLang';
 const safeText = (text) => text || '';
 
 // 배열 안전 처리 함수
-function safeArray(arr) {
-  return Array.isArray(arr) ? arr : [];
-}
+const safeArray = (arr) => (Array.isArray(arr) ? arr : []);
 
 /* --------------------------------------------------------------------------
    헬퍼 컴포넌트: Section & Title
@@ -52,17 +50,19 @@ const Section = ({ children, className = '' }) => (
 
 const Title = ({ level, children, gradient = false, Icon }) => {
   const Tag = `h${level}`;
-  // 각 레벨에 따른 기본 스타일과 전환 효과
-  const baseClasses = 'font-bold flex items-center pb-1 transition-all duration-300';
+  const baseClasses =
+    'font-bold flex items-center pb-1 transition-all duration-300';
   const levelClasses = {
     1: 'text-6xl mt-8 mb-2 pb-4 border-b-2 border-gradient-b text-[var(--primary)] text-glow',
     2: 'text-4xl mt-16 mb-2 text-[var(--primary)] text-outline purple-text-glow-5',
     3: 'text-xl mt-6 mb-1 text-[rgba(139,92,246,1)]',
   };
-  // gradient 옵션 활성 시 globals.css의 텍스트 그라데이션 적용
   const gradientClass = gradient ? 'text-gradient' : '';
   return (
-    <Tag className={`${baseClasses} ${levelClasses[level] || ''} ${gradientClass}`} tabIndex="0">
+    <Tag
+      className={`${baseClasses} ${levelClasses[level] || ''} ${gradientClass}`}
+      tabIndex="0"
+    >
       {Icon && <Icon className="mr-2 inline-block" />}
       {children}
     </Tag>
@@ -74,25 +74,27 @@ const Title = ({ level, children, gradient = false, Icon }) => {
    globals.css의 애니메이션, 전환, 그림자 효과 활용
 -------------------------------------------------------------------------- */
 const Gallery = ({ images }) => {
-  const [lightboxIndex, setLightboxIndex] = React.useState(null);
-  const lightboxRef = React.useRef(null);
+  const [lightboxIndex, setLightboxIndex] = useState(null);
+  const lightboxRef = useRef(null);
 
   const openLightbox = (index) => setLightboxIndex(index);
   const closeLightbox = () => setLightboxIndex(null);
 
-  const showNext = React.useCallback(() => {
+  const showNext = useCallback(() => {
     if (images.length && lightboxIndex !== null) {
       setLightboxIndex((prev) => (prev + 1) % images.length);
     }
   }, [images, lightboxIndex]);
 
-  const showPrev = React.useCallback(() => {
+  const showPrev = useCallback(() => {
     if (images.length && lightboxIndex !== null) {
-      setLightboxIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+      setLightboxIndex((prev) =>
+        prev === 0 ? images.length - 1 : prev - 1
+      );
     }
   }, [images, lightboxIndex]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handleKeyDown = (e) => {
       if (lightboxIndex !== null) {
         if (e.key === 'Escape') closeLightbox();
@@ -104,7 +106,8 @@ const Gallery = ({ images }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [lightboxIndex, showNext, showPrev]);
 
-  const currentImage = lightboxIndex !== null ? images[lightboxIndex] : null;
+  const currentImage =
+    lightboxIndex !== null ? images[lightboxIndex] : null;
 
   return (
     <>
@@ -116,7 +119,12 @@ const Gallery = ({ images }) => {
         {images && images.length > 0 ? (
           <div
             className="px-4 grid gap-2 items-center justify-items-center w-full"
-            style={{ gridTemplateColumns: `repeat(${Math.min(images.length, 3)}, minmax(0, 1fr))` }}
+            style={{
+              gridTemplateColumns: `repeat(${Math.min(
+                images.length,
+                3
+              )}, minmax(0, 1fr))`,
+            }}
           >
             {images.map((img, index) => (
               <button
@@ -134,7 +142,9 @@ const Gallery = ({ images }) => {
                       loading="lazy"
                     />
                   ) : (
-                    <div className="text-sm text-[var(--foreground-muted)]">No Image Available</div>
+                    <div className="text-sm text-[var(--foreground-muted)]">
+                      No Image Available
+                    </div>
                   )}
                 </div>
               </button>
@@ -187,11 +197,16 @@ const Gallery = ({ images }) => {
               {currentImage && currentImage.src ? (
                 <img
                   src={currentImage.src}
-                  alt={currentImage.alt || `Lightbox image ${lightboxIndex + 1}`}
+                  alt={
+                    currentImage.alt ||
+                    `Lightbox image ${lightboxIndex + 1}`
+                  }
                   className="max-h-[90vh] object-contain transition-transform duration-300 shadow-2xl"
                 />
               ) : (
-                <div className="text-[var(--foreground)]">No Image Available</div>
+                <div className="text-[var(--foreground)]">
+                  No Image Available
+                </div>
               )}
             </div>
           </div>
@@ -211,7 +226,11 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
   switch (type) {
     case 'SectionTitle':
       return (
-        <div className="my-4 transition-all" role="region" aria-label="Section Title Block">
+        <div
+          className="my-4 transition-all"
+          role="region"
+          aria-label="Section Title Block"
+        >
           {props.src && (
             <img
               src={props.src}
@@ -220,7 +239,9 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
               loading="lazy"
             />
           )}
-          <Title level={1} gradient>{safeLangValue(props.text, locale)}</Title>
+          <Title level={1} gradient>
+            {safeLangValue(props.text, locale)}
+          </Title>
         </div>
       );
 
@@ -234,7 +255,9 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
     case 'Subtitle':
       return (
         <div role="heading" aria-level="3" aria-label="Subtitle Block">
-          <Title level={3} gradient>❐ {safeLangValue(props.text, locale)}</Title>
+          <Title level={3} gradient>
+            ❐ {safeLangValue(props.text, locale)}
+          </Title>
         </div>
       );
 
@@ -251,7 +274,11 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
 
     case 'Image':
       return (
-        <div className="my-8 flex justify-center transition-all" role="img" aria-label="Image Block">
+        <div
+          className="my-8 flex justify-center transition-all"
+          role="img"
+          aria-label="Image Block"
+        >
           <img
             src={props.src || ''}
             alt={safeLangValue(props.alt, locale) || 'Image'}
@@ -264,12 +291,18 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
     case 'Video': {
       const extractYouTubeId = (url) => {
         if (!url) return null;
-        const match = url.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/.*[?&]v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+        const match = url.match(
+          /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/.*[?&]v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+        );
         return match ? match[1] : null;
       };
       const videoId = extractYouTubeId(props.src);
       return (
-        <div className="video-container my-9 transition-all" role="region" aria-label="Video Block">
+        <div
+          className="video-container my-9 transition-all"
+          role="region"
+          aria-label="Video Block"
+        >
           {videoId ? (
             <iframe
               className="w-11/12 h-60 mx-auto rounded-lg shadow-soft transition-transform transform focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -296,21 +329,34 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
         items = [];
       }
       return (
-        <div className="my-4 transition-all" role="list" aria-label="List Block">
+        <div
+          className="my-4 transition-all"
+          role="list"
+          aria-label="List Block"
+        >
           <div className="flex items-center mb-2">
-            <ListIcon className="inline-block mr-2 text-[rgba(139,92,246,1)] animate-pulse-soft" aria-hidden="true" />
-            <span className="sr-only">{props.ordered ? 'Ordered List' : 'Unordered List'}</span>
+            <ListIcon
+              className="inline-block mr-2 text-[rgba(139,92,246,1)] animate-pulse-soft"
+              aria-hidden="true"
+            />
+            <span className="sr-only">
+              {props.ordered ? 'Ordered List' : 'Unordered List'}
+            </span>
           </div>
           {props.ordered ? (
             <ol className="list-decimal list-inside my-2 text-[var(--text-primary)]">
               {items.map((item, index) => (
-                <li key={index} className="mb-1" role="listitem">{item}</li>
+                <li key={index} className="mb-1" role="listitem">
+                  {item}
+                </li>
               ))}
             </ol>
           ) : (
             <ul className="list-disc list-inside my-2 text-[var(--text-primary)]">
               {items.map((item, index) => (
-                <li key={index} className="mb-1" role="listitem">{item}</li>
+                <li key={index} className="mb-1" role="listitem">
+                  {item}
+                </li>
               ))}
             </ul>
           )}
@@ -327,10 +373,15 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
           role="quote"
           aria-label="Blockquote"
         >
-          <FaQuoteLeft className="inline-block mr-2 text-[rgba(139,92,246,1)]" aria-hidden="true" />
+          <FaQuoteLeft
+            className="inline-block mr-2 text-[rgba(139,92,246,1)]"
+            aria-hidden="true"
+          />
           “{quoteText}”
           {quoteCite && (
-            <cite className="block text-right text-sm text-[var(--foreground-muted)] mt-2">- {quoteCite}</cite>
+            <cite className="block text-right text-sm text-[var(--foreground-muted)] mt-2">
+              - {quoteCite}
+            </cite>
           )}
         </blockquote>
       );
@@ -338,7 +389,11 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
 
     case 'Code':
       return (
-        <div className="my-4 transition-all" role="region" aria-label="Code Block">
+        <div
+          className="my-4 transition-all"
+          role="region"
+          aria-label="Code Block"
+        >
           <pre
             className="bg-[var(--background-muted)] text-[var(--foreground)] p-4 rounded-lg overflow-auto shadow-[0_8px_16px_rgba(0,0,0,0.4)] transition-all"
             tabIndex="0"
@@ -353,12 +408,20 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
     case 'Table': {
       const tableData = safeLangMapper(props.tableData, locale);
       if (tableData.length === 0) {
-        return <div className="my-8 text-center text-gray-500">No Table Data</div>;
+        return (
+          <div className="my-8 text-center text-gray-500">
+            No Table Data
+          </div>
+        );
       }
       const headers = tableData[0] ? tableData[0].split('@@') : [];
       const rows = tableData.slice(1);
       return (
-        <div className="overflow-x-auto my-8 transition-all" role="region" aria-label="Table Block">
+        <div
+          className="overflow-x-auto my-8 transition-all"
+          role="region"
+          aria-label="Table Block"
+        >
           <table className="min-w-full border-collapse border border-[var(--background-second)]">
             <thead>
               <tr>
@@ -377,7 +440,11 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
               {rows.map((row, rowIndex) => {
                 const cells = row.split('@@');
                 return (
-                  <tr key={rowIndex} className="even:bg-[var(--background-muted)]" role="row">
+                  <tr
+                    key={rowIndex}
+                    className="even:bg-[var(--background-muted)]"
+                    role="row"
+                  >
                     {cells.map((cell, cellIndex) => (
                       <td
                         key={cellIndex}
@@ -401,7 +468,11 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
       const chartData = safeArray(props.data);
       const renderChart = () => {
         if (!chartData || chartData.length === 0) {
-          return <div className="text-center text-gray-500 p-4">No chart data available</div>;
+          return (
+            <div className="text-center text-gray-500 p-4">
+              No chart data available
+            </div>
+          );
         }
         switch (props.chartType) {
           case 'LineChart':
@@ -413,7 +484,12 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
                   <YAxis stroke="var(--text-primary)" />
                   <Tooltip />
                   <Legend />
-                  <Line type="monotone" dataKey={props.dataKey} stroke="var(--accent)" strokeWidth={3} />
+                  <Line
+                    type="monotone"
+                    dataKey={props.dataKey}
+                    stroke="var(--accent)"
+                    strokeWidth={3}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             );
@@ -434,7 +510,10 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
                     label
                   >
                     {chartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
                     ))}
                   </Pie>
                 </PieChart>
@@ -450,15 +529,27 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
                   <YAxis stroke="var(--text-primary)" />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey={props.dataKey} fill="var(--accent)" barSize={30} />
+                  <Bar
+                    dataKey={props.dataKey}
+                    fill="var(--accent)"
+                    barSize={30}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             );
         }
       };
       return (
-        <div className="my-4 transition-all" role="region" aria-label="Chart Block">
-          {props.title && <Title level={3} gradient>{safeText(props.title)}</Title>}
+        <div
+          className="my-4 transition-all"
+          role="region"
+          aria-label="Chart Block"
+        >
+          {props.title && (
+            <Title level={3} gradient>
+              {safeText(props.title)}
+            </Title>
+          )}
           <div className="bg-animated-glow p-4 rounded-lg shadow-[0_8px_16px_rgba(0,0,0,0.4)] transition-all">
             {renderChart()}
           </div>
@@ -468,7 +559,11 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
 
     case 'Link':
       return (
-        <div className="my-4 transition-all" role="link" aria-label="Link Block">
+        <div
+          className="my-4 transition-all"
+          role="link"
+          aria-label="Link Block"
+        >
           <a
             href={props.href || '#'}
             target="_blank"
@@ -483,7 +578,11 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
 
     case 'File':
       return (
-        <div className="my-4 transition-all" role="link" aria-label="File Download Block">
+        <div
+          className="my-4 transition-all"
+          role="link"
+          aria-label="File Download Block"
+        >
           <a
             href={props.href || '#'}
             download
@@ -497,7 +596,9 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
 
     case 'Countdown': {
       const calculateTimeLeft = () => {
-        const diff = props.targetDate ? +new Date(props.targetDate) - +new Date() : -1;
+        const diff = props.targetDate
+          ? +new Date(props.targetDate) - +new Date()
+          : -1;
         let timeLeft = {};
         if (diff > 0) {
           timeLeft = {
@@ -509,8 +610,8 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
         }
         return timeLeft;
       };
-      const [timeLeft, setTimeLeft] = React.useState(calculateTimeLeft());
-      React.useEffect(() => {
+      const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+      useEffect(() => {
         const timer = setInterval(() => setTimeLeft(calculateTimeLeft()), 1000);
         return () => clearInterval(timer);
       }, [props.targetDate]);
@@ -527,9 +628,17 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
           role="region"
           aria-label="Countdown Block"
         >
-          {props.title && <Title level={3} gradient>{safeText(props.title)}</Title>}
+          {props.title && (
+            <Title level={3} gradient>
+              {safeText(props.title)}
+            </Title>
+          )}
           <div className="flex justify-center items-center text-lg">
-            {timerComponents || <span className="text-green-600 font-bold">이벤트가 시작되었습니다!</span>}
+            {timerComponents || (
+              <span className="text-green-600 font-bold">
+                이벤트가 시작되었습니다!
+              </span>
+            )}
           </div>
         </div>
       );
@@ -544,7 +653,11 @@ const BlocksRenderer = ({ block, locale = 'ko' }) => {
 
     default:
       return (
-        <div className="my-4 text-center text-gray-500 transition-all" role="region" aria-label="Unknown Block">
+        <div
+          className="my-4 text-center text-gray-500 transition-all"
+          role="region"
+          aria-label="Unknown Block"
+        >
           Unsupported block type: {type}
         </div>
       );

@@ -29,9 +29,9 @@ const History = ({ openModal, locale = 'en' }) => {
     };
 
     return (
-        <div className="relative flex flex-col items-center p-1">
+        <div className="relative flex flex-col items-center p-1 w-full">
             {sectionTitles.length > 0 ? (
-                <div>
+                <div className='w-full'>
                     <div
                         className='absolute top-4 w-full'
                         style={{
