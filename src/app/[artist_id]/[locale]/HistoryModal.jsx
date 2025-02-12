@@ -37,8 +37,10 @@ const HistoryModal = ({ onClose, contents, locale }) => {
     }, []);
 
     return (
-        <div className="fixed inset-0 z-50 flex justify-center items-center">
-            <div className="p-[1px] bg-gradient-to-br from-[rgba(255,255,255,0.4)] to-[rgba(255,255,255,0.2)] shadow-inner">
+        <div className="fixed inset-0 z-50 flex justify-center items-center"
+             onClick={(e) => e.stopPropagation()} 
+        >
+            <div className="p-[1px] bg-gradient-to-br from-[rgba(255,255,255,0.4)] to-[rgba(255,255,255,0.1)] shadow-inner">
                 <div className="relative w-full max-w-[480px] max-h-dvh bg-animated-glow shadow-lg flex flex-col">
                     {/* 패럴랙스 백그라운드 div */}
                     <div
@@ -64,13 +66,13 @@ const HistoryModal = ({ onClose, contents, locale }) => {
                         CLOSE
                     </button>
 
-                    {/* 스크롤 가능한 콘텐츠 */}
+                    {/* 스크롤 가능한 컨텐츠 */}
                     <div
                         ref={scrollContainerRef}
-                        className="flex flex-col gap-1 min-h-dvh flex-grow overflow-y-auto z-20"
+                        className="relative gap-1 min-h-dvh min-w-0 w-[99dvw] max-w-[480px] overflow-y-auto z-50"
                     >
 
-                        <div className="p-9">
+                        <div className="p-4">
                             {contents.map((block, index) => (
                                 <BlocksRenderer key={index} block={block} locale={locale} />
                             ))}

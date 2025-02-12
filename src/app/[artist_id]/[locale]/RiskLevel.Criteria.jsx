@@ -22,7 +22,7 @@ import { useParams } from "next/navigation";
 import { translations } from '../../../lib/translations';
 
 const CriteriaPage = ({ onClose, percentage }) => {
-    const { locale } = useParams(); 
+    const { locale } = useParams();
     const t = translations[locale] || translations.en;
 
     const evaluationFactors = [
@@ -56,99 +56,99 @@ const CriteriaPage = ({ onClose, percentage }) => {
     // 위험 등급 데이터
     const riskLevels = [
         {
-          min: 0,
-          max: 20,
-          color: 'bg-blue-500',
-          textColor: 'text-blue-600',
-          icon: <FaCheckCircle className="text-blue-600 text-xl" />,
-          riskText: {
-            en: 'Ultra-Low Risk',
-            ko: '초저위험',
-          },
-          description: {
-            en: 'An extremely stable investment with minimal risk.',
-            ko: '매우 안정적인 투자이며, 위험이 극도로 낮습니다.',
-          },
-          qualitative: {
-            en: 'Expected to generate stable returns with very low sensitivity to market fluctuations.',
-            ko: '시장 변동에 대한 민감도가 매우 낮아, 안정적인 수익을 기대할 수 있습니다.',
-          },
+            min: 0,
+            max: 20,
+            color: 'bg-blue-500',
+            textColor: 'text-blue-600',
+            icon: <FaCheckCircle className="text-blue-600 text-xl" />,
+            riskText: {
+                en: 'Ultra-Low Risk',
+                ko: '초저위험',
+            },
+            description: {
+                en: 'An extremely stable investment with minimal risk.',
+                ko: '매우 안정적인 투자이며, 위험이 극도로 낮습니다.',
+            },
+            qualitative: {
+                en: 'Expected to generate stable returns with very low sensitivity to market fluctuations.',
+                ko: '시장 변동에 대한 민감도가 매우 낮아, 안정적인 수익을 기대할 수 있습니다.',
+            },
         },
         {
-          min: 20,
-          max: 40,
-          color: 'bg-green-500',
-          textColor: 'text-green-600',
-          icon: <FaCheckCircle className="text-green-600 text-xl" />,
-          riskText: {
-            en: 'Low Risk',
-            ko: '저위험',
-          },
-          description: {
-            en: 'A relatively stable investment with low risk.',
-            ko: '비교적 안정적이며, 위험이 낮은 투자입니다.',
-          },
-          qualitative: {
-            en: 'Likely to produce steady returns with limited risk factors.',
-            ko: '위험 요소가 제한되어 꾸준한 수익을 기대할 수 있습니다.',
-          },
+            min: 20,
+            max: 40,
+            color: 'bg-green-500',
+            textColor: 'text-green-600',
+            icon: <FaCheckCircle className="text-green-600 text-xl" />,
+            riskText: {
+                en: 'Low Risk',
+                ko: '저위험',
+            },
+            description: {
+                en: 'A relatively stable investment with low risk.',
+                ko: '비교적 안정적이며, 위험이 낮은 투자입니다.',
+            },
+            qualitative: {
+                en: 'Likely to produce steady returns with limited risk factors.',
+                ko: '위험 요소가 제한되어 꾸준한 수익을 기대할 수 있습니다.',
+            },
         },
         {
-          min: 40,
-          max: 60,
-          color: 'bg-yellow-500',
-          textColor: 'text-yellow-600',
-          icon: <FaExclamationTriangle className="text-yellow-600 text-xl" />,
-          riskText: {
-            en: 'Moderate Risk',
-            ko: '중간 위험',
-          },
-          description: {
-            en: 'An investment with the potential for both profits and losses.',
-            ko: '이익과 손실이 모두 발생할 가능성이 있는 투자입니다.',
-          },
-          qualitative: {
-            en: 'Returns may fluctuate based on market conditions and internal factors.',
-            ko: '시장 상황과 내부 요인에 따라 수익률이 변동될 수 있습니다.',
-          },
+            min: 40,
+            max: 60,
+            color: 'bg-yellow-500',
+            textColor: 'text-yellow-600',
+            icon: <FaExclamationTriangle className="text-yellow-600 text-xl" />,
+            riskText: {
+                en: 'Moderate Risk',
+                ko: '중간 위험',
+            },
+            description: {
+                en: 'An investment with the potential for both profits and losses.',
+                ko: '이익과 손실이 모두 발생할 가능성이 있는 투자입니다.',
+            },
+            qualitative: {
+                en: 'Returns may fluctuate based on market conditions and internal factors.',
+                ko: '시장 상황과 내부 요인에 따라 수익률이 변동될 수 있습니다.',
+            },
         },
         {
-          min: 60,
-          max: 80,
-          color: 'bg-orange-500',
-          textColor: 'text-orange-600',
-          icon: <FaExclamationTriangle className="text-orange-600 text-xl" />,
-          riskText: {
-            en: 'High Risk',
-            ko: '고위험',
-          },
-          description: {
-            en: 'A high-risk investment requiring careful consideration.',
-            ko: '주의 깊은 검토가 필요한 고위험 투자입니다.',
-          },
-          qualitative: {
-            en: 'Returns can be highly volatile and may be significantly affected by external factors.',
-            ko: '수익 변동성이 크고, 외부 요인에 큰 영향을 받을 수 있습니다.',
-          },
+            min: 60,
+            max: 80,
+            color: 'bg-orange-500',
+            textColor: 'text-orange-600',
+            icon: <FaExclamationTriangle className="text-orange-600 text-xl" />,
+            riskText: {
+                en: 'High Risk',
+                ko: '고위험',
+            },
+            description: {
+                en: 'A high-risk investment requiring careful consideration.',
+                ko: '주의 깊은 검토가 필요한 고위험 투자입니다.',
+            },
+            qualitative: {
+                en: 'Returns can be highly volatile and may be significantly affected by external factors.',
+                ko: '수익 변동성이 크고, 외부 요인에 큰 영향을 받을 수 있습니다.',
+            },
         },
         {
-          min: 80,
-          max: 100,
-          color: 'bg-red-500',
-          textColor: 'text-red-600',
-          icon: <FaTimesCircle className="text-red-600 text-xl" />,
-          riskText: {
-            en: 'Ultra-High Risk',
-            ko: '초고위험',
-          },
-          description: {
-            en: 'An extremely high-risk investment demanding great caution.',
-            ko: '매우 주의가 필요한 극도로 높은 위험의 투자입니다.',
-          },
-          qualitative: {
-            en: 'Unanticipated fluctuations may result in a high likelihood of principal loss.',
-            ko: '예상치 못한 변동으로 원금 손실 가능성이 매우 큽니다.',
-          },
+            min: 80,
+            max: 100,
+            color: 'bg-red-500',
+            textColor: 'text-red-600',
+            icon: <FaTimesCircle className="text-red-600 text-xl" />,
+            riskText: {
+                en: 'Ultra-High Risk',
+                ko: '초고위험',
+            },
+            description: {
+                en: 'An extremely high-risk investment demanding great caution.',
+                ko: '매우 주의가 필요한 극도로 높은 위험의 투자입니다.',
+            },
+            qualitative: {
+                en: 'Unanticipated fluctuations may result in a high likelihood of principal loss.',
+                ko: '예상치 못한 변동으로 원금 손실 가능성이 매우 큽니다.',
+            },
         },
     ];
 
@@ -174,7 +174,7 @@ const CriteriaPage = ({ onClose, percentage }) => {
                 >
                     Close
                 </button>
-                
+
                 <div className='p-4'>
                     {/* 헤더 섹션 */}
                     <header className="mt-6 mb-6">
@@ -194,22 +194,22 @@ const CriteriaPage = ({ onClose, percentage }) => {
                             Investment Risk
                         </h2>
                         <p className="text-[var(--text-secondary)] text-xs mb-2">
-                            Our calculation of investment risk is based on the relationship 
-                            between estimated revenue after funding and the target fundraising amount. 
-                            This serves as an indicator for the likelihood of achieving 
+                            Our calculation of investment risk is based on the relationship
+                            between estimated revenue after funding and the target fundraising amount.
+                            This serves as an indicator for the likelihood of achieving
                             the investor’s desired returns.
                         </p>
-                        <div 
+                        <div
                             className="bg-[rgba(255,255,255,0.2)] p-1 rounded-sm my-4 mx-2"
                             style={{ overflowX: "auto" }}
                         >
-                            <div style={{ 
-                                    transform: "scale(0.6)", 
-                                    transformOrigin: "left",
-                                }}>
-                            <BlockMath>
-                                {'\\text{Risk} = \\frac{\\left| \\text{Target Amount} - \\text{Minimum Estimated Revenue} \\right|}{\\text{Target Amount}} + \\text{Volatility Index}'}
-                            </BlockMath>
+                            <div style={{
+                                transform: "scale(0.6)",
+                                transformOrigin: "left",
+                            }}>
+                                <BlockMath>
+                                    {'\\text{Risk} = \\frac{\\left| \\text{Target Amount} - \\text{Minimum Estimated Revenue} \\right|}{\\text{Target Amount}} + \\text{Volatility Index}'}
+                                </BlockMath>
                             </div>
                         </div>
                         <h4 className="text-[var(--text-secondary)] text-xs mt-4 mb-2">
@@ -224,15 +224,15 @@ const CriteriaPage = ({ onClose, percentage }) => {
                             </li>
                         </ul>
                         <p className="text-[var(--text-secondary)] text-xs mb-3">
-                            Essentially, this formula calculates the percentage difference between 
-                            the minimum estimated revenue and the target amount. 
+                            Essentially, this formula calculates the percentage difference between
+                            the minimum estimated revenue and the target amount.
                             A higher risk value indicates greater difficulty in meeting the target returns.
                         </p>
                         <p className="text-[var(--text-secondary)] text-xs">
-                            While this formula offers an intuitive measure of investment risk, there are various 
-                            qualitative factors that simple numerical comparisons can’t capture. 
-                            Therefore, we use our unique evaluation model to apply additional adjustments 
-                            before determining the final risk rating. These adjustments include market conditions, 
+                            While this formula offers an intuitive measure of investment risk, there are various
+                            qualitative factors that simple numerical comparisons can’t capture.
+                            Therefore, we use our unique evaluation model to apply additional adjustments
+                            before determining the final risk rating. These adjustments include market conditions,
                             the artist’s potential, fan engagement levels, and other qualitative elements.
                         </p>
                         <div className="flex items-start mt-8 justify-start">
@@ -253,15 +253,15 @@ const CriteriaPage = ({ onClose, percentage }) => {
                                         {/* 그라디언트 */}
                                         <defs>
                                             <radialGradient
-                                            id="gradientRiskLevel"
-                                            cx="50%"   // 중심점 X
-                                            cy="50%"   // 중심점 Y
-                                            r="50%"    // 반지름
-                                            fx="50%"   // 초점 X
-                                            fy="50%"   // 초점 Y
+                                                id="gradientRiskLevel"
+                                                cx="50%"   // 중심점 X
+                                                cy="50%"   // 중심점 Y
+                                                r="50%"    // 반지름
+                                                fx="50%"   // 초점 X
+                                                fy="50%"   // 초점 Y
                                             >
-                                            <stop offset="0%" stopColor="rgba(178, 65, 261, 0.8)" />
-                                            <stop offset="100%" stopColor="rgba(178, 65, 251, 0.3)" />
+                                                <stop offset="0%" stopColor="rgba(178, 65, 261, 0.8)" />
+                                                <stop offset="100%" stopColor="rgba(178, 65, 251, 0.3)" />
                                             </radialGradient>
                                         </defs>
                                         <RadialBar
@@ -282,14 +282,14 @@ const CriteriaPage = ({ onClose, percentage }) => {
                             </div>
                             <div className="ml-4 mt-1">
                                 <div className='flex'>
-                                <div className="mr-1 mt-1">{riskLevel.icon}</div>
-                                <h3 className="text-xs font-bold mt-1">{riskLevel.riskText[locale]}</h3>
+                                    <div className="mr-1 mt-1">{riskLevel.icon}</div>
+                                    <h3 className="text-xs font-bold mt-1">{riskLevel.riskText[locale]}</h3>
                                 </div>
                                 <p className="text-[0.6rem] mt-0.5">{riskLevel.description[locale]}</p>
                             </div>
                         </div>
                         <p className="text-[var(--text-secondary)] text-xs mt-2">
-                            The current risk level is as shown above. It can serve as a key reference 
+                            The current risk level is as shown above. It can serve as a key reference
                             when making investment decisions.
                         </p>
                     </section>
@@ -301,32 +301,34 @@ const CriteriaPage = ({ onClose, percentage }) => {
                             Evaluation Criteria
                         </h2>
                         <p className="text-[var(--text-secondary)] text-xs mb-2">
-                            We conduct comprehensive assessments by leveraging various key indicators. 
+                            We conduct comprehensive assessments by leveraging various key indicators.
                             Below are the main evaluation factors and their descriptions:
                         </p>
-                        <table className="min-w-full bg-[rgba(255,255,255,0.1)] text-xs my-6">
-                            <thead>
-                                <tr>
-                                    <th className="py-1 px-2 bg-[rgba(255,255,255,0.2)] text-left text-[var(--text-primary)] font-bold uppercase">
-                                        Factor
-                                    </th>
-                                    <th className="py-1 px-2 bg-[rgba(255,255,255,0.2)] text-left text-[var(--text-primary)] font-bold uppercase">
-                                        Description
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {evaluationFactors.map((factor, index) => (
-                                    <tr key={index} className="border-b border-b-[rgba(255,255,255,0.25)]">
-                                        <td className="py-1 px-2">{factor.factor}</td>
-                                        <td className="py-1 px-2 text-[0.6rem]">{factor.description}</td>
+                        <div className='overflow-x-auto'>
+                            <table className="min-w-full bg-[rgba(255,255,255,0.1)] text-xs my-6">
+                                <thead>
+                                    <tr>
+                                        <th className="py-1 px-2 bg-[rgba(255,255,255,0.2)] text-left text-[var(--text-primary)] font-bold uppercase">
+                                            Factor
+                                        </th>
+                                        <th className="py-1 px-2 bg-[rgba(255,255,255,0.2)] text-left text-[var(--text-primary)] font-bold uppercase">
+                                            Description
+                                        </th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {evaluationFactors.map((factor, index) => (
+                                        <tr key={index} className="border-b border-b-[rgba(255,255,255,0.25)]">
+                                            <td className="py-1 px-2">{factor.factor}</td>
+                                            <td className="py-1 px-2 text-[0.6rem]">{factor.description}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                         <p className="text-[var(--text-secondary)] text-xs mt-2">
-                            We combine quantitative data and qualitative analysis for a more accurate 
-                            determination of the investment risk level. Each factor directly or indirectly 
+                            We combine quantitative data and qualitative analysis for a more accurate
+                            determination of the investment risk level. Each factor directly or indirectly
                             affects potential returns, and all are considered crucial to forming a well-rounded judgment.
                         </p>
                     </section>
@@ -338,51 +340,53 @@ const CriteriaPage = ({ onClose, percentage }) => {
                             Detailed Risk Levels
                         </h2>
                         <p className="text-[var(--text-secondary)] text-xs mb-2">
-                            The table below provides detailed descriptions of each risk level and 
-                            qualitative criteria. Through this, investors can intuitively understand 
+                            The table below provides detailed descriptions of each risk level and
+                            qualitative criteria. Through this, investors can intuitively understand
                             the implications of each level.
                         </p>
-                        <table className="min-w-full bg-[rgba(255,255,255,0.1)] text-xs my-6">
-                            <thead>
-                                <tr>
-                                    <th
-                                        className="py-1 px-2 bg-[rgba(255,255,255,0.2)] text-left text-[var(--text-primary)] font-bold uppercase"
-                                        style={{ width: '30%' }}
-                                    >
-                                        Level
-                                    </th>
-                                    <th
-                                        className="py-1 px-2 bg-[rgba(255,255,255,0.2)] text-left text-[var(--text-primary)] font-bold uppercase"
-                                        style={{ width: '20%' }}
-                                    >
-                                        Risk (%)
-                                    </th>
-                                    <th className="py-1 px-2 bg-[rgba(255,255,255,0.2)] text-left text-[var(--text-primary)] font-bold uppercase">
-                                        Description
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {riskLevels.map((level, index) => (
-                                    <tr key={index} className="border-b border-b-[rgba(255,255,255,0.25)] justify-center items-center">
-                                        <td className="py-2 px-2 items-center">
-                                            <div className='flex'>
-                                                <div
-                                                    className={`w-4 h-4 mr-1 rounded-full ${level.color}`}
-                                                ></div>
-                                                <span className={`${level.textColor} font-semibold text-[0.7rem]`}>
-                                                    {level.riskText[locale].replace(' Risk', '')}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td className="py-2 px-2 text-[0.7rem]">
-                                            {level.min}-{level.max}%
-                                        </td>
-                                        <td className="py-2 px-2 text-[0.6rem]">{level.qualitative[locale]}</td>
+                        <div className='overflow-x-auto'>
+                            <table className="min-w-full bg-[rgba(255,255,255,0.1)] text-xs my-6">
+                                <thead>
+                                    <tr>
+                                        <th
+                                            className="py-1 px-2 bg-[rgba(255,255,255,0.2)] text-left text-[var(--text-primary)] font-bold uppercase"
+                                            style={{ width: '30%' }}
+                                        >
+                                            Level
+                                        </th>
+                                        <th
+                                            className="py-1 px-2 bg-[rgba(255,255,255,0.2)] text-left text-[var(--text-primary)] font-bold uppercase"
+                                            style={{ width: '20%' }}
+                                        >
+                                            Risk (%)
+                                        </th>
+                                        <th className="py-1 px-2 bg-[rgba(255,255,255,0.2)] text-left text-[var(--text-primary)] font-bold uppercase">
+                                            Description
+                                        </th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {riskLevels.map((level, index) => (
+                                        <tr key={index} className="border-b border-b-[rgba(255,255,255,0.25)] justify-center items-center">
+                                            <td className="py-2 px-2 items-center">
+                                                <div className='flex'>
+                                                    <div
+                                                        className={`w-4 h-4 mr-1 rounded-full ${level.color}`}
+                                                    ></div>
+                                                    <span className={`${level.textColor} font-semibold text-[0.7rem]`}>
+                                                        {level.riskText[locale].replace(' Risk', '')}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td className="py-2 px-2 text-[0.7rem]">
+                                                {level.min}-{level.max}%
+                                            </td>
+                                            <td className="py-2 px-2 text-[0.6rem]">{level.qualitative[locale]}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </section>
 
                     {/* 참고 사항 섹션 */}
@@ -392,13 +396,13 @@ const CriteriaPage = ({ onClose, percentage }) => {
                             Important Notice
                         </h2>
                         <p className="text-[var(--text-secondary)] text-xs mb-2">
-                            This material is not intended as investment advice; 
-                            any investment decision should be made at the sole discretion of the investor. 
+                            This material is not intended as investment advice;
+                            any investment decision should be made at the sole discretion of the investor.
                         </p>
 
                         <p className="text-[var(--text-secondary)] text-xs mb-2">
-                            Estimated returns and risk levels may vary according to market conditions 
-                            and other factors, and we bear no responsibility for these variations. 
+                            Estimated returns and risk levels may vary according to market conditions
+                            and other factors, and we bear no responsibility for these variations.
                             Please conduct thorough research and consult with professionals before investing.
                         </p>
                     </section>

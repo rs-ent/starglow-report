@@ -154,7 +154,6 @@ export const revenueSpectrumChart = (totalValueMultiple, spectrum, currentRevenu
 
 const KPI = ({locale, exchangeRate = 1}) => {
     const t = translations[locale] || translations.en;
-    console.log(exchangeRate);
 
     const [isExpanded, setIsExpanded] = useState(false);
     const containerRef = useRef(null);

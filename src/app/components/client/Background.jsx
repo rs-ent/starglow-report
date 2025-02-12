@@ -108,6 +108,7 @@ export default function Background() {
       ctx.clearRect(0, 0, size, size);
 
       ctx.save();
+      ctx.filter = "blur(48px)";
       ctx.translate(centerX, centerY);
       ctx.beginPath();
       const steps = 100;
@@ -145,14 +146,10 @@ export default function Background() {
     // ---------------------------------------------------
     // 애니메이션 오브젝트 설정
     // ---------------------------------------------------
-    const lightCount = 4; // 큰 빛의 개수
-    const particleCount = 150; // 작은 입자의 개수
+    const lightCount = 5; // 큰 빛의 개수
+    const particleCount = 200; // 작은 입자의 개수
     const animatedObjects = [];
 
-    /**
-     * 애니메이션 오브젝트 생성 함수  
-     * type: "light" 또는 "particle"
-     */
     function createAnimatedObject(type) {
       let material;
       let baseSize;
@@ -169,16 +166,16 @@ export default function Background() {
         material = new THREE.SpriteMaterial({
           map: dynamicTexture.texture,
           transparent: true,
-          opacity: randomRange(0.2, 0.6),
+          opacity: randomRange(0.2, 0.4),
           depthTest: false,
         });
-        baseSize = 500;
+        baseSize = 400;
         obj.rotationSpeed = randomRange(-0.001, 0.001);
       } else if (type === "particle") {
         material = new THREE.SpriteMaterial({
           map: createParticleTexture(),
           transparent: true,
-          opacity: 0.8,
+          opacity: 0.6,
           depthTest: false,
         });
         baseSize = 15;
@@ -426,7 +423,7 @@ export default function Background() {
         width: "100%",
         height: "100%",
         pointerEvents: "none",
-        background: "linear-gradient(135deg, black 0%, rgb(7, 0, 7) 50%, black 100%)",
+        background: "linear-gradient(135deg, black 0%, rgb(4, 0, 7) 50%, black 100%)",
       }}
     />
   );
