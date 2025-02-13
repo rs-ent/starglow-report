@@ -5,10 +5,12 @@ import { useSearchParams } from 'next/navigation';
 import { saveData, uploadFiles, fetchData } from '../../firebase/fetch';
 import { krw_usd } from '../../../script/exchange';
 import { formatNumber } from '../../utils/formatNumber';
+import { set } from 'lodash';
 
 export default function CreateReportPage() {
     const searchParams = useSearchParams();
-    const docId = searchParams.get('docId');
+    const docIdParams = searchParams.get('docId');
+    const [docId, setDocId] = useState(docIdParams);
     const artistId = searchParams.get('artistId');
     const [formData, setFormData] = useState({
         artist_eng: "KNK",
@@ -40,7 +42,6 @@ export default function CreateReportPage() {
         nft_price: 50,
     });
 
-    const [localPreview, setLocalPreview] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [dateError, setDateError] = useState(null);
@@ -59,9 +60,6 @@ export default function CreateReportPage() {
                 const report = await fetchData('Report', { comp: 'docId', val: docId });
                 if (report) {
                     setFormData(prev => ({ ...prev, ...report }));
-                    if (report.image_alpha) {
-                        setLocalPreview(report.image_alpha);
-                    }
                 }
             })();
         } else if (artistId) {
@@ -69,9 +67,7 @@ export default function CreateReportPage() {
                 const report = await fetchData('Report', { comp: 'artist_id', sign: '==', val: artistId });
                 if (report) {
                     setFormData(prev => ({ ...prev, ...report }));
-                    if (report.image_alpha) {
-                        setLocalPreview(report.image_alpha);
-                    }
+                    setDocId(report.docId);
                 }
             })();
         }
@@ -138,7 +134,6 @@ export default function CreateReportPage() {
         const file = e.target.files && e.target.files[0];
         if (file) {
             const localURL = URL.createObjectURL(file);
-            setLocalPreview(localURL);
             setUploading(true);
             setUploadProgress(0);
             try {

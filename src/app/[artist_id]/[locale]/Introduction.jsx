@@ -16,6 +16,8 @@ const Introduction = ({locale}) => {
   const catchPhrase = safeLangValue(data?.catchPhrase, locale);
   const subCatchPhrase = safeLangValue(data?.subCatchPhrase, locale);
 
+  console.log('data: ', data);
+
   // 소개글
   const introduction = safeLangValue(data?.introduction, locale);
   const paragraphMatches = introduction.match(/<p[^>]*>(.*?)<\/p>/gs) || [];
