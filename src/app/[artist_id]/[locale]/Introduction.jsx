@@ -5,6 +5,7 @@ import { useIntroduction, useValuation } from "../../../context/GlobalData";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { safeLangValue } from "../../../script/convertLang";
+import IntroductionGallery from "./Introduction.Gallery";
 
 const Introduction = ({locale}) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -15,8 +16,9 @@ const Introduction = ({locale}) => {
   // 캐치프레이즈 & 서브 캐치프레이즈
   const catchPhrase = safeLangValue(data?.catchPhrase, locale);
   const subCatchPhrase = safeLangValue(data?.subCatchPhrase, locale);
-
-  console.log('data: ', data);
+  
+  // 갤러리
+  const galleryImages = data?.galleryImages || [];
 
   // 소개글
   const introduction = safeLangValue(data?.introduction, locale);
@@ -132,6 +134,11 @@ const Introduction = ({locale}) => {
       <div className="py-6 px-4 text-[var(--text-third)] text-sm text-center grid grid-cols-1 gap-0.5">
         {finalParagraphs}
       </div>
+
+      {/* 갤러리 */}
+      {galleryImages.length > 0 && (
+        <IntroductionGallery galleryImages={galleryImages} />
+      )}
 
       {isExpanded && (
         <>

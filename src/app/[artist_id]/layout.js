@@ -1,5 +1,6 @@
 // [src/app/[artist_id]/layout.js]
 import { DataProvider } from '../../context/GlobalData';
+import { format } from 'date-fns';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 3600;
