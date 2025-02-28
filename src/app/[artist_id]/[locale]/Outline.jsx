@@ -76,8 +76,9 @@ const Outline = ({ locale, fixedExchangeRate = 1 }) => {
   const nft_price = reportData.nft_price || 50;
 
   const avgRevenue = kpiData.expectedAnnualRevenue;
+  const maxRevenue = kpiData.maxRevenue;
   const investorsShareRatio = reportData.investors_share_ratio;
-  const investorsAvgRevenue = avgRevenue * investorsShareRatio;
+  const investorsMaxRevenue = maxRevenue * investorsShareRatio;
 
   const nft_sales_start = reportData.nft_sales_start || "2025-01-31";
   const nftSalesStart = new Date(nft_sales_start);
@@ -293,7 +294,7 @@ const Outline = ({ locale, fixedExchangeRate = 1 }) => {
             <h2 className="text-glow text-lg ml-6 mb-3">
               <CountUp
                 start={0}
-                end={((investorsAvgRevenue - goal_fund) / goal_fund) * 100}
+                end={((investorsMaxRevenue - goal_fund) / goal_fund) * 100}
                 suffix="%" // 앞에 달러 기호 붙이기
                 duration={2.5} // 애니메이션 진행 시간(초 단위)
                 easingFn={easeOutCirc} // Easing
