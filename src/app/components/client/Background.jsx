@@ -1,18 +1,18 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-/** 주어진 범위 내 무작위 수 반환 */
+// 기존의 유틸리티 함수들은 그대로 유지
 function randomRange(min, max) {
   return Math.random() * (max - min) + min;
 }
 
-/** 큰 빛에 사용할 랜덤 색상 팔레트 생성 (보라/블루 계열) */
 function getRandomBigLightColors() {
   const hue1 = randomRange(260, 300);
   const sat1 = randomRange(65, 140);
@@ -25,397 +25,379 @@ function getRandomBigLightColors() {
   return { color1, color2 };
 }
 
-export default function Background() {
-  const containerRef = useRef(null);
-  const cameraRef = useRef(null);
+// 별 필드 컴포넌트 개선
+function StarField() {
+  const { size } = useThree();
+  const starCount = 3000; // 별 개수 증가
+  const starRef = useRef();
 
-  useEffect(() => {
-    const container = containerRef.current;
-    let width = container.clientWidth;
-    let height = container.clientHeight;
+  const starGeometry = useMemo(() => {
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(starCount * 3);
+    const sizes = new Float32Array(starCount);
+    const phases = new Float32Array(starCount);
+    const opacities = new Float32Array(starCount);
 
-    // ---------------------------------------------------
-    // Scene, Camera, Renderer 설정
-    // ---------------------------------------------------
-    const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x120012, 0.0008);
-
-    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 2000);
-    camera.position.set(0, 0, 500);
-    camera.lookAt(0, 0, 0);
-    cameraRef.current = camera;
-
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setSize(width, height);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    container.appendChild(renderer.domElement);
-
-    // ---------------------------------------------------
-    // easing 함수
-    // ---------------------------------------------------
-    function easeInOut(t) {
-      return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-    }
-    function linear(t) {
-      return t;
-    }
-
-    // ---------------------------------------------------
-    // 텍스처 생성 함수
-    // ---------------------------------------------------
-    // 작은 입자용 텍스처 (중심은 흰색, 외곽은 투명)
-    function createParticleTexture() {
-      const size = 64;
-      const canvas = document.createElement("canvas");
-      canvas.width = size;
-      canvas.height = size;
-      const ctx = canvas.getContext("2d");
-
-      const gradient = ctx.createRadialGradient(
-        size / 2,
-        size / 2,
-        0,
-        size / 2,
-        size / 2,
-        size / 2
-      );
-      gradient.addColorStop(0, "rgba(255,255,255,1)");
-      gradient.addColorStop(1, "rgba(255,255,255,0)");
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, size, size);
-
-      return new THREE.CanvasTexture(canvas);
-    }
-
-    // 동적 큰 빛 텍스처 생성 (매 프레임 업데이트)
-    function createDynamicBigLightTexture() {
-      const size = 1024;
-      const canvas = document.createElement("canvas");
-      canvas.width = size;
-      canvas.height = size;
-      const ctx = canvas.getContext("2d");
-      const texture = new THREE.CanvasTexture(canvas);
-      texture.needsUpdate = true;
-      return { canvas, ctx, texture, size, params: {} };
-    }
-
-    // 동적 텍스처 업데이트 (각 큰 빛마다 고유 파라미터 적용)
-    function updateDynamicBigLightTexture(dynamicTexture, time) {
-      const { canvas, ctx, size, params } = dynamicTexture;
-      const centerX = size / 2;
-      const centerY = size / 2;
-      const baseRadius = size / 2;
-      ctx.clearRect(0, 0, size, size);
-
-      ctx.save();
-      ctx.filter = "blur(48px)";
-      ctx.translate(centerX, centerY);
-      ctx.beginPath();
-      const steps = 100;
-      const freq = params.freq || 3;
-      const amp = params.amp ? baseRadius * params.amp : baseRadius * 0.1;
-      for (let i = 0; i <= steps; i++) {
-        const angle = (i / steps) * 2 * Math.PI;
-        const variation = Math.sin(angle * freq + time) * amp;
-        const r = baseRadius + variation;
-        const x = r * Math.cos(angle);
-        const y = r * Math.sin(angle);
-        if (i === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
-        }
-      }
-      ctx.closePath();
-
-      const colors = params.colors || {
-        color1: "rgba(35,7,60,1)",
-        color2: "rgba(30,0,50,0.2)",
-      };
-      const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, baseRadius);
-      gradient.addColorStop(0, colors.color1);
-      gradient.addColorStop(0.8, colors.color2);
-      gradient.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = gradient;
-      ctx.fill();
-      ctx.restore();
-
-      dynamicTexture.texture.needsUpdate = true;
-    }
-
-    // ---------------------------------------------------
-    // 애니메이션 오브젝트 설정
-    // ---------------------------------------------------
-    const lightCount = 5; // 큰 빛의 개수
-    const particleCount = 200; // 작은 입자의 개수
-    const animatedObjects = [];
-
-    function createAnimatedObject(type) {
-      let material;
-      let baseSize;
-      let dynamicTexture = null;
-      const obj = {};
-
-      if (type === "light") {
-        dynamicTexture = createDynamicBigLightTexture();
-        dynamicTexture.params = {
-          freq: randomRange(1, 6),
-          amp: randomRange(0.01, 0.1),
-          colors: getRandomBigLightColors(),
-        };
-        material = new THREE.SpriteMaterial({
-          map: dynamicTexture.texture,
-          transparent: true,
-          opacity: randomRange(0.2, 0.4),
-          depthTest: false,
-        });
-        baseSize = 400;
-        obj.rotationSpeed = randomRange(-0.001, 0.001);
-      } else if (type === "particle") {
-        material = new THREE.SpriteMaterial({
-          map: createParticleTexture(),
-          transparent: true,
-          opacity: 0.6,
-          depthTest: false,
-        });
-        baseSize = 15;
-        obj.jitter = {
-          freq: randomRange(1, 3),
-          amp: randomRange(1, 5),
-          phaseX: randomRange(0, Math.PI * 2),
-          phaseY: randomRange(0, Math.PI * 2),
-        };
-      }
-      const sprite = new THREE.Sprite(material);
-      scene.add(sprite);
-
-      // 초기 startState 및 목표 targetState
-      let startState, targetState, easeFunc;
-      if (type === "light") {
-        startState = {
-          x: randomRange(-width / 2, width / 2),
-          y: randomRange(-height / 2, height / 2),
-          z: randomRange(-100, 100),
-          scale: randomRange(0.7, 1.4),
-          opacity: randomRange(0.6, 1.0),
-        };
-        targetState = getContinuousTarget(startState, type);
-        easeFunc = easeInOut;
-      } else {
-        startState = {
-          x: randomRange(-width / 2, width / 2),
-          y: randomRange(-height / 2, height / 2),
-          z: randomRange(-100, 100),
-          scale: randomRange(0.1, 0.2),
-          opacity: 0.7,
-        };
-        targetState = getContinuousTarget(startState, type);
-        easeFunc = linear;
-      }
-
-      obj.sprite = sprite;
-      obj.type = type;
-      obj.baseSize = baseSize;
-      obj.startState = startState;
-      obj.targetState = targetState;
-      // 시작 시간을 THREE.Clock과 유사하게 사용 (초 단위)
-      obj.startTime = performance.now() / 1000;
-      obj.ease = easeFunc;
-      if (dynamicTexture) {
-        obj.dynamicTexture = dynamicTexture;
-      }
-      return obj;
-    }
-
-    // 목표 상태를 이전 상태에서 충분한 범위의 델타를 주어 연속적인 이동 구현
-    function getContinuousTarget(prev, type) {
-      if (type === "light") {
-        return {
-          x: prev.x + randomRange(-200, 200),
-          y: prev.y + randomRange(-200, 200),
-          z: prev.z + randomRange(-50, 50),
-          scale: randomRange(0.35, 2),
-          opacity: randomRange(0.3, 1.0),
-          duration: randomRange(20, 40),
-        };
-      } else {
-        return {
-          x: prev.x + randomRange(-200, 200),
-          y: prev.y + randomRange(-200, 200),
-          z: prev.z + randomRange(-50, 50),
-          scale: randomRange(0.1, 0.2),
-          opacity: randomRange(0.1, 1.0),
-          duration: randomRange(30, 60),
-        };
-      }
-    }
-
-    // 큰 빛과 입자 생성
-    for (let i = 0; i < lightCount; i++) {
-      animatedObjects.push(createAnimatedObject("light"));
-    }
-    for (let i = 0; i < particleCount; i++) {
-      animatedObjects.push(createAnimatedObject("particle"));
-    }
-
-    // ---------------------------------------------------
-    // 별 필드 (우주 느낌 강화)
-    // ---------------------------------------------------
-    const starCount = 1000;
-    const starGeometry = new THREE.BufferGeometry();
-    const starPositions = new Float32Array(starCount * 3);
     for (let i = 0; i < starCount; i++) {
-      starPositions[i * 3] = randomRange(-width, width);
-      starPositions[i * 3 + 1] = randomRange(-height, height);
-      starPositions[i * 3 + 2] = randomRange(-1000, 0);
-    }
-    starGeometry.setAttribute("position", new THREE.BufferAttribute(starPositions, 3));
-
-    const starMaterial = new THREE.PointsMaterial({
-      color: 0xffffff,
-      size: randomRange(0.55, 1.65),
-      transparent: true,
-      opacity: 0.7,
-    });
-    const starField = new THREE.Points(starGeometry, starMaterial);
-    scene.add(starField);
-
-    // ---------------------------------------------------
-    // 마우스 이동에 따른 카메라 Parallax 효과
-    // ---------------------------------------------------
-    function onMouseMove(event) {
-      const mouseX = (event.clientX / width) * 2 - 1;
-      const mouseY = (event.clientY / height) * 2 - 1;
-      camera.position.x = mouseX * 35;
-      camera.position.y = -mouseY * 35;
-      camera.lookAt(0, 0, 0);
-    }
-    document.addEventListener("mousemove", onMouseMove);
-
-    // ---------------------------------------------------
-    // 스크롤 이벤트 처리
-    // ---------------------------------------------------
-    let targetScrollOffset = 0;
-    let currentScrollOffset = 0;
-    function onScroll() {
-      const scrollY = window.scrollY || document.documentElement.scrollTop;
-      // 스크롤에 따라 0 ~ 3 사이의 값 (필요에 따라 조정)
-      targetScrollOffset = Math.min(scrollY / 7000, 3);
-    }
-    window.addEventListener("scroll", onScroll);
-
-    // ---------------------------------------------------
-    // 유틸리티: 선형 보간 함수
-    // ---------------------------------------------------
-    function lerp(a, b, t) {
-      return a + (b - a) * t;
+      positions[i * 3] = randomRange(-size.width, size.width);
+      positions[i * 3 + 1] = randomRange(-size.height, size.height);
+      positions[i * 3 + 2] = randomRange(-3000, -500);
+      sizes[i] = randomRange(1, 10);
+      phases[i] = randomRange(0, Math.PI * 2);
+      opacities[i] = randomRange(0.3, 0.8);
     }
 
-    // ---------------------------------------------------
-    // 시간 관리: THREE.Clock 사용
-    // ---------------------------------------------------
-    const clock = new THREE.Clock();
+    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute("size", new THREE.BufferAttribute(sizes, 1));
+    geometry.setAttribute("phase", new THREE.BufferAttribute(phases, 1));
+    geometry.setAttribute("opacity", new THREE.BufferAttribute(opacities, 1));
+    return geometry;
+  }, [size, starCount]);
 
-    // ---------------------------------------------------
-    // 애니메이션 업데이트 함수들
-    // ---------------------------------------------------
-    function updateAnimatedObjects(deltaTime, currentTime) {
-      animatedObjects.forEach((obj) => {
-        let t = (currentTime - obj.startTime) / obj.targetState.duration;
-        if (t >= 1) {
-          obj.startState = { ...obj.targetState };
-          obj.targetState = getContinuousTarget(obj.startState, obj.type);
-          obj.startTime = currentTime;
-          t = 0;
-        }
-        const easedT = obj.ease(t);
-        const currentState = {
-          x: lerp(obj.startState.x, obj.targetState.x, easedT),
-          y: lerp(obj.startState.y, obj.targetState.y, easedT),
-          z: lerp(obj.startState.z, obj.targetState.z, easedT),
-          scale: lerp(obj.startState.scale, obj.targetState.scale, easedT),
-          opacity: lerp(obj.startState.opacity, obj.targetState.opacity, easedT),
-        };
+  useFrame((state) => {
+    if (starRef.current) {
+      const sizes = starRef.current.geometry.attributes.size.array;
+      const phases = starRef.current.geometry.attributes.phase.array;
+      const opacities = starRef.current.geometry.attributes.opacity.array;
 
-        // 스프라이트 업데이트
-        obj.sprite.position.set(currentState.x, currentState.y, currentState.z);
-        const finalSize = obj.baseSize * currentState.scale;
-        obj.sprite.scale.set(finalSize, finalSize, 1);
-        if (obj.sprite.material) {
-          obj.sprite.material.opacity = currentState.opacity;
-        }
-
-        // 큰 빛: 동적 텍스처 업데이트 및 회전 효과
-        if (obj.type === "light" && obj.dynamicTexture) {
-          updateDynamicBigLightTexture(obj.dynamicTexture, currentTime);
-          obj.sprite.material.rotation += (obj.rotationSpeed || 0) * deltaTime;
-        }
-
-        // 작은 입자: 미세한 잔물결(jitter) 효과
-        if (obj.type === "particle" && obj.jitter) {
-          obj.sprite.position.x += Math.sin(currentTime * obj.jitter.freq + obj.jitter.phaseX) * obj.jitter.amp;
-          obj.sprite.position.y += Math.cos(currentTime * obj.jitter.freq + obj.jitter.phaseY) * obj.jitter.amp;
-        }
-      });
+      for (let i = 0; i < starCount; i++) {
+        const twinkle =
+          Math.sin(state.clock.elapsedTime * 2 + phases[i]) * 0.5 + 0.5;
+        sizes[i] = randomRange(0.05, 0.2) * twinkle;
+        opacities[i] = randomRange(0.3, 0.8) * twinkle;
+      }
+      starRef.current.geometry.attributes.size.needsUpdate = true;
+      starRef.current.geometry.attributes.opacity.needsUpdate = true;
     }
-
-    function updateCamera() {
-      // 스크롤 값에 관성 효과 적용
-      currentScrollOffset = lerp(currentScrollOffset, targetScrollOffset, 0.1);
-      const targetZ = 500 - currentScrollOffset * 150;
-      const targetFov = 75 - currentScrollOffset * 5;
-      const targetY = currentScrollOffset * 100;
-
-      camera.position.z = lerp(camera.position.z, targetZ, 0.1);
-      camera.fov = lerp(camera.fov, targetFov, 0.1);
-      camera.updateProjectionMatrix();
-      camera.lookAt(0, targetY, 0);
-    }
-
-    // ---------------------------------------------------
-    // 메인 애니메이션 루프
-    // ---------------------------------------------------
-    let animationFrameId;
-    function animate() {
-      animationFrameId = requestAnimationFrame(animate);
-      const deltaTime = clock.getDelta();
-      const currentTime = clock.elapsedTime;
-
-      updateAnimatedObjects(deltaTime, currentTime);
-      updateCamera();
-
-      renderer.render(scene, camera);
-    }
-    animate();
-
-    // ---------------------------------------------------
-    // 창 크기 변경 처리
-    // ---------------------------------------------------
-    function onWindowResize() {
-      width = container.clientWidth;
-      height = container.clientHeight;
-      renderer.setSize(width, height);
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-    }
-    window.addEventListener("resize", onWindowResize);
-
-    // ---------------------------------------------------
-    // 클린업: 이벤트 및 리소스 정리
-    // ---------------------------------------------------
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener("resize", onWindowResize);
-      window.removeEventListener("scroll", onScroll);
-      document.removeEventListener("mousemove", onMouseMove);
-      container.removeChild(renderer.domElement);
-      renderer.dispose();
-    };
-  }, []);
+  });
 
   return (
+    <points ref={starRef}>
+      <primitive object={starGeometry} />
+      <pointsMaterial
+        color={0xffffff}
+        size={1}
+        transparent
+        opacity={0.8}
+        sizeAttenuation={true}
+        blending={THREE.AdditiveBlending}
+        vertexColors={true}
+      />
+    </points>
+  );
+}
+
+// 텍스처 메모이제이션을 위한 커스텀 훅
+function useLightTexture() {
+  return useMemo(() => {
+    const size = 256;
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext("2d");
+
+    const gradient = ctx.createRadialGradient(
+      size / 2,
+      size / 2,
+      0,
+      size / 2,
+      size / 2,
+      size / 2
+    );
+    gradient.addColorStop(0, "rgba(255,255,255,1)");
+    gradient.addColorStop(0.2, "rgba(255,255,255,0.8)");
+    gradient.addColorStop(0.4, "rgba(255,255,255,0.4)");
+    gradient.addColorStop(1, "rgba(255,255,255,0)");
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, size, size);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+    return texture;
+  }, []);
+}
+
+// 입자 시스템 개선
+function ParticleSystem({ count, size }) {
+  const instancedMeshRef = useRef();
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const texture = useLightTexture();
+
+  const particles = useMemo(() => {
+    return Array.from({ length: count }, () => ({
+      position: [
+        randomRange(-size.width / 2, size.width / 2),
+        randomRange(-size.height / 2, size.height / 2),
+        randomRange(-300, 300),
+      ],
+      scale: randomRange(0.1, 3),
+      color: new THREE.Color().setHSL(
+        randomRange(0.4, 0.8),
+        randomRange(0.1, 0.3),
+        randomRange(0.8, 1.0)
+      ),
+      velocity: [
+        randomRange(-0.05, 0.05),
+        randomRange(-0.05, 0.05),
+        randomRange(-0.02, 0.02),
+      ],
+      phase: randomRange(0, Math.PI * 2),
+      life: randomRange(0, 2),
+      fadeIn: true,
+    }));
+  }, [count, size]);
+
+  useFrame((state) => {
+    particles.forEach((particle, i) => {
+      if (particle.fadeIn) {
+        particle.life += 0.002;
+        if (particle.life >= 1) {
+          particle.fadeIn = false;
+        }
+      } else {
+        particle.life -= 0.001;
+        if (particle.life <= 0) {
+          particle.position = [
+            randomRange(-size.width / 2, size.width / 2),
+            randomRange(-size.height / 2, size.height / 2),
+            randomRange(-300, 300),
+          ];
+          particle.velocity = [
+            randomRange(-0.05, 0.05),
+            randomRange(-0.05, 0.05),
+            randomRange(-0.02, 0.02),
+          ];
+          particle.phase = randomRange(0, Math.PI * 2);
+          particle.life = 0;
+          particle.fadeIn = true;
+        }
+      }
+
+      particle.position[0] += particle.velocity[0];
+      particle.position[1] += particle.velocity[1];
+      particle.position[2] += particle.velocity[2];
+
+      if (Math.abs(particle.position[0]) > 500) particle.velocity[0] *= -1;
+      if (Math.abs(particle.position[1]) > 500) particle.velocity[1] *= -1;
+      if (Math.abs(particle.position[2]) > 100) particle.velocity[2] *= -1;
+
+      particle.position[0] +=
+        Math.sin(state.clock.elapsedTime + particle.phase) * 0.1;
+      particle.position[1] +=
+        Math.cos(state.clock.elapsedTime + particle.phase) * 0.1;
+
+      dummy.position.set(...particle.position);
+      const scale = particle.scale * (particle.fadeIn ? particle.life : 1);
+      dummy.scale.setScalar(scale);
+      dummy.updateMatrix();
+      instancedMeshRef.current.setMatrixAt(i, dummy.matrix);
+    });
+    instancedMeshRef.current.instanceMatrix.needsUpdate = true;
+  });
+
+  return (
+    <instancedMesh ref={instancedMeshRef} args={[null, null, count]}>
+      <planeGeometry args={[1, 1]} />
+      <meshBasicMaterial
+        map={texture}
+        transparent
+        opacity={0.6}
+        depthTest={false}
+        blending={THREE.AdditiveBlending}
+      />
+    </instancedMesh>
+  );
+}
+
+// 빛나는 입자 컴포넌트 개선
+function GlowingParticle({ position, scale, color }) {
+  const particleRef = useRef();
+  const initialPosition = useRef(position);
+  const velocity = useRef([
+    randomRange(-0.2, 0.2),
+    randomRange(-0.2, 0.2),
+    randomRange(-0.1, 0.1),
+  ]);
+  const phase = useRef(randomRange(0, Math.PI * 2));
+
+  useFrame((state) => {
+    if (particleRef.current) {
+      // 기본 움직임
+      particleRef.current.position.x += velocity.current[0];
+      particleRef.current.position.y += velocity.current[1];
+      particleRef.current.position.z += velocity.current[2];
+
+      // 경계 체크 및 반전
+      if (Math.abs(particleRef.current.position.x) > 500)
+        velocity.current[0] *= -1;
+      if (Math.abs(particleRef.current.position.y) > 500)
+        velocity.current[1] *= -1;
+      if (Math.abs(particleRef.current.position.z) > 100)
+        velocity.current[2] *= -1;
+
+      // 부드러운 움직임을 위한 사인파 추가
+      particleRef.current.position.x +=
+        Math.sin(state.clock.elapsedTime + phase.current) * 0.1;
+      particleRef.current.position.y +=
+        Math.cos(state.clock.elapsedTime + phase.current) * 0.1;
+    }
+  });
+
+  return (
+    <sprite ref={particleRef} position={position} scale={[scale, scale, 1]}>
+      <spriteMaterial
+        map={useLightTexture()}
+        color={color}
+        transparent
+        opacity={0.6}
+        depthTest={false}
+        blending={THREE.AdditiveBlending}
+      />
+    </sprite>
+  );
+}
+
+// 큰 빛 컴포넌트 개선
+function BigLight({ position, scale, colors }) {
+  const lightRef = useRef();
+  const initialPosition = useRef(position);
+  const rotationSpeed = useRef(randomRange(-0.0005, 0.0005)); // 회전 속도 감소
+  const pulseSpeed = useRef(randomRange(0.3, 0.8)); // 펄스 속도 감소
+  const pulsePhase = useRef(randomRange(0, Math.PI * 2));
+
+  useFrame((state) => {
+    if (lightRef.current) {
+      // 회전
+      lightRef.current.rotation.z += rotationSpeed.current;
+
+      // 펄스 효과
+      const pulse =
+        Math.sin(
+          state.clock.elapsedTime * pulseSpeed.current + pulsePhase.current
+        ) *
+          0.03 +
+        0.97;
+      lightRef.current.scale.set(scale * pulse, scale * pulse, 1);
+
+      // 부드러운 움직임
+      lightRef.current.position.x =
+        initialPosition.current[0] +
+        Math.sin(state.clock.elapsedTime * 0.2) * 20;
+      lightRef.current.position.y =
+        initialPosition.current[1] +
+        Math.cos(state.clock.elapsedTime * 0.2) * 20;
+    }
+  });
+
+  return (
+    <sprite ref={lightRef} position={position} scale={[scale, scale, 1]}>
+      <spriteMaterial
+        map={useLightTexture()}
+        color={colors.color1}
+        transparent
+        opacity={0.6} // 투명도 증가 (0.2 → 0.4)
+        depthTest={false}
+        blending={THREE.AdditiveBlending}
+      />
+    </sprite>
+  );
+}
+
+// 마우스 인터랙션을 위한 커스텀 훅
+function useMouseParallax() {
+  const { camera, size } = useThree();
+  const mouse = useRef([0, 0]);
+
+  useEffect(() => {
+    const onMouseMove = (event) => {
+      mouse.current = [
+        (event.clientX / size.width) * 2 - 1,
+        -(event.clientY / size.height) * 2 + 1,
+      ];
+    };
+
+    window.addEventListener("mousemove", onMouseMove);
+    return () => window.removeEventListener("mousemove", onMouseMove);
+  }, [size]);
+
+  useFrame(() => {
+    // 부드러운 카메라 움직임을 위한 보간
+    camera.position.x += (mouse.current[0] * 35 - camera.position.x) * 0.05;
+    camera.position.y += (mouse.current[1] * 35 - camera.position.y) * 0.05;
+    camera.lookAt(0, 0, 0);
+  });
+}
+
+// 스크롤 효과를 위한 커스텀 훅
+function useScrollEffect() {
+  const { camera } = useThree();
+  const scrollOffset = useRef(0);
+  const targetOffset = useRef(0);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      targetOffset.current = Math.min(scrollY / 7000, 3);
+    };
+
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useFrame(() => {
+    // 부드러운 스크롤 효과를 위한 보간
+    scrollOffset.current += (targetOffset.current - scrollOffset.current) * 0.1;
+
+    // 카메라 위치와 시야각 업데이트
+    const targetZ = 500 - scrollOffset.current * 150;
+    const targetFov = 75 - scrollOffset.current * 5;
+    const targetY = scrollOffset.current * 100;
+
+    camera.position.z += (targetZ - camera.position.z) * 0.1;
+    camera.fov += (targetFov - camera.fov) * 0.1;
+    camera.updateProjectionMatrix();
+    camera.lookAt(0, targetY, 0);
+  });
+}
+
+// 장면 컴포넌트 업데이트
+function Scene() {
+  const { size } = useThree();
+  const particleCount = 500;
+  const lightCount = 6;
+
+  // 마우스와 스크롤 효과 적용
+  useMouseParallax();
+  useScrollEffect();
+
+  const lights = useMemo(() => {
+    return Array.from({ length: lightCount }, () => ({
+      position: [
+        randomRange(-size.width / 2, size.width / 2),
+        randomRange(-size.height / 2, size.height / 2),
+        randomRange(-50, 50),
+      ],
+      scale: randomRange(300, 600), // 크기 증가 (200-400 → 300-600)
+      colors: getRandomBigLightColors(),
+    }));
+  }, [size, lightCount]);
+
+  return (
+    <>
+      <fog attach="fog" args={[0x120012, 0.0008]} />
+      <ParticleSystem count={particleCount} size={size} />
+      {lights.map((props, i) => (
+        <BigLight key={`light-${i}`} {...props} />
+      ))}
+    </>
+  );
+}
+
+// 메인 Background 컴포넌트
+export default function Background() {
+  return (
     <div
-      ref={containerRef}
       style={{
         position: "fixed",
         top: 0,
@@ -423,8 +405,16 @@ export default function Background() {
         width: "100%",
         height: "100%",
         pointerEvents: "none",
-        background: "linear-gradient(135deg, black 0%, rgb(4, 0, 7) 50%, black 100%)",
+        background:
+          "linear-gradient(135deg, black 0%, rgb(5, 1, 9) 50%, black 100%)",
       }}
-    />
+    >
+      <Canvas
+        camera={{ position: [0, 0, 500], fov: 75 }}
+        gl={{ alpha: true, antialias: true }}
+      >
+        <Scene />
+      </Canvas>
+    </div>
   );
 }

@@ -1,108 +1,177 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
-import * as THREE from "three";
-import gsap from "gsap";
+import React, { useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import Slider from "react-slick";
+import Image from "next/image";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const IntroductionGallery = ({ galleryImages = [] }) => {
-  const containerRef = useRef(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartX = useRef(0);
 
-  useEffect(() => {
-    if (!containerRef.current) return;
+  const settings = {
+    dots: false,
+    arrows: false,
+    infinite: true,
+    speed: 500,
+    slidesToShow: Math.min(galleryImages.length, 5),
+    slidesToScroll: 1,
+    draggable: true,
+    swipe: true,
+    swipeToSlide: true,
+    pauseOnHover: true,
+    autoplay: true,
+    autoplaySpeed: 2500,
+  };
 
-    // 기본 사이즈 설정
-    let width = containerRef.current.clientWidth;
-    let height = containerRef.current.clientHeight;
+  const handleMouseDown = (e) => {
+    setIsDragging(false);
+    dragStartX.current = e.clientX;
+  };
 
-    // Scene, Camera, Renderer 생성
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-    camera.position.z = 5;
+  const handleTouchStart = (e) => {
+    setIsDragging(false);
+    dragStartX.current = e.touches[0].clientX;
+  };
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(width, height);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    containerRef.current.appendChild(renderer.domElement);
+  const handleMouseMove = (e) => {
+    if (Math.abs(e.clientX - dragStartX.current) > 5) {
+      setIsDragging(true);
+    }
+  };
 
-    // 이미지 평면들을 저장할 배열
-    const imageMeshes = [];
-    const loader = new THREE.TextureLoader();
+  const handleTouchMove = (e) => {
+    if (Math.abs(e.touches[0].clientX - dragStartX.current) > 5) {
+      setIsDragging(true);
+    }
+  };
 
-    // 평면 크기 및 간격
-    const planeWidth = 3;
-    const planeHeight = 2;
-    const gap = 1.0;
-    const totalWidth = galleryImages.length * (planeWidth + gap) - gap;
+  const handleMouseUp = (e, index) => {
+    if (!isDragging) {
+      setSelectedImage(index);
+    }
+    setIsDragging(false);
+  };
 
-    // 각 이미지 로드 및 평면 생성
-    galleryImages.forEach((image, index) => {
-      loader.load(
-        image.url,
-        (texture) => {
-          const geometry = new THREE.PlaneGeometry(planeWidth, planeHeight);
-          const material = new THREE.MeshBasicMaterial({
-            map: texture,
-            transparent: true,
-            opacity: 0,
-          });
-          const mesh = new THREE.Mesh(geometry, material);
-          // 중앙 정렬: 각 평면을 X축 기준으로 배치
-          mesh.position.x =
-            index * (planeWidth + gap) - totalWidth / 2 + planeWidth / 2;
-          scene.add(mesh);
-          imageMeshes.push(mesh);
+  const handleTouchEnd = (e, index) => {
+    if (!isDragging) {
+      setSelectedImage(index);
+    }
+    setIsDragging(false);
+  };
 
-          // gsap를 이용해 각 평면의 opacity 애니메이션 적용
-          gsap.to(material, {
-            opacity: 1,
-            duration: 1.5,
-            delay: index * 0.2,
-            ease: "power2.out",
-          });
-        },
-        undefined,
-        (error) => {
-          console.error("Texture load error:", error);
-        }
-      );
-    });
+  const handlePrevImage = (e) => {
+    e.stopPropagation();
+    setSelectedImage((prev) =>
+      prev === 0 ? galleryImages.length - 1 : prev - 1
+    );
+  };
 
-    // 애니메이션 루프
-    const animate = () => {
-      requestAnimationFrame(animate);
-      renderer.render(scene, camera);
-    };
-    animate();
+  const handleNextImage = (e) => {
+    e.stopPropagation();
+    setSelectedImage((prev) =>
+      prev === galleryImages.length - 1 ? 0 : prev + 1
+    );
+  };
 
-    // 예시: gsap를 이용한 카메라 애니메이션 (딜레이 후 Z축 이동)
-    gsap.to(camera.position, {
-      z: 4,
-      duration: 2,
-      ease: "power2.inOut",
-      delay: 1,
-    });
+  return (
+    <div className="relative w-full h-[300px]">
+      <Slider {...settings}>
+        {galleryImages.map((image, index) => (
+          <motion.div
+            key={image.url}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{
+              duration: 1.5,
+              delay: index * 0.2,
+              ease: "easeOut",
+            }}
+            className="px-[1px]"
+          >
+            <div className="relative w-full h-[300px]">
+              <Image
+                src={image.url}
+                alt={`Gallery image ${index + 1}`}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover cursor-pointer select-none"
+                style={{
+                  WebkitUserSelect: "none",
+                  WebkitUserDrag: "none",
+                  WebkitTapHighlightColor: "transparent",
+                  outline: "none",
+                }}
+                onMouseDown={handleMouseDown}
+                onTouchStart={handleTouchStart}
+                onMouseMove={handleMouseMove}
+                onTouchMove={handleTouchMove}
+                onMouseUp={(e) => handleMouseUp(e, index)}
+                onTouchEnd={(e) => handleTouchEnd(e, index)}
+                onMouseLeave={() => setIsDragging(false)}
+              />
+            </div>
+          </motion.div>
+        ))}
+      </Slider>
 
-    // 리사이즈 핸들러
-    const handleResize = () => {
-      width = containerRef.current.clientWidth;
-      height = containerRef.current.clientHeight;
-      renderer.setSize(width, height);
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-    };
-    window.addEventListener("resize", handleResize);
+      <AnimatePresence>
+        {selectedImage !== null && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/90 z-[99] flex items-center justify-center"
+            onClick={() => setSelectedImage(null)}
+          >
+            <button
+              className="absolute top-1 right-1 text-white text-2xl hover:text-gray-300"
+              onClick={() => setSelectedImage(null)}
+            >
+              ×
+            </button>
 
-    // 클린업
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      if (containerRef.current && renderer.domElement.parentNode === containerRef.current) {
-        containerRef.current.removeChild(renderer.domElement);
-      }
-      renderer.dispose();
-    };
-  }, [galleryImages]);
+            {/* 이전 이미지 버튼 */}
+            <button
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-white text-4xl hover:text-gray-300 z-10"
+              onClick={handlePrevImage}
+            >
+              ‹
+            </button>
 
-  return <div ref={containerRef} style={{ width: "100%", height: "400px" }} />;
+            <motion.div
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.8 }}
+              className="relative max-w-[80%] max-h-[90%]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img
+                src={galleryImages[selectedImage].url}
+                alt={`Gallery image ${selectedImage + 1}`}
+                className="max-h-[90vh] w-auto object-contain"
+                style={{
+                  display: "block", // 추가
+                  maxWidth: "100%", // 추가
+                }}
+              />
+            </motion.div>
+
+            {/* 다음 이미지 버튼 */}
+            <button
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-white text-4xl hover:text-gray-300 z-10"
+              onClick={handleNextImage}
+            >
+              ›
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 };
 
 export default IntroductionGallery;

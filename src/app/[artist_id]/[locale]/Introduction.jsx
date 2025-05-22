@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { safeLangValue } from "../../../script/convertLang";
 import IntroductionGallery from "./Introduction.Gallery";
 
-const Introduction = ({locale}) => {
+const Introduction = ({ locale }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const valuationData = useValuation();
@@ -16,7 +16,7 @@ const Introduction = ({locale}) => {
   // 캐치프레이즈 & 서브 캐치프레이즈
   const catchPhrase = safeLangValue(data?.catchPhrase, locale);
   const subCatchPhrase = safeLangValue(data?.subCatchPhrase, locale);
-  
+
   // 갤러리
   const galleryImages = data?.galleryImages || [];
 
@@ -24,9 +24,7 @@ const Introduction = ({locale}) => {
   const introduction = safeLangValue(data?.introduction, locale);
   const paragraphMatches = introduction.match(/<p[^>]*>(.*?)<\/p>/gs) || [];
   const formattedIntroduction = paragraphMatches.map((block) =>
-    block
-      .replace(/^<p[^>]*>/, "")
-      .replace(/<\/p>$/, "")
+    block.replace(/^<p[^>]*>/, "").replace(/<\/p>$/, "")
   );
 
   const finalParagraphs = formattedIntroduction.map((paragraph, index) => {
@@ -41,7 +39,7 @@ const Introduction = ({locale}) => {
         </span>`
       )
       .replace(/<br\s*\/?>/g, '<div class="mb-2"></div>');
-  
+
     return (
       <motion.div
         key={index}
@@ -144,7 +142,7 @@ const Introduction = ({locale}) => {
         <>
           {/* 멤버 소개 */}
           {members.length > 0 && (
-            <div>
+            <div className="mt-[100px]">
               <h2 className="section-title">Members</h2>
               <div className="relative overflow-x-scroll">
                 <div
@@ -160,7 +158,7 @@ const Introduction = ({locale}) => {
                     const tagsArray = member.tags || [];
                     const tagsText = tagsArray
                       .map((tag) => {
-                        if (typeof tag === 'object') {
+                        if (typeof tag === "object") {
                           return safeLangValue(tag, locale);
                         }
                         return tag; // 단순 문자열이면 그대로
@@ -263,7 +261,10 @@ const Introduction = ({locale}) => {
                     )
                     .map((album, idx) => {
                       // album_title이 { ko, en }일 수 있음
-                      const albumTitle = safeLangValue(album.album_title, locale);
+                      const albumTitle = safeLangValue(
+                        album.album_title,
+                        locale
+                      );
 
                       return (
                         <div
@@ -305,7 +306,10 @@ const Introduction = ({locale}) => {
                   const name = safeLangValue(member.name, locale);
                   const title = safeLangValue(member.title, locale);
                   const experience = safeLangValue(member.experience, locale);
-                  const introduction = safeLangValue(member.introduction, locale);
+                  const introduction = safeLangValue(
+                    member.introduction,
+                    locale
+                  );
 
                   return (
                     <div
