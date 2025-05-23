@@ -205,6 +205,48 @@ const Outline = ({ locale, fixedExchangeRate = 1 }) => {
               {artistName[locale]}
             </h1>
           </div>
+          <h2 className="text-glow text-lg ml-6 mb-3">
+            MAX ROI:{" "}
+            <CountUp
+              start={0}
+              end={((investorsMaxRevenue - goal_fund) / goal_fund) * 100}
+              suffix="%" // 앞에 달러 기호 붙이기
+              duration={2.5} // 애니메이션 진행 시간(초 단위)
+              easingFn={easeOutCirc} // Easing
+              separator="," // 천 단위 구분자(선택)
+            />
+          </h2>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Outline;
+
+/**
+ * <div>
+      <section className="section-base-without-py6-px3">
+        <div className="w-full aspect-w-16 aspect-h-9 shadow-soft overflow-hidden purple-glow-5">
+          <div className="w-full h-full">
+            <Image
+              src={profilePicture}
+              alt="Profile Picture"
+              fill
+              quality={100}
+              sizes="(max-width: 768px) 100vw, 80vw"
+              className="object-cover"
+              loading="lazy"
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-between items-baseline border-gradient-b">
+          <div className="pt-6 pb-3 px-3 flex gap-2 items-baseline">
+            <h1 className="text-gradient text-4xl font-bold leading-none tracking-wide text-glow">
+              {artistName[locale]}
+            </h1>
+          </div>
           <h4 className="text-gradient text-sm text-left w-36 purple-text-glow-3">
             {days + hours + minutes + seconds > 0
               ? `D-${days}:${String(hours).padStart(2, "0")}:${String(
@@ -307,7 +349,4 @@ const Outline = ({ locale, fixedExchangeRate = 1 }) => {
         <ApplyButton isPre={isPre} label={applyButtonLabel} />
       </section>
     </div>
-  );
-};
-
-export default Outline;
+ */
