@@ -205,17 +205,6 @@ const Outline = ({ locale, fixedExchangeRate = 1 }) => {
               {artistName[locale]}
             </h1>
           </div>
-          <h2 className="text-glow text-lg ml-6 mb-3">
-            MAX ROI:{" "}
-            <CountUp
-              start={0}
-              end={((investorsMaxRevenue - goal_fund) / goal_fund) * 100}
-              suffix="%" // 앞에 달러 기호 붙이기
-              duration={2.5} // 애니메이션 진행 시간(초 단위)
-              easingFn={easeOutCirc} // Easing
-              separator="," // 천 단위 구분자(선택)
-            />
-          </h2>
         </div>
       </section>
     </div>

@@ -20,6 +20,19 @@ const ClientManager = ({
   locale,
   exchangeRate = 1,
   fixedExchangeRate = 1,
+  sectionVisibility = {
+    header: true,
+    outline: true,
+    introduction: true,
+    kpi: true,
+    summary: true,
+    rewards: true,
+    investmentPoints: true,
+    history: true,
+    risk: true,
+    estimation: true,
+    riskLevel: true,
+  },
 }) => {
   const [isHistoryModalOpen, setHistoryModalOpen] = useState(false);
   const [modalContents, setModalContents] = useState([]);
@@ -42,42 +55,54 @@ const ClientManager = ({
   return (
     <>
       {/* 헤더 */}
-      <Header />
+      {sectionVisibility.header && <Header />}
 
       <div className="relative flex flex-col gap-4 pb-3">
         {/* 개요 */}
-        <section>
-          <Outline locale={locale} fixedExchangeRate={fixedExchangeRate} />
-        </section>
+        {sectionVisibility.outline && (
+          <section>
+            <Outline locale={locale} fixedExchangeRate={fixedExchangeRate} />
+          </section>
+        )}
 
         {/* 소개 */}
-        <section className="section-base">
-          <Introduction locale={locale} />
-        </section>
+        {sectionVisibility.introduction && (
+          <section className="section-base">
+            <Introduction locale={locale} />
+          </section>
+        )}
 
         {/* KPI 섹션 */}
-        <section className="section-base">
-          <h2 className="section-title">Key Performance Indicators</h2>
-          <KPI locale={locale} exchangeRate={exchangeRate} />
-        </section>
+        {sectionVisibility.kpi && (
+          <section className="section-base">
+            <h2 className="section-title">Key Performance Indicators</h2>
+            <KPI locale={locale} exchangeRate={exchangeRate} />
+          </section>
+        )}
 
         {/* 투자요약 섹션 */}
-        <section className="section-base">
-          <h2 className="section-title">Investment Details</h2>
-          <Summary locale={locale} />
-        </section>
+        {sectionVisibility.summary && (
+          <section className="section-base">
+            <h2 className="section-title">Investment Details</h2>
+            <Summary locale={locale} />
+          </section>
+        )}
 
         {/* 리워드 섹션 */}
-        <Rewards locale={locale} />
+        {sectionVisibility.rewards && <Rewards locale={locale} />}
 
         {/* 투자 포인트 */}
-        <InvestmentPoints type="Investment Point" locale={locale} />
+        {sectionVisibility.investmentPoints && (
+          <InvestmentPoints type="Investment Point" locale={locale} />
+        )}
 
         {/* 히스토리 */}
-        <section className="section-base">
-          <h2 className="section-title">History Analysis</h2>
-          <History openModal={openHistoryModal} locale={locale} />
-        </section>
+        {sectionVisibility.history && (
+          <section className="section-base">
+            <h2 className="section-title">History Analysis</h2>
+            <History openModal={openHistoryModal} locale={locale} />
+          </section>
+        )}
 
         {/* History Modal */}
         {isHistoryModalOpen && (
@@ -89,19 +114,25 @@ const ClientManager = ({
         )}
 
         {/* 리스크 */}
-        <InvestmentPoints type="Risk" locale={locale} />
+        {sectionVisibility.risk && (
+          <InvestmentPoints type="Risk" locale={locale} />
+        )}
 
         {/* Estimation */}
-        <section className="section-base">
-          <h2 className="section-title">Estimation</h2>
-          <Estimation locale={locale} exchangeRate={exchangeRate} />
-        </section>
+        {sectionVisibility.estimation && (
+          <section className="section-base">
+            <h2 className="section-title">Estimation</h2>
+            <Estimation locale={locale} exchangeRate={exchangeRate} />
+          </section>
+        )}
 
         {/* 위험도 */}
-        <section className="section-base">
-          <h2 className="section-title">Risk Level Analysis</h2>
-          <RiskLevel />
-        </section>
+        {sectionVisibility.riskLevel && (
+          <section className="section-base">
+            <h2 className="section-title">Risk Level Analysis</h2>
+            <RiskLevel />
+          </section>
+        )}
       </div>
     </>
   );
