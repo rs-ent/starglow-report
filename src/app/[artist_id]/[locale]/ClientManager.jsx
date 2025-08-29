@@ -92,7 +92,7 @@ const ClientManager = ({
         )}
 
         {/* 리워드 섹션 */}
-        {(sectionVisibility.rewards || dev) && <Rewards locale={locale} />}
+        {/*{(sectionVisibility.rewards || dev) && <Rewards locale={locale} />}*/}
 
         {/* 투자 포인트 */}
         {(sectionVisibility.investmentPoints || dev) && (
