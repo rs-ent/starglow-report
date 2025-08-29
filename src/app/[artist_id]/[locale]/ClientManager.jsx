@@ -14,6 +14,7 @@ import RiskLevel from "./RiskLevel";
 import Summary from "./Summary";
 import Rewards from "./Rewards";
 import Estimation from "./Estimation";
+import { useSearchParams } from "next/navigation";
 
 const ClientManager = ({
   artist_id,
@@ -34,17 +35,19 @@ const ClientManager = ({
     riskLevel: true,
   },
 }) => {
+  const searchParams = useSearchParams();
+  const dev = searchParams.get("dev") || false;
+
   const [isHistoryModalOpen, setHistoryModalOpen] = useState(false);
   const [modalContents, setModalContents] = useState([]);
 
   useEffect(() => {
-    // 클라이언트 사이드에서 최상위 <html> 태그의 lang 속성 업데이트
     document.documentElement.lang = locale;
   }, [locale]);
 
   const openHistoryModal = (contents) => {
-    setModalContents(contents); // 선택된 contents를 저장
-    setHistoryModalOpen(true); // 모달 열기
+    setModalContents(contents);
+    setHistoryModalOpen(true);
   };
 
   const closeHistoryModal = () => {
@@ -59,21 +62,21 @@ const ClientManager = ({
 
       <div className="relative flex flex-col gap-4 pb-3">
         {/* 개요 */}
-        {sectionVisibility.outline && (
+        {(sectionVisibility.outline || dev) && (
           <section>
             <Outline locale={locale} fixedExchangeRate={fixedExchangeRate} />
           </section>
         )}
 
         {/* 소개 */}
-        {sectionVisibility.introduction && (
+        {(sectionVisibility.introduction || dev) && (
           <section className="section-base">
             <Introduction locale={locale} />
           </section>
         )}
 
         {/* KPI 섹션 */}
-        {sectionVisibility.kpi && (
+        {(sectionVisibility.kpi || dev) && (
           <section className="section-base">
             <h2 className="section-title">Key Performance Indicators</h2>
             <KPI locale={locale} exchangeRate={exchangeRate} />
@@ -81,7 +84,7 @@ const ClientManager = ({
         )}
 
         {/* 투자요약 섹션 */}
-        {sectionVisibility.summary && (
+        {(sectionVisibility.summary || dev) && (
           <section className="section-base">
             <h2 className="section-title">Investment Details</h2>
             <Summary locale={locale} />
@@ -89,15 +92,15 @@ const ClientManager = ({
         )}
 
         {/* 리워드 섹션 */}
-        {sectionVisibility.rewards && <Rewards locale={locale} />}
+        {(sectionVisibility.rewards || dev) && <Rewards locale={locale} />}
 
         {/* 투자 포인트 */}
-        {sectionVisibility.investmentPoints && (
+        {(sectionVisibility.investmentPoints || dev) && (
           <InvestmentPoints type="Investment Point" locale={locale} />
         )}
 
         {/* 히스토리 */}
-        {sectionVisibility.history && (
+        {(sectionVisibility.history || dev) && (
           <section className="section-base">
             <h2 className="section-title">History Analysis</h2>
             <History openModal={openHistoryModal} locale={locale} />
@@ -114,12 +117,12 @@ const ClientManager = ({
         )}
 
         {/* 리스크 */}
-        {sectionVisibility.risk && (
+        {(sectionVisibility.risk || dev) && (
           <InvestmentPoints type="Risk" locale={locale} />
         )}
 
         {/* Estimation */}
-        {sectionVisibility.estimation && (
+        {(sectionVisibility.estimation || dev) && (
           <section className="section-base">
             <h2 className="section-title">Estimation</h2>
             <Estimation locale={locale} exchangeRate={exchangeRate} />
@@ -127,7 +130,7 @@ const ClientManager = ({
         )}
 
         {/* 위험도 */}
-        {sectionVisibility.riskLevel && (
+        {(sectionVisibility.riskLevel || dev) && (
           <section className="section-base">
             <h2 className="section-title">Risk Level Analysis</h2>
             <RiskLevel />
